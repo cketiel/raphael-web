@@ -1,33 +1,16 @@
+import type { Schemas } from "@raphael/api-client";
+
 /**
- * What GET /api/BookingPortal/my-trips returns (Raphael.Shared/DTOs/TripReadDto.cs).
+ * What GET /api/BookingPortal/my-trips returns: the generated TripReadDto, not a copy.
  *
- * ⚠️ Written by hand only because the endpoint returns IActionResult without
- * [ProducesResponseType], so Swagger does not describe it and the generator cannot see it.
- * Delete this file once the backend declares the type: it is exactly the drift §5 forbids.
+ * The generator marks every property optional, including C# value types (int, double,
+ * DateTime) that the backend always serializes. The ones this portal relies on are declared
+ * required here, rather than papered over with defaults that would hide a real gap.
  */
-export interface TripRead {
-  id: number;
-  date: string;
-  fromTime: string | null;
-  toTime: string | null;
-  customerId: number;
-  customerName: string;
-  pickupAddress: string;
-  pickupLatitude: number;
-  pickupLongitude: number;
-  dropoffAddress: string;
-  dropoffLatitude: number;
-  dropoffLongitude: number;
-  spaceTypeName: string;
-  isCancelled: boolean;
-  charge: number | null;
-  type: string | null;
-  pickupComment: string | null;
-  dropoffComment: string | null;
-  tripId: string | null;
-  distance: number | null;
-  status: string;
-  fundingSourceName: string | null;
-  pickupCity: string | null;
-  dropoffCity: string | null;
-}
+export type TripRead = Schemas["TripReadDto"] &
+  Required<
+    Pick<
+      Schemas["TripReadDto"],
+      "id" | "date" | "pickupLatitude" | "pickupLongitude" | "dropoffLatitude" | "dropoffLongitude"
+    >
+  >;

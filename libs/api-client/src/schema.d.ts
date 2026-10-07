@@ -469,7 +469,22 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "text/plain": components["schemas"]["TripReadDto"][];
+                        "application/json": components["schemas"]["TripReadDto"][];
+                        "text/json": components["schemas"]["TripReadDto"][];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -541,7 +556,22 @@ export interface paths {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content?: never;
+                    content: {
+                        "text/plain": components["schemas"]["FundingSource"];
+                        "application/json": components["schemas"]["FundingSource"];
+                        "text/json": components["schemas"]["FundingSource"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -7603,6 +7633,7 @@ export interface paths {
                 query?: {
                     date?: string;
                     fundingSourceId?: number | null;
+                    includeSignatures?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -7645,6 +7676,7 @@ export interface paths {
                     endDate?: string;
                     fundingSourceIds?: string;
                     vehicleRouteIds?: string;
+                    includeSignatures?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -7686,6 +7718,7 @@ export interface paths {
                     startDate?: string;
                     endDate?: string;
                     fundingSourceIds?: string;
+                    includeSignatures?: boolean;
                 };
                 header?: never;
                 path?: never;
@@ -12787,6 +12820,64 @@ export interface components {
             date: string;
             /** Format: date-span */
             time: string;
+        };
+        TripReadDto: {
+            /** Format: int32 */
+            id?: number;
+            day?: string | null;
+            /** Format: date-time */
+            date?: string;
+            /** Format: date-span */
+            fromTime?: string | null;
+            /** Format: date-span */
+            toTime?: string | null;
+            /** Format: int32 */
+            customerId?: number;
+            customerName?: string | null;
+            pickupAddress?: string | null;
+            /** Format: double */
+            pickupLatitude?: number;
+            /** Format: double */
+            pickupLongitude?: number;
+            dropoffAddress?: string | null;
+            /** Format: double */
+            dropoffLatitude?: number;
+            /** Format: double */
+            dropoffLongitude?: number;
+            /** Format: int32 */
+            spaceTypeId?: number;
+            spaceTypeName?: string | null;
+            isCancelled?: boolean;
+            /** Format: double */
+            charge?: number | null;
+            /** Format: double */
+            paid?: number | null;
+            type?: string | null;
+            pickup?: string | null;
+            pickupPhone?: string | null;
+            pickupComment?: string | null;
+            dropoff?: string | null;
+            dropoffPhone?: string | null;
+            dropoffComment?: string | null;
+            tripId?: string | null;
+            authorization?: string | null;
+            /** Format: double */
+            distance?: number | null;
+            /** Format: double */
+            eta?: number | null;
+            /** Format: int32 */
+            vehicleRouteId?: number;
+            runName?: string | null;
+            willCall?: boolean;
+            status?: string | null;
+            driverNoShowReason?: string | null;
+            /** Format: date-time */
+            created: string;
+            /** Format: int32 */
+            fundingSourceId?: number | null;
+            fundingSourceName?: string | null;
+            pickupCity?: string | null;
+            dropoffCity?: string | null;
         };
         TripTypeUpdateDto: {
             /** Format: int32 */
