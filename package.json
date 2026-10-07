@@ -1,0 +1,15 @@
+{
+  "name": "raphael-web",
+  "private": true,
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:booking": "pnpm --filter booking dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "api:types": "pnpm --filter @raphael/api-client generate"
+  }
+}

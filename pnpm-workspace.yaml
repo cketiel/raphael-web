@@ -1,0 +1,10 @@
+packages:
+  - "apps/*"
+  - "libs/*"
+
+# Install scripts stay disabled: these packages ship prebuilt binaries.
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  sharp: false
+  unrs-resolver: false

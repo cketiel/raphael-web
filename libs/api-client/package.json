@@ -1,0 +1,18 @@
+{
+  "name": "@raphael/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "fetch-spec": "node scripts/fetch-spec.mjs",
+    "generate": "openapi-typescript openapi/raphael-api.json -o src/schema.d.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7",
+    "typescript": "^5"
+  }
+}
