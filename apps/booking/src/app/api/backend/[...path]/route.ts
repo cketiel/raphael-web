@@ -12,6 +12,7 @@ const ALLOWED: ReadonlyArray<{ method: string; pattern: RegExp; brokerOnly?: boo
   { method: "GET", pattern: /^BookingPortal\/my-trips$/ },
   { method: "GET", pattern: /^BookingPortal\/my-funding-source$/ },
   { method: "GET", pattern: /^BookingPortal\/trips\/\d{1,10}\/tracking$/ },
+  { method: "GET", pattern: /^BookingPortal\/notifications$/ },
   // Provider catalogue (CATALOG_MODEL.md). Contracting and editing are checked again by the backend.
   { method: "GET", pattern: /^BookingPortal\/catalog\/categories$/ },
   { method: "GET", pattern: /^BookingPortal\/catalog\/providers\/search$/ },

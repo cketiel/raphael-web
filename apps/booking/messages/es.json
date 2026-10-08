@@ -19,7 +19,8 @@
     "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY no está configurada en el servidor.",
     "tabs": {
       "trips": "Viajes",
-      "catalog": "Catálogo"
+      "catalog": "Catálogo",
+      "notifications": "Notificaciones"
     }
   },
   "login": {
@@ -80,7 +81,12 @@
     "cancelUnavailable": "No se puede cancelar ahora mismo.",
     "trackTrip": "Seguir viaje",
     "providerLabel": "Proveedor: {name}",
-    "providerDefault": "Raphael (por defecto)"
+    "providerDefault": "Raphael (por defecto)",
+    "filterPlaceholder": "Buscar un viaje: número, paciente, teléfono, dirección, provider…",
+    "filterLabel": "Buscar un viaje en las fechas cargadas",
+    "filterCount": "{shown} de {total} viajes",
+    "noMatches": "Ningún viaje de estas fechas coincide con «{term}».",
+    "highlightMissing": "El viaje #{id} no está entre los viajes del {date}. Puede que lo hayan movido a otro día."
   },
   "status": {
     "Assigned": "Asignado",
@@ -164,8 +170,8 @@
     "providerNoneContracted": "No tienes proveedores contratados que operen en Raphael. Búscalos en la pestaña Catálogo."
   },
   "notifications": {
-    "title": "Notificaciones en vivo",
-    "empty": "Nada todavía. Los cambios en los viajes de tu centro aparecerán aquí en cuanto ocurran.",
+    "title": "Notificaciones",
+    "empty": "No hay avisos aquí. Los cambios en los viajes de tu centro aparecen en cuanto ocurren.",
     "connecting": "conectando",
     "connected": "conectado",
     "reconnecting": "reconectando",
@@ -191,6 +197,26 @@
         "title": "Viaje completado",
         "body": "El viaje #{tripId} se ha completado: el paciente llegó a su destino."
       }
+    },
+    "bellLabel": "Notificaciones, {count} sin leer",
+    "window": "Avisos sobre los viajes de tu centro de los últimos 7 días. Las marcas de leído se guardan en este navegador.",
+    "loading": "Cargando…",
+    "loadFailed": "Ahora no se pueden cargar los avisos anteriores. Los nuevos siguen llegando en vivo.",
+    "markAllRead": "Marcar todo como leído",
+    "markRead": "Marcar como leído",
+    "unread": "Sin leer",
+    "unreadCount": "{count} sin leer",
+    "viewTrip": "Ver viaje",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "pageOf": "Página {page} de {pages}",
+    "tabs": {
+      "all": "Todas",
+      "scheduled": "Programados",
+      "started": "En camino",
+      "completed": "Completados",
+      "cancelled": "Cancelados",
+      "reactivated": "Reactivados"
     }
   },
   "csv": {

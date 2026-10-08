@@ -2,7 +2,7 @@
 
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useFeedback } from "@/components/Feedback";
 import { useErrorText } from "@/i18n/useErrorText";
 import { api } from "@/lib/bff";
@@ -11,6 +11,7 @@ import { TrackingModal } from "@/features/tracking/TrackingModal";
 import { reportFundingIds, useCustomers, useFundingContext, useSpaceTypes } from "./catalogs";
 import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./productionReportCsv";
 import { localToday, statusBadgeClass, summarize, toTimeInput } from "./rules";
+import { tripMatches } from "./tripFilter";
 import { TripModal } from "./TripModal";
 import type { TripRead } from "./types";
 
@@ -21,6 +22,8 @@ interface BookingDashboardProps {
   isIntegrator: boolean;
   mapsKey: string;
   mapId: string;
+  /** A trip to show and highlight, from a notification's "View trip": its day is the one loaded. */
+  focus: { tripId: number; date: string } | null;
 }
 
 interface Loaded {
@@ -31,7 +34,7 @@ interface Loaded {
   end: string;
 }
 
-export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashboardProps) {
+export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: BookingDashboardProps) {
   const feedback = useFeedback();
   const t = useTranslations("dashboard");
   const tStatus = useTranslations("status");
@@ -43,8 +46,11 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
   const spaceTypes = useSpaceTypes();
   const funding = useFundingContext(isIntegrator);
 
-  const [start, setStart] = useState(localToday);
-  const [end, setEnd] = useState(localToday);
+  const [start, setStart] = useState(() => focus?.date ?? localToday());
+  const [end, setEnd] = useState(() => focus?.date ?? localToday());
+  const [filter, setFilter] = useState("");
+  const [highlightId, setHighlightId] = useState<number | null>(focus?.tripId ?? null);
+  const highlightRefs = useRef(new Map<string, HTMLElement>());
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<{ open: boolean; trip: TripRead | null }>({ open: false, trip: null });
@@ -140,7 +146,28 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
     }
   }
 
-  const trips = loaded?.trips ?? [];
+  const allTrips = loaded?.trips ?? [];
+  const trips = allTrips.filter((trip) => tripMatches(trip, filter, statusLabel));
+  const highlightMissing = highlightId !== null && loaded !== null && !allTrips.some((x) => x.id === highlightId);
+
+  // Brings the highlighted trip into view once the list has it. The phone cards and the table are
+  // both rendered and one of them is hidden by CSS, so the visible one is the one with a layout box.
+  useEffect(() => {
+    if (highlightId === null || !loaded) return;
+    const target = [...highlightRefs.current.entries()]
+      .filter(([key]) => key.endsWith(`:${highlightId}`))
+      .map(([, el]) => el)
+      .find((el) => el.offsetParent !== null);
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [highlightId, loaded]);
+
+  /** Registers a row or card under its layout ("card" or "row") so the highlight can find the visible one. */
+  const highlightRef = (layout: string, id: number) => (el: HTMLElement | null) => {
+    if (el) highlightRefs.current.set(`${layout}:${id}`, el);
+    else highlightRefs.current.delete(`${layout}:${id}`);
+  };
+  const highlightClass = (id: number) => (id === highlightId ? "ring-2 ring-amber-400 bg-amber-50" : "");
+
   const summary = loaded ? summarize(loaded.trips, loaded.report) : null;
   const allChecked = trips.length > 0 && trips.every((x) => selected.has(x.tripId ?? ""));
 
@@ -200,7 +227,11 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
             </label>
             <div className="flex gap-2">
               {/* An end before the start makes the backend throw (TripService.GetByDateRangeAsync → 500). */}
-              <button onClick={() => void loadTrips()} disabled={!start || !end || end < start}
+              <button onClick={() => {
+                  // A search the user asks for is a new list: the highlighted trip from a notification is done with.
+                  setHighlightId(null);
+                  void loadTrips();
+                }} disabled={!start || !end || end < start}
                 className="w-full rounded-lg bg-brand py-2 text-sm font-bold text-white disabled:opacity-50">
                 {t("search")}
               </button>
@@ -213,6 +244,28 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
             </div>
           </div>
         </div>
+
+        {/* Find a trip among the loaded ones. Only in this browser: what is typed never leaves it. */}
+        {loaded && allTrips.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <input type="search" value={filter} onChange={(e) => {
+                // A selection must never include trips the filter hides: "Cancel selected" would cancel them unseen.
+                setFilter(e.target.value);
+                setSelected(new Set());
+              }}
+              placeholder={t("filterPlaceholder")} aria-label={t("filterLabel")}
+              className="min-w-0 flex-1 basis-72 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
+            <span className="text-sm text-muted" aria-live="polite">{t("filterCount", { shown: trips.length, total: allTrips.length })}</span>
+          </div>
+        )}
+        {filter && trips.length === 0 && allTrips.length > 0 && (
+          <p className="mb-4 rounded-2xl bg-surface p-4 text-sm text-muted shadow-sm">{t("noMatches", { term: filter })}</p>
+        )}
+        {highlightMissing && (
+          <p className="mb-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {t("highlightMissing", { id: highlightId, date: format.dateTime(new Date(`${loaded!.start}T12:00:00`), DATE_FORMAT) })}
+          </p>
+        )}
 
         {/* Summary */}
         {summary && (
@@ -234,7 +287,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
             </li>
           )}
           {trips.map((trip) => (
-            <li key={trip.id} className="rounded-2xl bg-surface p-4 shadow-sm">
+            <li key={trip.id} ref={highlightRef("card", trip.id)} className={`rounded-2xl bg-surface p-4 shadow-sm ${highlightClass(trip.id)}`}>
               <div className="flex items-start gap-3">
                 <input type="checkbox" className="mt-1" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
                   onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
@@ -279,7 +332,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
               </thead>
               <tbody>
                 {trips.map((trip) => (
-                  <tr key={trip.id} className="border-t border-border hover:bg-slate-50">
+                  <tr key={trip.id} ref={highlightRef("row", trip.id)} className={`border-t border-border hover:bg-slate-50 ${highlightClass(trip.id)}`}>
                     <td className="px-3 py-3">
                       <input type="checkbox" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
                         onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />

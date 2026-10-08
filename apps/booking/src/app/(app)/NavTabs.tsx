@@ -3,16 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useNotifications } from "@/features/notifications/NotificationsProvider";
 
 /** The portal's sections. More will come (members, settings…): one entry each. */
 const TABS = [
   { href: "/", key: "trips" },
   { href: "/catalog", key: "catalog" },
+  { href: "/notifications", key: "notifications" },
 ] as const;
 
 export function NavTabs() {
   const t = useTranslations("nav.tabs");
   const pathname = usePathname();
+  const { unread } = useNotifications();
 
   return (
     <div className="border-b border-border bg-surface px-3 sm:px-6">
@@ -26,6 +29,9 @@ export function NavTabs() {
                   active ? "border-brand text-brand" : "border-transparent text-muted hover:text-foreground"
                 }`}>
                 {t(tab.key)}
+                {tab.key === "notifications" && unread > 0 && (
+                  <span className="ml-1.5 rounded-full bg-red-600 px-1.5 py-0.5 text-[0.7rem] font-bold text-white">{unread > 99 ? "99+" : unread}</span>
+                )}
               </Link>
             </li>
           );

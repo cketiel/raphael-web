@@ -53,9 +53,8 @@ interface HubToken {
 
 interface Realtime {
   status: HubStatus;
+  /** Notices received live since the page opened. NotificationsProvider merges them with the stored ones. */
   notifications: LiveNotification[];
-  unread: number;
-  markRead(): void;
   /** Calls back on every status change of this clinic's trips. Returns the unsubscribe. */
   onTripStatus(listener: (change: TripStatusChange) => void): () => void;
   /** Follows one trip's vehicle while it is under way. Returns null when the trip is not this clinic's. */
@@ -82,7 +81,6 @@ export function useRealtime() {
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<HubStatus>("connecting");
   const [notifications, setNotifications] = useState<LiveNotification[]>([]);
-  const [unread, setUnread] = useState(0);
   const dispatchRef = useRef<HubConnection | null>(null);
   const statusListeners = useRef(new Set<(c: TripStatusChange) => void>());
   const positionListeners = useRef(new Map<number, (p: TripVehiclePosition) => void>());
@@ -113,8 +111,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
       const notificationHub = build(base, "/hubs/notifications");
       notificationHub.on("ReceiveNotification", (n: LiveNotification) => {
-        setNotifications((current) => [n, ...current].slice(0, 50));
-        setUnread((u) => u + 1);
+        setNotifications((current) => [n, ...current].slice(0, 200));
       });
 
       const dispatchHub = build(base, "/hubs/dispatch");
@@ -173,8 +170,6 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const value: Realtime = {
     status,
     notifications,
-    unread,
-    markRead: () => setUnread(0),
     onTripStatus,
     watchTrip,
   };

@@ -19,7 +19,8 @@
     "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY is not configured on the server.",
     "tabs": {
       "trips": "Trips",
-      "catalog": "Catalog"
+      "catalog": "Catalog",
+      "notifications": "Notifications"
     }
   },
   "login": {
@@ -80,7 +81,12 @@
     "cancelUnavailable": "Unable to cancel right now.",
     "trackTrip": "Track Trip",
     "providerLabel": "Provider: {name}",
-    "providerDefault": "Raphael (default)"
+    "providerDefault": "Raphael (default)",
+    "filterPlaceholder": "Find a trip: number, patient, phone, address, provider…",
+    "filterLabel": "Find a trip in the loaded dates",
+    "filterCount": "{shown} of {total} trips",
+    "noMatches": "No trip in these dates matches “{term}”.",
+    "highlightMissing": "Trip #{id} is not among the trips of {date}. It may have been moved to another day."
   },
   "status": {
     "Assigned": "Assigned",
@@ -164,8 +170,8 @@
     "providerNoneContracted": "You have no contracted providers that operate in Raphael. Find them in the Catalog tab."
   },
   "notifications": {
-    "title": "Live notifications",
-    "empty": "Nothing yet. Trip changes for your facility appear here as they happen.",
+    "title": "Notifications",
+    "empty": "No notices here. Trip changes for your facility appear as they happen.",
     "connecting": "connecting",
     "connected": "connected",
     "reconnecting": "reconnecting",
@@ -191,6 +197,26 @@
         "title": "Trip completed",
         "body": "Trip #{tripId} was completed: the patient reached the destination."
       }
+    },
+    "bellLabel": "Notifications, {count} unread",
+    "window": "Notices about your facility's trips from the last 7 days. Read marks are kept in this browser.",
+    "loading": "Loading…",
+    "loadFailed": "Unable to load older notices right now. New ones still arrive live.",
+    "markAllRead": "Mark all as read",
+    "markRead": "Mark as read",
+    "unread": "Unread",
+    "unreadCount": "{count} unread",
+    "viewTrip": "View trip",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "tabs": {
+      "all": "All",
+      "scheduled": "Scheduled",
+      "started": "On the way",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "reactivated": "Reactivated"
     }
   },
   "csv": {

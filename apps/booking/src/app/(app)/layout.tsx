@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { FeedbackProvider } from "@/components/Feedback";
 import { UserMenu } from "@/features/account/UserMenu";
+import { NotificationsProvider } from "@/features/notifications/NotificationsProvider";
 import { NotificationBell } from "@/features/realtime/NotificationBell";
 import { RealtimeProvider } from "@/features/realtime/RealtimeProvider";
 import { selectEnvironment } from "@/server/environments";
@@ -21,19 +22,21 @@ export default async function SignedInLayout({ children }: { children: ReactNode
   return (
     <FeedbackProvider>
       <RealtimeProvider>
-        {environment.name !== "PROD" && (
-          <div className="bg-amber-400 px-4 py-1 text-center text-xs font-bold text-amber-950">
-            {t("nav.environment", { name: environment.name })}
-          </div>
-        )}
-        <nav className="flex flex-wrap items-center gap-2 bg-navy px-4 py-3 text-white shadow-sm sm:gap-4 sm:px-6">
-          <span className="mr-auto font-bold">{t("common.appName")}</span>
-          <NotificationBell />
-          <LanguageSwitcher />
-          <UserMenu username={session.user.username} />
-        </nav>
-        <NavTabs />
-        {children}
+        <NotificationsProvider userId={session.user.userId}>
+          {environment.name !== "PROD" && (
+            <div className="bg-amber-400 px-4 py-1 text-center text-xs font-bold text-amber-950">
+              {t("nav.environment", { name: environment.name })}
+            </div>
+          )}
+          <nav className="flex flex-wrap items-center gap-2 bg-navy px-4 py-3 text-white shadow-sm sm:gap-4 sm:px-6">
+            <span className="mr-auto font-bold">{t("common.appName")}</span>
+            <NotificationBell />
+            <LanguageSwitcher />
+            <UserMenu username={session.user.username} />
+          </nav>
+          <NavTabs />
+          {children}
+        </NotificationsProvider>
       </RealtimeProvider>
     </FeedbackProvider>
   );
