@@ -10,9 +10,11 @@ const TABS = [
   { href: "/", key: "trips" },
   { href: "/catalog", key: "catalog" },
   { href: "/notifications", key: "notifications" },
+  { href: "/admin", key: "admin", adminOnly: true },
 ] as const;
 
-export function NavTabs() {
+/** `isClinicAdmin` only decides whether the Admin tab is drawn: the page and the backend check it again. */
+export function NavTabs({ isClinicAdmin }: { isClinicAdmin: boolean }) {
   const t = useTranslations("nav.tabs");
   const pathname = usePathname();
   const { unread } = useNotifications();
@@ -20,7 +22,7 @@ export function NavTabs() {
   return (
     <div className="border-b border-border bg-surface px-3 sm:px-6">
       <ul className="flex gap-1 overflow-x-auto" role="tablist">
-        {TABS.map((tab) => {
+        {TABS.filter((tab) => !("adminOnly" in tab) || isClinicAdmin).map((tab) => {
           const active = tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
           return (
             <li key={tab.href} className="flex-1 sm:flex-none">

@@ -653,6 +653,933 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/BookingPortal/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The clinic's notices: what its integrator is told, the same rows the API Key integration reads.
+         * @description Expired ones are not returned, so the window is the retention policy's for an integration
+         *     (seven days). Read state is not kept here: the recipient is the whole integrator, shared by
+         *     every user of the clinic and by its API Key client, so the portal keeps it per user.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["NotificationDto"][];
+                        "application/json": components["schemas"]["NotificationDto"][];
+                        "text/json": components["schemas"]["NotificationDto"][];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminRoleDto"][];
+                        "application/json": components["schemas"]["BookingAdminRoleDto"][];
+                        "text/json": components["schemas"]["BookingAdminRoleDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminUserDto"][];
+                        "application/json": components["schemas"]["BookingAdminUserDto"][];
+                        "text/json": components["schemas"]["BookingAdminUserDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminUserCreateDto"];
+                    "text/json": components["schemas"]["BookingAdminUserCreateDto"];
+                    "application/*+json": components["schemas"]["BookingAdminUserCreateDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminUserDto"];
+                        "application/json": components["schemas"]["BookingAdminUserDto"];
+                        "text/json": components["schemas"]["BookingAdminUserDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminUserEditDto"];
+                    "text/json": components["schemas"]["BookingAdminUserEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminUserEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminUserDto"];
+                        "application/json": components["schemas"]["BookingAdminUserDto"];
+                        "text/json": components["schemas"]["BookingAdminUserDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/users/{id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Ends every open session of that user. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminPasswordDto"];
+                    "text/json": components["schemas"]["BookingAdminPasswordDto"];
+                    "application/*+json": components["schemas"]["BookingAdminPasswordDto"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/users/{id}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Disabling ends every open session of that user. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminUserActiveDto"];
+                    "text/json": components["schemas"]["BookingAdminUserActiveDto"];
+                    "application/*+json": components["schemas"]["BookingAdminUserActiveDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminUserDto"];
+                        "application/json": components["schemas"]["BookingAdminUserDto"];
+                        "text/json": components["schemas"]["BookingAdminUserDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminOrganizationDto"];
+                        "application/json": components["schemas"]["BookingAdminOrganizationDto"];
+                        "text/json": components["schemas"]["BookingAdminOrganizationDto"];
+                    };
+                };
+            };
+        };
+        /** @description A name and zip that belong to another catalog entry answer 409 (global handler). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminOrganizationEditDto"];
+                    "text/json": components["schemas"]["BookingAdminOrganizationEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminOrganizationEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminOrganizationDto"];
+                        "application/json": components["schemas"]["BookingAdminOrganizationDto"];
+                        "text/json": components["schemas"]["BookingAdminOrganizationDto"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/organization/api-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Apart from the record, so the key only travels when somebody asks to see it. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminApiKeyDto"];
+                        "application/json": components["schemas"]["BookingAdminApiKeyDto"];
+                        "text/json": components["schemas"]["BookingAdminApiKeyDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/funding-source": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description 204 when the clinic has none yet: the screen then offers to create it. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "application/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "text/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                    };
+                };
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                    "text/json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "application/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "text/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                    "text/json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminFundingSourceEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "application/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                        "text/json": components["schemas"]["BookingAdminFundingSourceDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/billing-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminBillingItemDto"][];
+                        "application/json": components["schemas"]["BookingAdminBillingItemDto"][];
+                        "text/json": components["schemas"]["BookingAdminBillingItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                    "text/json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminBillingItemDto"];
+                        "application/json": components["schemas"]["BookingAdminBillingItemDto"];
+                        "text/json": components["schemas"]["BookingAdminBillingItemDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/billing-items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                    "text/json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminBillingItemEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminBillingItemDto"];
+                        "application/json": components["schemas"]["BookingAdminBillingItemDto"];
+                        "text/json": components["schemas"]["BookingAdminBillingItemDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** @description Only an item that was never rated: one with rates has them closed instead. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminRateDto"][];
+                        "application/json": components["schemas"]["BookingAdminRateDto"][];
+                        "text/json": components["schemas"]["BookingAdminRateDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminRateEditDto"];
+                    "text/json": components["schemas"]["BookingAdminRateEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminRateEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminRateDto"];
+                        "application/json": components["schemas"]["BookingAdminRateDto"];
+                        "text/json": components["schemas"]["BookingAdminRateDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/admin/rates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Rates are never deleted: one that no longer applies gets its end date. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BookingAdminRateEditDto"];
+                    "text/json": components["schemas"]["BookingAdminRateEditDto"];
+                    "application/*+json": components["schemas"]["BookingAdminRateEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["BookingAdminRateDto"];
+                        "application/json": components["schemas"]["BookingAdminRateDto"];
+                        "text/json": components["schemas"]["BookingAdminRateDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/BookingPortal/catalog/categories": {
         parameters: {
             query?: never;
@@ -10535,6 +11462,12 @@ export interface components {
             apSubAccount?: string | null;
             apCompany?: string | null;
             fundingSourceBillingItems?: components["schemas"]["FundingSourceBillingItem"][] | null;
+            /**
+             * Format: int32
+             * @description The clinic that keeps this item through the Booking Portal; null for the office's own.
+             */
+            ownerIntegratorId?: number | null;
+            ownerIntegrator?: components["schemas"]["Integrator"];
         };
         BillingItemDto: {
             description: string;
@@ -10562,6 +11495,225 @@ export interface components {
             unitAbbreviation?: string | null;
             /** Format: int32 */
             unitId?: number;
+            /**
+             * Format: int32
+             * @description The clinic that keeps this item in the Booking Portal; null for the office's own.
+             */
+            ownerIntegratorId?: number | null;
+            /** @description That clinic's name, so the office can group the items without another call. */
+            ownerIntegratorName?: string | null;
+        };
+        BookingAdminApiKeyDto: {
+            apiKey?: string | null;
+        };
+        /** @description One of the clinic's own billing items. */
+        BookingAdminBillingItemDto: {
+            description?: string | null;
+            /** Format: int32 */
+            unitId?: number;
+            isCopay?: boolean;
+            arAccount?: string | null;
+            arSubAccount?: string | null;
+            arCompany?: string | null;
+            apAccount?: string | null;
+            apSubAccount?: string | null;
+            apCompany?: string | null;
+            /** Format: int32 */
+            id?: number;
+            unitAbbreviation?: string | null;
+            /** @description Rated on a funding source at least once: it can no longer be deleted. */
+            isAssigned?: boolean;
+        };
+        BookingAdminBillingItemEditDto: {
+            description?: string | null;
+            /** Format: int32 */
+            unitId?: number;
+            isCopay?: boolean;
+            arAccount?: string | null;
+            arSubAccount?: string | null;
+            arCompany?: string | null;
+            apAccount?: string | null;
+            apSubAccount?: string | null;
+            apCompany?: string | null;
+        };
+        /** @description The clinic's funding source, and whether it may change it. */
+        BookingAdminFundingSourceDto: {
+            name?: string | null;
+            accountNumber?: string | null;
+            address?: string | null;
+            phone?: string | null;
+            fax?: string | null;
+            email?: string | null;
+            contactFirst?: string | null;
+            contactLast?: string | null;
+            signaturePickup?: boolean | null;
+            signatureDropoff?: boolean | null;
+            driverSignaturePickup?: boolean | null;
+            driverSignatureDropoff?: boolean | null;
+            requireOdometer?: boolean | null;
+            barcodeScanRequired?: boolean | null;
+            /** Format: int32 */
+            id?: number;
+            isActive?: boolean;
+            /** @description Other integrators use it too: the office manages it, the clinic only reads it. */
+            isShared?: boolean;
+            canEdit?: boolean;
+        };
+        /**
+         * @description What a clinic sets on its funding source. Not its state nor the Vectorcare facility id, which
+         *     stay with the office.
+         */
+        BookingAdminFundingSourceEditDto: {
+            name?: string | null;
+            accountNumber?: string | null;
+            address?: string | null;
+            phone?: string | null;
+            fax?: string | null;
+            email?: string | null;
+            contactFirst?: string | null;
+            contactLast?: string | null;
+            signaturePickup?: boolean | null;
+            signatureDropoff?: boolean | null;
+            driverSignaturePickup?: boolean | null;
+            driverSignatureDropoff?: boolean | null;
+            requireOdometer?: boolean | null;
+            barcodeScanRequired?: boolean | null;
+        };
+        /** @description The clinic's own record. The API key is not here: it is asked for apart, on demand. */
+        BookingAdminOrganizationDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            isActive?: boolean;
+            phone?: string | null;
+            website?: string | null;
+            email?: string | null;
+            address?: string | null;
+            contactName?: string | null;
+            /** Format: int32 */
+            fundingSourceId?: number | null;
+            fundingSourceName?: string | null;
+        };
+        /** @description The contact details a clinic corrects. Name, state and funding source stay with the office. */
+        BookingAdminOrganizationEditDto: {
+            phone?: string | null;
+            website?: string | null;
+            email?: string | null;
+            address?: string | null;
+            contactName?: string | null;
+        };
+        /** @description A password the admin sets for another user of the clinic. Ends that user's sessions. */
+        BookingAdminPasswordDto: {
+            newPassword?: string | null;
+        };
+        /**
+         * @description A rate on the clinic's funding source. The office's rates are listed too, read only, so the
+         *     clinic sees everything it is billed with.
+         */
+        BookingAdminRateDto: {
+            /** Format: int32 */
+            billingItemId?: number;
+            /** Format: int32 */
+            spaceTypeId?: number;
+            /** Format: double */
+            rate?: number;
+            per?: string | null;
+            isDefault?: boolean;
+            procedureCode?: string | null;
+            /** Format: double */
+            minCharge?: number | null;
+            /** Format: double */
+            maxCharge?: number | null;
+            /** Format: int32 */
+            greaterThanMinQty?: number | null;
+            /** Format: int32 */
+            lessOrEqualMaxQty?: number | null;
+            /** Format: int32 */
+            freeQty?: number | null;
+            /** Format: date-time */
+            fromDate?: string;
+            /** Format: date-time */
+            toDate?: string;
+            /** Format: int32 */
+            id?: number;
+            billingItemDescription?: string | null;
+            billingItemUnitAbbreviation?: string | null;
+            spaceTypeName?: string | null;
+            /** @description The billing item is the office's: shown, never editable here. */
+            isOffice?: boolean;
+            canEdit?: boolean;
+        };
+        /**
+         * @description A rate the clinic sets. Rates are not deleted: one that stops applying is closed with its
+         *     Raphael.Shared.DTOs.BookingAdmin.BookingAdminRateEditDto.ToDate, so what was billed before can still be explained.
+         */
+        BookingAdminRateEditDto: {
+            /** Format: int32 */
+            billingItemId?: number;
+            /** Format: int32 */
+            spaceTypeId?: number;
+            /** Format: double */
+            rate?: number;
+            per?: string | null;
+            isDefault?: boolean;
+            procedureCode?: string | null;
+            /** Format: double */
+            minCharge?: number | null;
+            /** Format: double */
+            maxCharge?: number | null;
+            /** Format: int32 */
+            greaterThanMinQty?: number | null;
+            /** Format: int32 */
+            lessOrEqualMaxQty?: number | null;
+            /** Format: int32 */
+            freeQty?: number | null;
+            /** Format: date-time */
+            fromDate?: string;
+            /** Format: date-time */
+            toDate?: string;
+        };
+        /** @description A role a clinic's admin can give: Admin (1) or Booking (6). */
+        BookingAdminRoleDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+        };
+        BookingAdminUserActiveDto: {
+            isActive?: boolean;
+        };
+        /** @description A new user of the clinic. It belongs to the caller's integrator and is born active. */
+        BookingAdminUserCreateDto: {
+            fullName?: string | null;
+            username?: string | null;
+            /** @description Final, not temporary: the admin sets it and tells the user (decided 2026-10-08). */
+            password?: string | null;
+            email?: string | null;
+            phoneNumber?: string | null;
+            /** Format: int32 */
+            roleId?: number;
+        };
+        /** @description One user of the clinic. Never the password hash. */
+        BookingAdminUserDto: {
+            /** Format: int32 */
+            id?: number;
+            fullName?: string | null;
+            username?: string | null;
+            email?: string | null;
+            phoneNumber?: string | null;
+            /** Format: int32 */
+            roleId?: number;
+            roleName?: string | null;
+            isActive?: boolean;
+            /** @description The caller: the screen does not offer to disable or demote oneself. */
+            isCurrentUser?: boolean;
+        };
+        BookingAdminUserEditDto: {
+            fullName?: string | null;
+            username?: string | null;
+            email?: string | null;
+            phoneNumber?: string | null;
+            /** Format: int32 */
+            roleId?: number;
         };
         /** @description Data Transfer Object for Bot Trip requests. */
         BotTripRequest: {
@@ -12129,6 +13281,49 @@ export interface components {
             /** Format: date-time */
             lastDay?: string | null;
         };
+        NotificationActionDto: {
+            /** Format: uuid */
+            id?: string;
+            actionCode?: string | null;
+            /** Format: int32 */
+            sortOrder?: number;
+            isPrimary?: boolean;
+        };
+        NotificationDto: {
+            /** Format: uuid */
+            id?: string;
+            businessEventCode?: string | null;
+            priority?: string | null;
+            severity?: string | null;
+            type?: string | null;
+            status?: string | null;
+            title?: string | null;
+            message?: string | null;
+            /** Format: date-time */
+            createdAtUtc?: string;
+            /** Format: date-time */
+            expiresAtUtc?: string | null;
+            recipients?: components["schemas"]["NotificationRecipientDto"][] | null;
+            actions?: components["schemas"]["NotificationActionDto"][] | null;
+            metadata?: {
+                [key: string]: string;
+            } | null;
+        };
+        NotificationRecipientDto: {
+            /** Format: uuid */
+            id?: string;
+            /** Format: uuid */
+            recipientId?: string;
+            recipientType?: string | null;
+            isBroadcast?: boolean;
+            status?: string | null;
+            /** Format: date-time */
+            deliveredAtUtc?: string | null;
+            /** Format: date-time */
+            viewedAtUtc?: string | null;
+            /** Format: date-time */
+            acknowledgedAtUtc?: string | null;
+        };
         NotificationRuleActionDto: {
             /** Format: uuid */
             id?: string;
@@ -12240,7 +13435,7 @@ export interface components {
             /** Format: date-time */
             licenseExpiresOn?: string | null;
             planSegment?: string | null;
-            /** @description The caller may edit its contact details: a clinic admin who contracted it. */
+            /** @description The caller may edit its contact details: any clinic admin, contracted or not. */
             canEdit?: boolean;
             /** @description The caller may contract it or remove it: a clinic admin. */
             canContract?: boolean;

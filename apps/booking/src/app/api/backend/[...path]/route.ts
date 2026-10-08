@@ -21,6 +21,12 @@ const ALLOWED: ReadonlyArray<{ method: string; pattern: RegExp; brokerOnly?: boo
   { method: "PUT", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}$/ },
   { method: "POST", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/contract$/ },
   { method: "DELETE", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/contract$/ },
+  // Admin tab (BOOKING_ADMIN.md): a clinic's admin only, checked again by the backend on every call.
+  { method: "GET", pattern: /^BookingPortal\/admin\/(roles|users|organization|organization\/api-key|funding-source|billing-items|rates)$/ },
+  { method: "POST", pattern: /^BookingPortal\/admin\/(users|funding-source|billing-items|rates)$/ },
+  { method: "PUT", pattern: /^BookingPortal\/admin\/(users\/\d{1,10}(\/password|\/active)?|organization|funding-source|billing-items\/\d{1,10}|rates\/\d{1,10})$/ },
+  { method: "DELETE", pattern: /^BookingPortal\/admin\/billing-items\/\d{1,10}$/ },
+  { method: "GET", pattern: /^Units$/ },
   { method: "POST", pattern: /^BookingPortal\/sync-single$/ },
   { method: "POST", pattern: /^BookingPortal\/cancel-multiple$/ },
   { method: "GET", pattern: /^Customers$/ },

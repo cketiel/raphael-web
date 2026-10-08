@@ -18,6 +18,8 @@ export default async function SignedInLayout({ children }: { children: ReactNode
 
   const t = await getTranslations();
   const environment = selectEnvironment();
+  // A clinic's admin: role 1 with an integrator (CATALOG_MODEL.md, "Administrador de una clínica").
+  const isClinicAdmin = session.user.role === "1" && session.user.integratorId != null;
 
   return (
     <FeedbackProvider>
@@ -34,7 +36,7 @@ export default async function SignedInLayout({ children }: { children: ReactNode
             <LanguageSwitcher />
             <UserMenu username={session.user.username} />
           </nav>
-          <NavTabs />
+          <NavTabs isClinicAdmin={isClinicAdmin} />
           {children}
         </NotificationsProvider>
       </RealtimeProvider>
