@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { PAGE_SIZE, useCatalogCategories, useProviderSearch, type CatalogGroup, type ProviderRow, type ProviderSearch } from "./catalogApi";
+import { ContractButton } from "./ContractButton";
 import { ProviderDetailModal } from "./ProviderDetailModal";
 
 const EMPTY: ProviderSearch = { term: "", groupId: null, countyId: null, city: "", contracted: null, page: 1 };
@@ -112,14 +113,15 @@ export function CatalogBrowser({ isClinicAdmin }: { isClinicAdmin: boolean }) {
       {/* Phones and tablets: cards. */}
       <ul className="grid gap-3 md:grid-cols-2 lg:hidden">
         {page?.items?.map((r) => (
-          <li key={r.id}>
-            <button type="button" onClick={() => setOpenId(r.id ?? null)} className="w-full rounded-2xl bg-surface p-4 text-left shadow-sm hover:ring-2 hover:ring-brand/30">
+          <li key={r.id} className="rounded-2xl bg-surface shadow-sm hover:ring-2 hover:ring-brand/30">
+            <button type="button" onClick={() => setOpenId(r.id ?? null)} className="w-full p-4 pb-2 text-left">
               <p className="font-bold">{r.name}</p>
               <p className="mt-0.5 text-xs text-muted">{rowGroup(r)}</p>
               <p className="mt-2 text-sm">{[r.city, r.county, r.state].filter(Boolean).join(", ")}</p>
               {r.phone && <p className="text-sm text-muted">{r.phone}</p>}
               <Badges row={r} />
             </button>
+            {isClinicAdmin && <div className="flex justify-end px-4 pb-3"><ContractButton row={r} /></div>}
           </li>
         ))}
       </ul>
@@ -134,6 +136,7 @@ export function CatalogBrowser({ isClinicAdmin }: { isClinicAdmin: boolean }) {
               <th className="px-4">{t("colPlace")}</th>
               <th className="px-4">{t("colPhone")}</th>
               <th className="px-4">{t("colStatus")}</th>
+              {isClinicAdmin && <th className="px-4 text-right">{t("colActions")}</th>}
             </tr>
           </thead>
           <tbody>
@@ -146,6 +149,7 @@ export function CatalogBrowser({ isClinicAdmin }: { isClinicAdmin: boolean }) {
                 <td className="px-4 text-xs">{[r.city, r.county, r.state].filter(Boolean).join(", ")}</td>
                 <td className="px-4 text-xs">{r.phone}</td>
                 <td className="px-4"><Badges row={r} /></td>
+                {isClinicAdmin && <td className="px-4 text-right"><ContractButton row={r} /></td>}
               </tr>
             ))}
           </tbody>

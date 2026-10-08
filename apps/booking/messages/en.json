@@ -328,6 +328,7 @@
     "state": "State",
     "zip": "Zip",
     "save": "Save",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "colActions": "Actions"
   }
 }
