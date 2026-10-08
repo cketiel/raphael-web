@@ -5,28 +5,32 @@ export class BffError extends Error {
   constructor(
     message: string,
     readonly status: number,
+    /** Set by this portal's own server for its messages, so the page can show them in the user's language. */
+    readonly code?: string,
   ) {
     super(message);
   }
 }
 
-async function readMessage(response: Response) {
+async function readError(response: Response): Promise<{ message: string; code?: string }> {
   const text = await response.text();
   try {
     const body = JSON.parse(text);
+    // Messages of this portal's own server carry a code the page translates.
+    if (typeof body?.code === "string") return { message: body.message ?? text, code: body.code };
     // BadRequest("...") arrives as a JSON string; the original showed it with its quotes.
-    if (typeof body === "string") return body;
+    if (typeof body === "string") return { message: body };
     if (body?.errors && typeof body.errors === "object") {
       // ASP.NET ModelState: { errors: { Field: ["msg"] } }
       // Same wording as the original portal (Booking Web app.js:69-70).
       const lines = Object.entries(body.errors as Record<string, string[]>).map(
         ([field, messages]) => `- ${field}: ${messages.join(", ")}`,
       );
-      return `Validation Errors:\n${lines.join("\n")}`;
+      return { message: `Validation Errors:\n${lines.join("\n")}` };
     }
-    return body?.message ?? body?.title ?? text;
+    return { message: body?.message ?? body?.title ?? text };
   } catch {
-    return text || response.statusText;
+    return { message: text || response.statusText };
   }
 }
 
@@ -44,7 +48,10 @@ export async function bff<T>(path: string, init: RequestInit = {}): Promise<T> {
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign("/login");
   }
-  if (!response.ok) throw new BffError(await readMessage(response), response.status);
+  if (!response.ok) {
+    const { message, code } = await readError(response);
+    throw new BffError(message, response.status, code);
+  }
   if (response.status === 204) return undefined as T;
 
   const type = response.headers.get("content-type") ?? "";

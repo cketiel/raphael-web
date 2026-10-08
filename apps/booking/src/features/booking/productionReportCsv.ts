@@ -21,15 +21,33 @@ export function formatCell(value: unknown): string {
   return `"${text}"`;
 }
 
-const date = (v: string | null | undefined) => (v ? new Date(v).toLocaleDateString() : "");
-const yesNo = (v: unknown) => (v ? "Yes" : "No");
+/**
+ * The words and formats of one language. The CSV follows the user's language (decided
+ * 2026-10-07): headers, Yes/No and dates. English is the default, and the column order never changes.
+ */
+export interface CsvLocale {
+  headers: readonly string[];
+  yes: string;
+  no: string;
+  /** Formats a date (and, when asked, its time) the way the user reads them. */
+  formatDate: (value: Date, withTime: boolean) => string;
+}
+
+export const ENGLISH_CSV: CsvLocale = {
+  headers: CSV_HEADERS,
+  yes: "Yes",
+  no: "No",
+  formatDate: (value, withTime) => (withTime ? value.toLocaleString("en-US") : value.toLocaleDateString("en-US")),
+};
 
 /**
  * One row, field by field as the original mapped it. The `|| ""` and `|| 0` fallbacks are kept
  * as they were, including that a 0 coordinate prints as empty.
  * `paid` is an amount in the backend; the original printed it as Yes/No, which lost the figure.
  */
-export function toCsvRow(r: ProductionRow): unknown[] {
+export function toCsvRow(r: ProductionRow, l: CsvLocale = ENGLISH_CSV): unknown[] {
+  const date = (v: string | null | undefined) => (v ? l.formatDate(new Date(v), false) : "");
+  const yesNo = (v: unknown) => (v ? l.yes : l.no);
   return [
     date(r.date),
     r.reqPickup || "",
@@ -77,25 +95,25 @@ export function toCsvRow(r: ProductionRow): unknown[] {
     r.pickupLon || "",
     r.dropoffLat || "",
     r.dropoffLon || "",
-    r.created ? new Date(r.created).toLocaleString() : "",
+    r.created ? l.formatDate(new Date(r.created), true) : "",
   ];
 }
 
 /** CSV with a UTF-8 BOM so Excel opens accents correctly. Header row unquoted, as before. */
-export function buildProductionCsv(rows: ProductionRow[]): string {
-  return "﻿" + CSV_HEADERS.join(",") + "\n" + rows.map((r) => toCsvRow(r).map(formatCell).join(",")).join("\n");
+export function buildProductionCsv(rows: ProductionRow[], l: CsvLocale = ENGLISH_CSV): string {
+  return "﻿" + l.headers.join(",") + "\n" + rows.map((r) => toCsvRow(r, l).map(formatCell).join(",")).join("\n");
 }
 
 export function productionReportFileName(now = new Date()) {
   return `Production_Report_${now.toISOString().split("T")[0]}.csv`;
 }
 
-export function downloadProductionCsv(rows: ProductionRow[]) {
-  const blob = new Blob([buildProductionCsv(rows)], { type: "text/csv;charset=utf-8;" });
+export function downloadProductionCsv(rows: ProductionRow[], l: CsvLocale = ENGLISH_CSV, fileName = productionReportFileName()) {
+  const blob = new Blob([buildProductionCsv(rows, l)], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = productionReportFileName();
+  link.download = fileName;
   link.style.visibility = "hidden";
   document.body.appendChild(link);
   link.click();

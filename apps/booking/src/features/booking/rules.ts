@@ -87,12 +87,15 @@ export function isValidDob(value: string, today = localToday()): boolean {
 export const ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
 export const ATTACHMENT_EXTENSIONS = [".pdf", ".doc", ".docx"] as const;
 
-export function attachmentProblem(file: { name: string; size: number } | null | undefined): string | null {
+/** What is wrong with an attachment, as a code the form turns into words in the user's language. */
+export type AttachmentProblem = "attachmentType" | "attachmentSize" | "attachmentEmpty";
+
+export function attachmentProblem(file: { name: string; size: number } | null | undefined): AttachmentProblem | null {
   if (!file) return null;
   const name = file.name.toLowerCase();
-  if (!ATTACHMENT_EXTENSIONS.some((ext) => name.endsWith(ext))) return "The attachment must be a Word or PDF file.";
-  if (file.size > ATTACHMENT_MAX_BYTES) return "The attachment cannot be larger than 10 MB.";
-  if (file.size === 0) return "The attachment is empty.";
+  if (!ATTACHMENT_EXTENSIONS.some((ext) => name.endsWith(ext))) return "attachmentType";
+  if (file.size > ATTACHMENT_MAX_BYTES) return "attachmentSize";
+  if (file.size === 0) return "attachmentEmpty";
   return null;
 }
 

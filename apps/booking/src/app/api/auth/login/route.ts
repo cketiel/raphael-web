@@ -19,19 +19,19 @@ export async function POST(request: NextRequest) {
 
   const parsed = credentials.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ message: "Enter your username and password." }, { status: 400 });
+    return NextResponse.json({ code: "missing_credentials", message: "Enter your username and password." }, { status: 400 });
   }
 
   const { status, body } = await loginWithBackend(parsed.data.username, parsed.data.password);
 
   if (status === 403) {
-    return NextResponse.json({ message: "User account is disabled. Contact administrator." }, { status: 403 });
+    return NextResponse.json({ code: "account_disabled", message: "User account is disabled. Contact administrator." }, { status: 403 });
   }
   if (status !== 200 || !body?.token || !body.refreshToken) {
-    return NextResponse.json({ message: "Invalid username or password." }, { status: 401 });
+    return NextResponse.json({ code: "invalid_credentials", message: "Invalid username or password." }, { status: 401 });
   }
   if (!BOOKING_ROLES.has(body.role ?? "")) {
-    return NextResponse.json({ message: "This account does not have access to the Booking Portal." }, { status: 403 });
+    return NextResponse.json({ code: "no_portal_access", message: "This account does not have access to the Booking Portal." }, { status: 403 });
   }
 
   const session = await getSession();

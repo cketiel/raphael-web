@@ -36,12 +36,12 @@ async function forward(request: NextRequest, context: Context) {
   const target = path.join("/");
   const rule = ALLOWED.find((r) => r.method === request.method && r.pattern.test(target));
   if (!rule) {
-    return NextResponse.json({ message: "Not found." }, { status: 404 });
+    return NextResponse.json({ code: "not_found", message: "Not found." }, { status: 404 });
   }
 
   const session = await getSession();
   if (rule.brokerOnly && session.user?.integratorId != null) {
-    return NextResponse.json({ message: "Not found." }, { status: 404 });
+    return NextResponse.json({ code: "not_found", message: "Not found." }, { status: 404 });
   }
   const headers = new Headers();
   const contentType = request.headers.get("content-type");
@@ -60,12 +60,12 @@ async function forward(request: NextRequest, context: Context) {
     } as RequestInit);
   } catch (error) {
     if (error instanceof SessionExpiredError) return sessionExpired();
-    return NextResponse.json({ message: "The service is not available right now. Try again in a moment." }, { status: 502 });
+    return NextResponse.json({ code: "service_unavailable", message: "The service is not available right now. Try again in a moment." }, { status: 502 });
   }
 
   // Server errors reach the browser as a generic message, never with their original text.
   if (upstream.status >= 500) {
-    return NextResponse.json({ message: "Something went wrong on the server. Try again in a moment." }, { status: 502 });
+    return NextResponse.json({ code: "server_error", message: "Something went wrong on the server. Try again in a moment." }, { status: 502 });
   }
 
   const responseHeaders = new Headers();

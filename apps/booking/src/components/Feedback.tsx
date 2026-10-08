@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
 
 /**
@@ -28,6 +29,7 @@ interface DialogState {
 }
 
 export function FeedbackProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("common");
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [pending, setPending] = useState(0);
   const okRef = useRef<HTMLButtonElement>(null);
@@ -65,7 +67,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {pending > 0 && (
         <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-white/80" aria-busy="true" aria-live="polite">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand border-t-transparent" role="status">
-            <span className="sr-only">Loading…</span>
+            <span className="sr-only">{t("loading")}</span>
           </div>
         </div>
       )}
@@ -78,12 +80,12 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
             <div className="mt-6 flex justify-end gap-2">
               {dialog.kind === "confirm" && (
                 <button onClick={() => close(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-semibold">
-                  Cancel
+                  {t("cancel")}
                 </button>
               )}
               <button ref={okRef} autoFocus onClick={() => close(true)}
                 className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white">
-                OK
+                {t("ok")}
               </button>
             </div>
           </div>

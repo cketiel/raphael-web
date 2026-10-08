@@ -1,10 +1,12 @@
 "use client";
 
 import type { Schemas } from "@raphael/api-client";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useFeedback } from "@/components/Feedback";
 import { InfoTip } from "@/components/InfoTip";
-import { api, BffError } from "@/lib/bff";
+import { useErrorText } from "@/i18n/useErrorText";
+import { api } from "@/lib/bff";
 import { AddressInput } from "@/features/maps/AddressInput";
 import type { PlaceDetails } from "@/features/maps/places";
 import { TripMap, type LatLng } from "@/features/maps/TripMap";
@@ -122,6 +124,11 @@ interface LegResult {
 
 export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose, onSaved }: TripModalProps) {
   const feedback = useFeedback();
+  const t = useTranslations("trip");
+  const tc = useTranslations("common");
+  const errorText = useErrorText();
+  /** "N/A" is the form's own marker for "Google gave no town"; it is shown in the user's language. */
+  const cityText = (city: string) => (city === "N/A" ? tc("notAvailable") : city);
   const [form, setForm] = useState<FormState>(() => initialForm(trip, customers));
   const [pickup, setPickup] = useState<RoutePoint>(() => initialPoint(trip, "pickup"));
   const [dropoff, setDropoff] = useState<RoutePoint>(() => initialPoint(trip, "dropoff"));
@@ -226,30 +233,30 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
     // An address typed without choosing a suggestion kept the previous coordinates (Miami for a new
     // booking) and was saved that way: a trip routed to the wrong place. It is not accepted any more.
     if (!pickup.resolved || !dropoff.resolved) {
-      await feedback.alert("Choose the pickup and dropoff addresses from the suggestions, or place the pins on the map.");
+      await feedback.alert(t("needResolvedAddresses"));
       return;
     }
     const phone = normalizeUsPhone(form.custPhone);
     if (!phone) {
-      await feedback.alert("Enter a valid 10-digit US phone number.");
+      await feedback.alert(t("invalidPhone"));
       return;
     }
     if (!isValidDob(form.custDOB)) {
-      await feedback.alert("Enter a valid date of birth: it cannot be in the future or before 1900.");
+      await feedback.alert(t("invalidDob"));
       return;
     }
     const file = fileRef.current?.files?.[0];
     const fileProblem = attachmentProblem(file);
     if (fileProblem) {
-      await feedback.alert(fileProblem);
+      await feedback.alert(t(fileProblem));
       return;
     }
     if (spaceTypes.length > 0 && !spaceTypes.some((s) => s.name === form.spaceType)) {
-      await feedback.alert("Choose a Space Type from the list.");
+      await feedback.alert(t("chooseSpaceType"));
       return;
     }
     if (funding?.kind === "broker" && !funding.all.some((f) => f.name === form.fundingSource)) {
-      await feedback.alert("Choose a Funding Source from the list.");
+      await feedback.alert(t("chooseFundingSource"));
       return;
     }
 
@@ -295,9 +302,9 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
         onClose();
         await onSaved();
       });
-      await feedback.alert("Success: Booking registered.");
+      await feedback.alert(t("saved"));
     } catch (e) {
-      await feedback.alert(e instanceof BffError ? e.message : "Unable to save the booking right now.");
+      await feedback.alert(errorText(e, t("saveFailed")));
     }
   }
 
@@ -309,16 +316,16 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
       <form onSubmit={save} role="dialog" aria-modal="true" aria-labelledby="trip-modal-title"
         className="my-6 w-full max-w-6xl rounded-2xl bg-surface shadow-2xl">
         <div className="flex items-center justify-between border-b border-border bg-slate-50 px-6 py-4">
-          <h2 id="trip-modal-title" className="text-lg font-bold text-brand">Trip Registration</h2>
-          <button type="button" onClick={onClose} aria-label="Close" className="text-2xl leading-none text-muted hover:text-foreground">×</button>
+          <h2 id="trip-modal-title" className="text-lg font-bold text-brand">{t("title")}</h2>
+          <button type="button" onClick={onClose} aria-label={tc("close")} className="text-2xl leading-none text-muted hover:text-foreground">×</button>
         </div>
 
         <div className="grid gap-6 p-6 md:grid-cols-2">
           {/* Left column: patient and trip details */}
           <div>
-            <Section title="1. Patient Information">
+            <Section title={t("patientSection")}>
               <div className="relative mb-2">
-                <input className={input} placeholder="Search by name or code..." autoComplete="off" required
+                <input className={input} placeholder={t("searchPatient")} autoComplete="off" required
                   value={form.custName}
                   onChange={(e) => { set("custName", e.target.value); setSuggestOpen(true); }}
                   onBlur={() => setTimeout(() => setSuggestOpen(false), 150)} />
@@ -329,7 +336,7 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
                         <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => selectCustomer(c)}
                           className="w-full px-3 py-2 text-left hover:bg-slate-100">
                           <span className="block text-sm font-bold text-brand">{c.fullName}</span>
-                          <span className="text-xs text-muted">ID: {c.riderId || "N/A"}</span>
+                          <span className="text-xs text-muted">{t("riderIdShort", { id: c.riderId || tc("notAvailable") })}</span>
                         </button>
                       </li>
                     ))}
@@ -337,47 +344,47 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <Field label="Phone" className={small}><input type="tel" inputMode="tel" autoComplete="off" className={input} placeholder="(786) 555-0100" required value={form.custPhone}
+                <Field label={t("phone")} className={small}><input type="tel" inputMode="tel" autoComplete="off" className={input} placeholder="(786) 555-0100" required value={form.custPhone}
                   onChange={(e) => set("custPhone", e.target.value)}
                   onBlur={() => { const p = normalizeUsPhone(form.custPhone); if (p) set("custPhone", formatUsPhone(p)); }} /></Field>
-                <Field label="DOB (Date of Birth)" className={small}><input type="date" className={input} required min={MIN_DOB} max={localToday()} value={form.custDOB} onChange={(e) => set("custDOB", e.target.value)} /></Field>
-                <Field label="Rider ID" className={small}><input className={input} placeholder="Rider ID" value={form.riderId} onChange={(e) => set("riderId", e.target.value)} /></Field>
-                <Field label="Gender" className={small}>
+                <Field label={t("dob")} className={small}><input type="date" className={input} required min={MIN_DOB} max={localToday()} value={form.custDOB} onChange={(e) => set("custDOB", e.target.value)} /></Field>
+                <Field label={t("riderId")} className={small}><input className={input} placeholder={t("riderId")} value={form.riderId} onChange={(e) => set("riderId", e.target.value)} /></Field>
+                <Field label={t("gender")} className={small}>
                   <select className={input} required value={form.custGender} onChange={(e) => set("custGender", e.target.value)}>
-                    <option value="" disabled hidden>Select...</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                    <option value="" disabled hidden>{t("genderSelect")}</option>
+                    <option value="Male">{t("male")}</option>
+                    <option value="Female">{t("female")}</option>
                   </select>
                 </Field>
-                <Field label="Home Address" className={`${small} col-span-2`}><input className={input} placeholder="Home Address" required value={form.custAddress} onChange={(e) => set("custAddress", e.target.value)} /></Field>
-                <Field label="City" className={small}><input className={input} placeholder="City" required value={form.custCity} onChange={(e) => set("custCity", e.target.value)} /></Field>
-                <Field label="Zip" className={small}><input className={input} placeholder="Zip" required value={form.custZip} onChange={(e) => set("custZip", e.target.value)} /></Field>
+                <Field label={t("homeAddress")} className={`${small} col-span-2`}><input className={input} placeholder={t("homeAddress")} required value={form.custAddress} onChange={(e) => set("custAddress", e.target.value)} /></Field>
+                <Field label={t("city")} className={small}><input className={input} placeholder={t("city")} required value={form.custCity} onChange={(e) => set("custCity", e.target.value)} /></Field>
+                <Field label={t("zip")} className={small}><input className={input} placeholder={t("zip")} required value={form.custZip} onChange={(e) => set("custZip", e.target.value)} /></Field>
               </div>
             </Section>
 
-            <Section title="2. Logistics">
+            <Section title={t("logisticsSection")}>
               <div className="grid grid-cols-4 gap-2">
-                <Field label="Date" className="col-span-2 text-xs font-semibold"><input type="date" className={input} required value={form.tripDate} onChange={(e) => set("tripDate", e.target.value)} /></Field>
-                <Field label="Pickup" className="text-xs font-semibold"><input type="time" className={input} required value={form.tripPickup} onChange={(e) => set("tripPickup", e.target.value)} /></Field>
-                <Field label="Appt" className="text-xs font-semibold"><input type="time" className={input} value={form.tripAppt} onChange={(e) => set("tripAppt", e.target.value)} /></Field>
+                <Field label={t("date")} className="col-span-2 text-xs font-semibold"><input type="date" className={input} required value={form.tripDate} onChange={(e) => set("tripDate", e.target.value)} /></Field>
+                <Field label={t("pickupTime")} className="text-xs font-semibold"><input type="time" className={input} required value={form.tripPickup} onChange={(e) => set("tripPickup", e.target.value)} /></Field>
+                <Field label={t("apptTime")} className="text-xs font-semibold"><input type="time" className={input} value={form.tripAppt} onChange={(e) => set("tripAppt", e.target.value)} /></Field>
                 <Field className="col-span-2 text-xs font-semibold"
-                  label={<>Space Type<InfoTip label="Space type codes"><b>AMB:</b> Ambulatory (Walks)<br /><b>WCH:</b> Wheelchair<br /><b>STR:</b> Stretcher</InfoTip></>}>
-                  <input list="spaceList" className={input} placeholder="Select type..." required value={form.spaceType} onChange={(e) => set("spaceType", e.target.value)} />
+                  label={<>{t("spaceType")}<InfoTip label={t("spaceTypeHelp")}><b>AMB:</b> {t("spaceTypeAmb")}<br /><b>WCH:</b> {t("spaceTypeWch")}<br /><b>STR:</b> {t("spaceTypeStr")}</InfoTip></>}>
+                  <input list="spaceList" className={input} placeholder={t("spaceTypePlaceholder")} required value={form.spaceType} onChange={(e) => set("spaceType", e.target.value)} />
                   <datalist id="spaceList">{spaceTypes.map((s) => <option key={s.id} value={s.name} />)}</datalist>
                 </Field>
-                <Field label="Funding Source" className="col-span-2 text-xs font-semibold">
+                <Field label={t("fundingSource")} className="col-span-2 text-xs font-semibold">
                   {funding?.kind === "broker" ? (
                     <>
-                      <input list="fundingList" className={input} placeholder="Select or type Funding Source..." value={form.fundingSource} onChange={(e) => set("fundingSource", e.target.value)} />
+                      <input list="fundingList" className={input} placeholder={t("fundingPlaceholder")} value={form.fundingSource} onChange={(e) => set("fundingSource", e.target.value)} />
                       <datalist id="fundingList">{funding.all.map((f) => <option key={f.id} value={f.name} />)}</datalist>
                     </>
                   ) : (
                     <>
-                      <input readOnly value={fundingName} placeholder={bookingDisabled ? "Booking Disabled: No FS linked" : "Loading..."}
+                      <input readOnly value={fundingName} placeholder={bookingDisabled ? t("fundingDisabled") : tc("loading")}
                         aria-invalid={bookingDisabled}
                         className={`${input} bg-slate-100 ${bookingDisabled ? "border-red-500" : ""}`} />
                       {bookingDisabled && (
-                        <p className="mt-1 text-[0.7rem] text-red-600">Contact Raphael&apos;s Admin: Missing linked Funding Source.</p>
+                        <p className="mt-1 text-[0.7rem] text-red-600">{t("fundingMissing")}</p>
                       )}
                     </>
                   )}
@@ -385,20 +392,20 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
               </div>
             </Section>
 
-            <Section title="3. Route Selection">
-              <AddressInput id="pickupAddr" placeholder="Pickup Address" required value={pickup.address}
+            <Section title={t("routeSection")}>
+              <AddressInput id="pickupAddr" placeholder={t("pickupAddress")} required value={pickup.address}
                 icon={<span className="text-[#dc3545]">●</span>}
                 onTextChange={(text) => setPickup((p) => ({ ...p, address: text, resolved: false }))}
                 onPlace={(p) => placeChosen("pickup", p)} />
               <div className="mt-1 mb-3 flex justify-between px-1 text-xs text-muted">
-                <span>City: <b>{pickup.city}</b></span>
-                <span>Distance: <b>{distance}</b> mi</span>
+                <span>{t.rich("cityValue", { city: cityText(pickup.city), b: (chunks) => <b>{chunks}</b> })}</span>
+                <span>{t.rich("distanceValue", { distance, b: (chunks) => <b>{chunks}</b> })}</span>
               </div>
-              <AddressInput id="dropoffAddr" placeholder="Dropoff Address" required value={dropoff.address}
+              <AddressInput id="dropoffAddr" placeholder={t("dropoffAddress")} required value={dropoff.address}
                 icon={<span className="text-[#0d6efd]">●</span>}
                 onTextChange={(text) => setDropoff((p) => ({ ...p, address: text, resolved: false }))}
                 onPlace={(p) => placeChosen("dropoff", p)} />
-              <div className="mt-1 mb-3 px-1 text-xs text-muted">City: <b>{dropoff.city}</b></div>
+              <div className="mt-1 mb-3 px-1 text-xs text-muted">{t.rich("cityValue", { city: cityText(dropoff.city), b: (chunks) => <b>{chunks}</b> })}</div>
 
               {/* Only when booking: nothing links a return to its outbound trip, so an edit cannot
                   find the one already booked. The backend refuses it too; the return is edited on its own. */}
@@ -406,11 +413,11 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
                 <div className="rounded-lg border border-border bg-slate-50 p-2">
                   <label className="flex items-center gap-2 text-sm font-bold">
                     <input type="checkbox" role="switch" checked={form.isRoundTrip} onChange={(e) => set("isRoundTrip", e.target.checked)} />
-                    Create Return Trip?
+                    {t("roundTrip")}
                   </label>
                   {form.isRoundTrip && (
                     // Required here and by the backend, which used to skip a return without a time and say nothing.
-                    <input type="time" aria-label="Return time" required className={`${input} mt-2`} value={form.returnTime} onChange={(e) => set("returnTime", e.target.value)} />
+                    <input type="time" aria-label={t("returnTime")} required className={`${input} mt-2`} value={form.returnTime} onChange={(e) => set("returnTime", e.target.value)} />
                   )}
                 </div>
               )}
@@ -419,32 +426,32 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
 
           {/* Right column: map and notes */}
           <div className="md:border-l md:border-border md:pl-6">
-            <p className="mb-2 text-sm font-bold text-muted">Interactive Route Map</p>
+            <p className="mb-2 text-sm font-bold text-muted">{t("mapTitle")}</p>
             <TripMap mapId={mapId} pickup={pickup.coords} dropoff={dropoff.coords} polyline={polyline} onPinMoved={pinMoved} />
 
             <div className="mt-3 space-y-2">
               <Field className={small}
-                label={<>Pickup Instructions<InfoTip label="Pickup instruction examples">Examples:<br />• Room 302, 3rd floor.<br />• Dial 123 at the gate.<br />• Patient is oxygen-dependent.</InfoTip></>}>
-                <textarea className={input} rows={2} placeholder="Pickup instructions..." value={form.pickupComment} onChange={(e) => set("pickupComment", e.target.value)} />
+                label={<>{t("pickupInstructions")}<InfoTip label={t("pickupExamples")}>{t.rich("pickupExamplesText", { br: () => <br /> })}</InfoTip></>}>
+                <textarea className={input} rows={2} placeholder={t("pickupPlaceholder")} value={form.pickupComment} onChange={(e) => set("pickupComment", e.target.value)} />
               </Field>
               <Field className={small}
-                label={<>Dropoff Instructions<InfoTip label="Dropoff instruction examples">Examples:<br />• Leave at main lobby.<br />• Wait for nurse.<br />• Patient needs assistance to the chair.</InfoTip></>}>
-                <textarea className={input} rows={2} placeholder="Dropoff instructions..." value={form.dropoffComment} onChange={(e) => set("dropoffComment", e.target.value)} />
+                label={<>{t("dropoffInstructions")}<InfoTip label={t("dropoffExamples")}>{t.rich("dropoffExamplesText", { br: () => <br /> })}</InfoTip></>}>
+                <textarea className={input} rows={2} placeholder={t("dropoffPlaceholder")} value={form.dropoffComment} onChange={(e) => set("dropoffComment", e.target.value)} />
               </Field>
 
               {form.isRoundTrip && (
                 <div className="rounded-lg border border-border bg-slate-50 p-2">
-                  <p className="text-xs font-bold text-brand">Return Trip Notes</p>
-                  <textarea className={`${input} mt-1`} rows={1} placeholder="Return Pickup instructions..." value={form.roundTripPickupComment} onChange={(e) => set("roundTripPickupComment", e.target.value)} />
-                  <textarea className={`${input} mt-2`} rows={1} placeholder="Return Dropoff instructions..." value={form.roundTripDropoffComment} onChange={(e) => set("roundTripDropoffComment", e.target.value)} />
+                  <p className="text-xs font-bold text-brand">{t("returnNotes")}</p>
+                  <textarea className={`${input} mt-1`} rows={1} placeholder={t("returnPickupPlaceholder")} value={form.roundTripPickupComment} onChange={(e) => set("roundTripPickupComment", e.target.value)} />
+                  <textarea className={`${input} mt-2`} rows={1} placeholder={t("returnDropoffPlaceholder")} value={form.roundTripDropoffComment} onChange={(e) => set("roundTripDropoffComment", e.target.value)} />
                 </div>
               )}
 
-              <Field label="Attachment (Word/PDF)" className={small}>
+              <Field label={t("attachment")} className={small}>
                 <input ref={fileRef} type="file" accept={`${ATTACHMENT_EXTENSIONS.join(",")},application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document`}
                   onChange={async (e) => {
                     const problem = attachmentProblem(e.target.files?.[0]);
-                    if (problem) { e.target.value = ""; await feedback.alert(problem); }
+                    if (problem) { e.target.value = ""; await feedback.alert(t(problem)); }
                   }}
                   className={`${input} file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1`} />
               </Field>
@@ -453,10 +460,10 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
         </div>
 
         <div className="flex justify-end gap-2 border-t border-border bg-slate-50 px-6 py-4">
-          <button type="button" onClick={onClose} className="rounded-lg bg-slate-500 px-4 py-2 text-sm font-bold text-white">Close</button>
+          <button type="button" onClick={onClose} className="rounded-lg bg-slate-500 px-4 py-2 text-sm font-bold text-white">{tc("close")}</button>
           <button type="submit" disabled={bookingDisabled || !funding}
             className="rounded-lg bg-brand px-10 py-2 text-sm font-bold uppercase text-white shadow-sm disabled:opacity-50">
-            Save Booking
+            {t("save")}
           </button>
         </div>
       </form>

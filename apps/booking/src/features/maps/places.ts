@@ -16,18 +16,16 @@ function component(place: google.maps.places.Place, type: string, short = false)
 }
 
 /**
- * The language Maps is loaded in (BookingDashboard passes it to the APIProvider). Google writes the address
- * in it, and the backend caches each language apart, so it goes with every lookup and store.
- */
-export const MAPS_LANGUAGE = "en";
-
-/**
  * Write-behind cache (MAPS_POLICY §5.1): ask the backend first; only when nobody has looked this
  * place up yet, buy it with the browser key and hand it to the backend so the next user gets it free.
+ *
+ * `language` is the one Maps was loaded in: the user's own (BookingDashboard passes it to the
+ * APIProvider). Google writes the address in it, and the backend caches each language apart, so a
+ * place bought by a Spanish session is never handed to an English one.
  */
-export async function resolvePlace(prediction: google.maps.places.PlacePrediction): Promise<PlaceDetails> {
+export async function resolvePlace(prediction: google.maps.places.PlacePrediction, language: string): Promise<PlaceDetails> {
   const cached = await api<PlaceDetails>(
-    `routing/place/${encodeURIComponent(prediction.placeId)}?language=${MAPS_LANGUAGE}`,
+    `routing/place/${encodeURIComponent(prediction.placeId)}?language=${encodeURIComponent(language)}`,
   ).catch(() => null);
   if (cached?.status === "Ok") return cached;
 
@@ -48,7 +46,7 @@ export async function resolvePlace(prediction: google.maps.places.PlacePredictio
     city: component(place, "locality") ?? component(place, "sublocality"),
     state: component(place, "administrative_area_level_1", true),
     zip: component(place, "postal_code"),
-    language: MAPS_LANGUAGE,
+    language,
     status: "Ok",
     source: "Google",
   };

@@ -10,15 +10,15 @@ export const BFF_HEADER = "x-raphael-bff";
  */
 export function rejectCrossSite(request: NextRequest): NextResponse | null {
   if (request.headers.get(BFF_HEADER) !== "1") {
-    return NextResponse.json({ message: "Forbidden." }, { status: 403 });
+    return NextResponse.json({ code: "forbidden", message: "Forbidden." }, { status: 403 });
   }
   const origin = request.headers.get("origin");
   if (origin !== null && origin !== request.nextUrl.origin) {
-    return NextResponse.json({ message: "Forbidden." }, { status: 403 });
+    return NextResponse.json({ code: "forbidden", message: "Forbidden." }, { status: 403 });
   }
   return null;
 }
 
 export function sessionExpired() {
-  return NextResponse.json({ message: "Your session has expired. Please sign in again." }, { status: 401 });
+  return NextResponse.json({ code: "session_expired", message: "Your session has expired. Please sign in again." }, { status: 401 });
 }

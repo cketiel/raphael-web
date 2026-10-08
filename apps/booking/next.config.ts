@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   transpilePackages: ["@raphael/api-client"],
+  // next-intl finds its request config through this alias. Its plugin would set it, but the plugin
+  // loads @swc/core's native binary, which does not start on this machine; the alias is all it adds here.
+  // The language comes from the signed-in user's own cookie, not from the URL (src/i18n/request.ts).
+  turbopack: { resolveAlias: { "next-intl/config": "./src/i18n/request.ts" } },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

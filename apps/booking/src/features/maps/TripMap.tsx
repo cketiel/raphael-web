@@ -1,6 +1,7 @@
 "use client";
 
 import { AdvancedMarker, Map, Pin, useMap, useMapsLibrary, type MapMouseEvent } from "@vis.gl/react-google-maps";
+import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { reportUsage } from "./places";
 
@@ -64,6 +65,7 @@ interface TripMapProps {
  * as in the original (Booking Web app.js:351-373).
  */
 export function TripMap({ mapId, pickup, dropoff, polyline, onPinMoved }: TripMapProps) {
+  const t = useTranslations("trip");
   function dragEnd(which: "pickup" | "dropoff") {
     return (event: google.maps.MapMouseEvent | MapMouseEvent) => {
       const latLng = "latLng" in event ? event.latLng : null;
@@ -74,10 +76,10 @@ export function TripMap({ mapId, pickup, dropoff, polyline, onPinMoved }: TripMa
   return (
     <div className="h-[380px] w-full overflow-hidden rounded-lg border border-slate-300">
       <Map mapId={mapId} defaultCenter={pickup} defaultZoom={12} gestureHandling="greedy">
-        <AdvancedMarker position={pickup} draggable onDragEnd={dragEnd("pickup")} title="Pickup">
+        <AdvancedMarker position={pickup} draggable onDragEnd={dragEnd("pickup")} title={t("pinPickup")}>
           <Pin background="#dc3545" borderColor="#842029" glyphColor="#fff" />
         </AdvancedMarker>
-        <AdvancedMarker position={dropoff} draggable onDragEnd={dragEnd("dropoff")} title="Dropoff">
+        <AdvancedMarker position={dropoff} draggable onDragEnd={dragEnd("dropoff")} title={t("pinDropoff")}>
           <Pin background="#0d6efd" borderColor="#084298" glyphColor="#fff" />
         </AdvancedMarker>
         <RouteLine encoded={polyline} />

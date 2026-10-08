@@ -1,6 +1,7 @@
 "use client";
 
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import { useLocale } from "next-intl";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { reportUsage, resolvePlace, type PlaceDetails } from "./places";
 
@@ -25,6 +26,7 @@ interface AddressInputProps {
  */
 export function AddressInput({ id, value, placeholder, icon, required, onTextChange, onPlace }: AddressInputProps) {
   const places = useMapsLibrary("places");
+  const locale = useLocale();
   const [suggestions, setSuggestions] = useState<google.maps.places.PlacePrediction[]>([]);
   const [open, setOpen] = useState(false);
   const [typed, setTyped] = useState(false);
@@ -54,7 +56,7 @@ export function AddressInput({ id, value, placeholder, icon, required, onTextCha
   async function choose(prediction: google.maps.places.PlacePrediction) {
     setOpen(false);
     setTyped(false);
-    const details = await resolvePlace(prediction);
+    const details = await resolvePlace(prediction, locale);
     sessionRef.current = null; // Google bills the session; it ends with the choice.
     onPlace(details);
   }

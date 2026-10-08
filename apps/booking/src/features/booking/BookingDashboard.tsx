@@ -1,15 +1,19 @@
 "use client";
 
 import { APIProvider } from "@vis.gl/react-google-maps";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
 import { useFeedback } from "@/components/Feedback";
-import { api, BffError } from "@/lib/bff";
+import { useErrorText } from "@/i18n/useErrorText";
+import { api } from "@/lib/bff";
 import { reportFundingIds, useCustomers, useFundingContext, useSpaceTypes } from "./catalogs";
-import { downloadProductionCsv, type ProductionRow } from "./productionReportCsv";
+import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./productionReportCsv";
 import { localToday, statusBadgeClass, summarize, toTimeInput } from "./rules";
-import { MAPS_LANGUAGE } from "@/features/maps/places";
 import { TripModal } from "./TripModal";
 import type { TripRead } from "./types";
+
+/** Day, month and year in the order the user reads them: 10/20/2026 in English, 20/10/2026 in Spanish. */
+const DATE_FORMAT = { year: "numeric", month: "2-digit", day: "2-digit" } as const;
 
 interface BookingDashboardProps {
   isIntegrator: boolean;
@@ -24,6 +28,12 @@ interface Loaded {
 
 export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashboardProps) {
   const feedback = useFeedback();
+  const t = useTranslations("dashboard");
+  const tStatus = useTranslations("status");
+  const tCsv = useTranslations("csv");
+  const format = useFormatter();
+  const locale = useLocale();
+  const errorText = useErrorText();
   const customers = useCustomers();
   const spaceTypes = useSpaceTypes();
   const funding = useFundingContext(isIntegrator);
@@ -35,6 +45,18 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
   const [modal, setModal] = useState<{ open: boolean; trip: TripRead | null }>({ open: false, trip: null });
 
   const fundingIds = reportFundingIds(funding.data);
+
+  /** The backend's status, in the user's language. A status this portal does not know is shown as it comes. */
+  const statusLabel = (status: string | null | undefined) => (status && tStatus.has(status) ? tStatus(status) : status);
+
+  /** The report in the user's language: headers, Yes/No and dates (the column order never changes). */
+  const csvLocale: CsvLocale = {
+    headers: tCsv.raw("headers") as string[],
+    yes: tCsv("yes"),
+    no: tCsv("no"),
+    formatDate: (value, withTime) =>
+      format.dateTime(value, withTime ? { ...DATE_FORMAT, hour: "2-digit", minute: "2-digit", second: "2-digit" } : DATE_FORMAT),
+  };
 
   /** my-trips, then the production report for the same range (Booking Web app.js:159-179). */
   async function loadTrips() {
@@ -50,14 +72,14 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
         setLoaded({ trips: trips ?? [], report: report ?? [] });
         setSelected(new Set());
       } catch (e) {
-        await feedback.alert(e instanceof BffError ? e.message : "Unable to load trips right now.");
+        await feedback.alert(errorText(e, t("loadFailed")));
       }
     });
   }
 
   // First load once the funding sources are known, as the original loaded catalogs before trips.
   const onFundingReady = useEffectEvent(() => void loadTrips());
-  const onFundingFailed = useEffectEvent((message: string) => void feedback.alert(`Initialization failure: ${message}`));
+  const onFundingFailed = useEffectEvent((message: string) => void feedback.alert(t("initFailed", { message })));
   const fundingReady = funding.isSuccess;
   const fundingError = funding.error?.message;
   useEffect(() => {
@@ -69,7 +91,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
 
   async function cancelTrips(ids: string[]) {
     if (ids.length === 0) return;
-    if (!(await feedback.confirm(`Are you sure you want to cancel ${ids.length} trip(s)?`))) return;
+    if (!(await feedback.confirm(t("confirmCancel", { count: ids.length })))) return;
     try {
       const result = await feedback.busy(async () => {
         const r = await api<{ success?: boolean; cancelledCount?: number; attempted?: number }>("BookingPortal/cancel-multiple", {
@@ -81,17 +103,17 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
       });
       await feedback.alert(
         result?.attempted !== undefined && result.attempted < ids.length
-          ? `Process completed. ${result.attempted} of ${ids.length} trip(s) could be canceled; the rest are in a status that does not allow it.`
-          : "Process completed successfully.",
+          ? t("cancelPartial", { attempted: result.attempted, total: ids.length })
+          : t("cancelDone"),
       );
     } catch (e) {
-      await feedback.alert(`Error: ${e instanceof Error ? e.message : "Unable to cancel right now."}`);
+      await feedback.alert(t("cancelFailed", { message: errorText(e, e instanceof Error ? e.message : t("cancelUnavailable")) }));
     }
   }
 
   const trips = loaded?.trips ?? [];
   const summary = loaded ? summarize(loaded.trips, loaded.report) : null;
-  const allChecked = trips.length > 0 && trips.every((t) => selected.has(t.tripId ?? ""));
+  const allChecked = trips.length > 0 && trips.every((x) => selected.has(x.tripId ?? ""));
 
   function toggle(id: string, on: boolean) {
     setSelected((s) => {
@@ -106,12 +128,12 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
     <>
       <div className="w-full px-6 py-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-xl font-bold text-slate-600">Trip Management</h1>
+          <h1 className="text-xl font-bold text-slate-600">{t("title")}</h1>
           <div className="flex gap-2">
             {selected.size > 0 && (
               <button onClick={() => cancelTrips([...selected])}
                 className="rounded-lg bg-[#dc3545] px-4 py-2 text-sm font-bold text-white shadow-sm">
-                Cancel Selected ({selected.size})
+                {t("cancelSelected", { count: selected.size })}
               </button>
             )}
             <button onClick={() => {
@@ -121,7 +143,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
                 setModal({ open: true, trip: null });
               }}
               className="rounded-lg bg-[#198754] px-4 py-2 text-sm font-bold text-white shadow-sm">
-              + New Booking
+              {t("newBooking")}
             </button>
           </div>
         </div>
@@ -129,22 +151,22 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
         {/* Filters */}
         <div className="mb-6 rounded-2xl bg-surface p-5 shadow-sm">
           <div className="grid items-end gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1fr_1fr_1.4fr]">
-            <label className="text-xs font-bold">Start Date
+            <label className="text-xs font-bold">{t("startDate")}
               <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal" />
             </label>
-            <label className="text-xs font-bold">End Date
+            <label className="text-xs font-bold">{t("endDate")}
               <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal" />
             </label>
             <div className="flex gap-2">
               {/* An end before the start makes the backend throw (TripService.GetByDateRangeAsync → 500). */}
               <button onClick={() => void loadTrips()} disabled={!start || !end || end < start}
                 className="w-full rounded-lg bg-brand py-2 text-sm font-bold text-white disabled:opacity-50">
-                Search
+                {t("search")}
               </button>
               {(loaded?.report.length ?? 0) > 0 && (
-                <button onClick={() => downloadProductionCsv(loaded!.report)}
+                <button onClick={() => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }))}
                   className="w-full rounded-lg border border-[#198754] py-2 text-sm font-bold text-[#198754] hover:bg-[#198754] hover:text-white">
-                  Export Report
+                  {t("exportReport")}
                 </button>
               )}
             </div>
@@ -154,10 +176,10 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
         {/* Summary */}
         {summary && (
           <div className="mb-6 grid gap-3 md:grid-cols-4">
-            <Stat label="Total Trips" value={summary.totalTrips} className="bg-[#0d6efd]" />
-            <Stat label="Billed Trips" value={summary.billedTrips} className="bg-[#198754]" />
-            <Stat label="Canceled Trips" value={summary.canceledTrips} className="bg-[#dc3545]" />
-            <Stat label="Total Billed Value" value={summary.totalBilledValue} className="bg-[#212529]" />
+            <Stat label={t("totalTrips")} value={summary.totalTrips} className="bg-[#0d6efd]" />
+            <Stat label={t("billedTrips")} value={summary.billedTrips} className="bg-[#198754]" />
+            <Stat label={t("canceledTrips")} value={summary.canceledTrips} className="bg-[#dc3545]" />
+            <Stat label={t("totalBilledValue")} value={summary.totalBilledValue} className="bg-[#212529]" />
           </div>
         )}
 
@@ -168,45 +190,45 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
               <thead className="bg-slate-50 text-xs font-bold">
                 <tr>
                   <th className="w-[3%] min-w-10 px-3 py-3">
-                    <input type="checkbox" aria-label="Select all trips" checked={allChecked}
-                      onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((t) => t.tripId ?? "")) : new Set())} />
+                    <input type="checkbox" aria-label={t("selectAll")} checked={allChecked}
+                      onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((x) => x.tripId ?? "")) : new Set())} />
                   </th>
-                  <th className="w-[8%] min-w-[90px] px-3">Trip ID</th>
-                  <th className="w-[12%] min-w-[120px] px-3">Date / Time</th>
-                  <th className="w-[15%] min-w-[150px] px-3">Customer</th>
-                  <th className="px-3">Route Details</th>
-                  <th className="w-[10%] min-w-[100px] px-3 text-center">Status</th>
-                  <th className="w-[10%] min-w-[100px] px-3 text-center">Actions</th>
+                  <th className="w-[8%] min-w-[90px] px-3">{t("colTripId")}</th>
+                  <th className="w-[12%] min-w-[120px] px-3">{t("colDateTime")}</th>
+                  <th className="w-[15%] min-w-[150px] px-3">{t("colCustomer")}</th>
+                  <th className="px-3">{t("colRoute")}</th>
+                  <th className="w-[10%] min-w-[100px] px-3 text-center">{t("colStatus")}</th>
+                  <th className="w-[10%] min-w-[100px] px-3 text-center">{t("colActions")}</th>
                 </tr>
               </thead>
               <tbody>
-                {trips.map((t) => (
-                  <tr key={t.id} className="border-t border-border hover:bg-slate-50">
+                {trips.map((trip) => (
+                  <tr key={trip.id} className="border-t border-border hover:bg-slate-50">
                     <td className="px-3 py-3">
-                      <input type="checkbox" aria-label={`Select trip ${t.tripId || t.id}`} checked={selected.has(t.tripId ?? "")}
-                        onChange={(e) => toggle(t.tripId ?? "", e.target.checked)} />
+                      <input type="checkbox" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
+                        onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
                     </td>
-                    <td className="px-3 font-bold">#{t.tripId || t.id}</td>
+                    <td className="px-3 font-bold">#{trip.tripId || trip.id}</td>
                     <td className="px-3 text-xs">
-                      {new Date(t.date).toLocaleDateString()}
+                      {format.dateTime(new Date(trip.date), DATE_FORMAT)}
                       <br />
-                      {t.fromTime && <span className="mt-1 inline-block rounded border border-border bg-slate-50 px-1.5 py-0.5">{toTimeInput(t.fromTime)}</span>}
+                      {trip.fromTime && <span className="mt-1 inline-block rounded border border-border bg-slate-50 px-1.5 py-0.5">{toTimeInput(trip.fromTime)}</span>}
                     </td>
-                    <td className="px-3 text-xs font-bold">{t.customerName}</td>
+                    <td className="px-3 text-xs font-bold">{trip.customerName}</td>
                     <td className="px-3 py-2">
-                      <span className="block break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {t.pickupAddress}</span>
-                      <span className="mt-1 block break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {t.dropoffAddress}</span>
+                      <span className="block break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</span>
+                      <span className="mt-1 block break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</span>
                     </td>
                     <td className="px-3 text-center">
-                      <span className={`inline-block min-w-[90px] rounded-full px-3 py-1.5 text-[0.75rem] font-semibold uppercase tracking-wide shadow-sm ${statusBadgeClass(t.status)}`}>
-                        {t.status}
+                      <span className={`inline-block min-w-[90px] rounded-full px-3 py-1.5 text-[0.75rem] font-semibold uppercase tracking-wide shadow-sm ${statusBadgeClass(trip.status)}`}>
+                        {statusLabel(trip.status)}
                       </span>
                     </td>
                     <td className="px-3 text-center">
                       <div className="inline-flex overflow-hidden rounded-lg border border-border shadow-sm">
-                        <button onClick={() => setModal({ open: true, trip: t })} title="Edit Trip" aria-label="Edit Trip"
+                        <button onClick={() => setModal({ open: true, trip })} title={t("editTrip")} aria-label={t("editTrip")}
                           className="px-2.5 py-1 text-slate-600 hover:bg-slate-100">✎</button>
-                        <button onClick={() => cancelTrips([t.tripId ?? ""])} title="Cancel Trip" aria-label="Cancel Trip"
+                        <button onClick={() => cancelTrips([trip.tripId ?? ""])} title={t("cancelTrip")} aria-label={t("cancelTrip")}
                           className="border-l border-border px-2.5 py-1 text-[#dc3545] hover:bg-red-50">✕</button>
                       </div>
                     </td>
@@ -219,7 +241,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
       </div>
 
       {/* Maps JavaScript loads only when the form opens, never with the dashboard. */}
-      {modal.open && <APIProvider apiKey={mapsKey} language={MAPS_LANGUAGE} region="US"><TripModal
+      {modal.open && <APIProvider apiKey={mapsKey} language={locale} region="US"><TripModal
         key={modal.trip?.id ?? "new"}
         trip={modal.trip}
         customers={customers.data ?? []}

@@ -100,8 +100,8 @@ describe("fixes over the original", () => {
   it("accepts only Word or PDF attachments up to 10 MB", () => {
     expect(attachmentProblem({ name: "Order.PDF", size: 2_000 })).toBeNull();
     expect(attachmentProblem({ name: "notes.docx", size: 2_000 })).toBeNull();
-    expect(attachmentProblem({ name: "photo.jpg", size: 2_000 })).toMatch(/Word or PDF/);
-    expect(attachmentProblem({ name: "big.pdf", size: 11 * 1024 * 1024 })).toMatch(/10 MB/);
+    expect(attachmentProblem({ name: "photo.jpg", size: 2_000 })).toBe("attachmentType");
+    expect(attachmentProblem({ name: "big.pdf", size: 11 * 1024 * 1024 })).toBe("attachmentSize");
     expect(attachmentProblem(null)).toBeNull();
   });
 

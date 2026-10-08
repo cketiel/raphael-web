@@ -1,11 +1,15 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { bff, BffError } from "@/lib/bff";
+import { useErrorText } from "@/i18n/useErrorText";
+import { bff } from "@/lib/bff";
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations();
+  const errorText = useErrorText();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -21,7 +25,7 @@ export default function LoginPage() {
       });
       router.replace("/");
     } catch (e) {
-      setError(e instanceof BffError ? e.message : "Unable to sign in right now.");
+      setError(errorText(e, t("login.failed")));
       setBusy(false);
     }
   }
@@ -29,14 +33,14 @@ export default function LoginPage() {
   return (
     <main className="flex flex-1 items-center justify-center bg-navy px-4">
       <form onSubmit={onSubmit} className="w-full max-w-sm rounded-2xl bg-surface p-8 shadow-xl">
-        <h1 className="text-2xl font-bold">Raphael Booking Portal</h1>
-        <p className="mt-1 text-sm text-muted">Sign in with your facility account.</p>
+        <h1 className="text-2xl font-bold">{t("common.appName")}</h1>
+        <p className="mt-1 text-sm text-muted">{t("login.subtitle")}</p>
 
-        <label className="mt-6 block text-sm font-medium" htmlFor="username">User</label>
+        <label className="mt-6 block text-sm font-medium" htmlFor="username">{t("login.user")}</label>
         <input id="username" name="username" autoComplete="username" required
           className="mt-1 w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-brand" />
 
-        <label className="mt-4 block text-sm font-medium" htmlFor="password">Password</label>
+        <label className="mt-4 block text-sm font-medium" htmlFor="password">{t("login.password")}</label>
         <input id="password" name="password" type="password" autoComplete="current-password" required
           className="mt-1 w-full rounded-lg border border-border px-3 py-2 outline-none focus:border-brand" />
 
@@ -44,7 +48,7 @@ export default function LoginPage() {
 
         <button type="submit" disabled={busy}
           className="mt-6 w-full rounded-lg bg-gradient-to-r from-brand to-brand-2 py-2.5 font-semibold text-white disabled:opacity-60">
-          {busy ? "Authenticating..." : "LOGIN"}
+          {busy ? t("login.submitting") : t("login.submit")}
         </button>
       </form>
     </main>
