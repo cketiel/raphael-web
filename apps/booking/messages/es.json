@@ -16,7 +16,11 @@
     "environment": "Entorno {name} — no es producción",
     "user": "Usuario: {name}",
     "logout": "Cerrar sesión",
-    "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY no está configurada en el servidor."
+    "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY no está configurada en el servidor.",
+    "tabs": {
+      "trips": "Viajes",
+      "catalog": "Catálogo"
+    }
   },
   "login": {
     "subtitle": "Inicia sesión con la cuenta de tu centro.",
@@ -74,7 +78,9 @@
     "cancelDone": "Proceso terminado correctamente.",
     "cancelFailed": "Error: {message}",
     "cancelUnavailable": "No se puede cancelar ahora mismo.",
-    "trackTrip": "Seguir viaje"
+    "trackTrip": "Seguir viaje",
+    "providerLabel": "Proveedor: {name}",
+    "providerDefault": "Raphael (por defecto)"
   },
   "status": {
     "Assigned": "Asignado",
@@ -152,7 +158,10 @@
     "saveFailed": "No se puede guardar la reserva ahora mismo.",
     "attachmentType": "El adjunto tiene que ser un archivo Word o PDF.",
     "attachmentSize": "El adjunto no puede superar los 10 MB.",
-    "attachmentEmpty": "El adjunto está vacío."
+    "attachmentEmpty": "El adjunto está vacío.",
+    "provider": "Proveedor",
+    "providerDefault": "Raphael (por defecto)",
+    "providerNoneContracted": "No tienes proveedores contratados que operen en Raphael. Búscalos en la pestaña Catálogo."
   },
   "notifications": {
     "title": "Notificaciones en vivo",
@@ -267,5 +276,58 @@
     "saving": "Guardando...",
     "changed": "Tu contraseña se ha cambiado.",
     "failed": "No se puede cambiar la contraseña ahora mismo."
+  },
+  "catalog": {
+    "title": "Catálogo",
+    "searchPlaceholder": "Buscar por nombre, ciudad, teléfono…",
+    "groups": "Grupos",
+    "allGroups": "Todos",
+    "county": "Condado",
+    "allCounties": "Todos los condados",
+    "city": "Ciudad",
+    "allCities": "Todas las ciudades",
+    "contractedFilter": "Contratados",
+    "all": "Todos",
+    "contracted": "Contratado",
+    "notContracted": "No contratados",
+    "operates": "Opera en Raphael",
+    "inactive": "Inactivo",
+    "summary": "{total, plural, one {# resultado} other {# resultados}} · {contracted} contratados",
+    "loading": "Cargando…",
+    "loadFailed": "No se puede cargar el catálogo ahora mismo.",
+    "colName": "Nombre",
+    "colGroup": "Grupo",
+    "colPlace": "Ciudad / Condado",
+    "colPhone": "Teléfono",
+    "colStatus": "Estado",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "pageOf": "Página {page} de {pages}",
+    "contact": "Contacto",
+    "regulatory": "Licencias y cobertura",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Email",
+    "website": "Web",
+    "contactName": "Persona de contacto",
+    "serviceLevel": "Nivel de servicio",
+    "coverageArea": "Zona de cobertura",
+    "emsLicense": "Licencia EMS",
+    "licenseExpires": "Caducidad de la licencia",
+    "planSegment": "Segmento del plan",
+    "notOperatingYet": "Este proveedor todavía no opera en Raphael: está en tu lista, pero no se le pueden asignar viajes hasta que tenga cuenta.",
+    "contract": "Contratar",
+    "remove": "Quitar de contratados",
+    "edit": "Editar datos de contacto",
+    "confirmRemove": "¿Quitar a {name} de tus proveedores contratados? Los viajes ya asignados lo conservan.",
+    "inactiveCannotContract": "Un proveedor inactivo no se puede contratar.",
+    "actionFailed": "No se ha podido guardar el cambio ahora mismo.",
+    "editWarning": "Estos datos son compartidos: todos los centros y la oficina verán tus cambios.",
+    "name": "Nombre",
+    "street": "Calle",
+    "state": "Estado",
+    "zip": "Zip",
+    "save": "Guardar",
+    "saving": "Guardando..."
   }
 }

@@ -334,6 +334,14 @@ export interface paths {
                         CustomerDOB?: string | null;
                         RoundTripPickupComment?: string;
                         RoundTripDropoffComment?: string;
+                        /**
+                         * Format: int32
+                         * @description The Provider the clinic gives the trip to; null is the super broker. Applied only when
+                         *     Raphael.Shared.DTOs.PortalTripDto.SetProvider is true: the old Booking Web never sends it, and reading its
+                         *     silence as "super broker" would wipe a Provider the office had assigned.
+                         */
+                        ProviderId?: number | null;
+                        SetProvider?: boolean;
                         TripId: string;
                         /** Format: date-time */
                         Date: string;
@@ -386,6 +394,14 @@ export interface paths {
                         CustomerDOB?: string | null;
                         RoundTripPickupComment?: string;
                         RoundTripDropoffComment?: string;
+                        /**
+                         * Format: int32
+                         * @description The Provider the clinic gives the trip to; null is the super broker. Applied only when
+                         *     Raphael.Shared.DTOs.PortalTripDto.SetProvider is true: the old Booking Web never sends it, and reading its
+                         *     silence as "super broker" would wipe a Provider the office had assigned.
+                         */
+                        ProviderId?: number | null;
+                        SetProvider?: boolean;
                         TripId: string;
                         /** Format: date-time */
                         Date: string;
@@ -632,6 +648,304 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PortalCatalogCategoryDto"][];
+                        "application/json": components["schemas"]["PortalCatalogCategoryDto"][];
+                        "text/json": components["schemas"]["PortalCatalogCategoryDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/providers/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Term?: string;
+                    GroupId?: number | null;
+                    CountyId?: number | null;
+                    City?: string;
+                    /** @description True: only the ones this clinic contracted. False: only the ones it did not. */
+                    Contracted?: boolean | null;
+                    PageNumber?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PortalCatalogProviderRowDtoPortalCatalogPageDto"];
+                        "application/json": components["schemas"]["PortalCatalogProviderRowDtoPortalCatalogPageDto"];
+                        "text/json": components["schemas"]["PortalCatalogProviderRowDtoPortalCatalogPageDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/providers/assignable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AssignableProviderDto"][];
+                        "application/json": components["schemas"]["AssignableProviderDto"][];
+                        "text/json": components["schemas"]["AssignableProviderDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/providers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PortalCatalogProviderDetailDto"];
+                        "application/json": components["schemas"]["PortalCatalogProviderDetailDto"];
+                        "text/json": components["schemas"]["PortalCatalogProviderDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** @description A name and zip that belong to another catalog entry answer 409 (global handler). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PortalCatalogProviderEditDto"];
+                    "text/json": components["schemas"]["PortalCatalogProviderEditDto"];
+                    "application/*+json": components["schemas"]["PortalCatalogProviderEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PortalCatalogProviderDetailDto"];
+                        "application/json": components["schemas"]["PortalCatalogProviderDetailDto"];
+                        "text/json": components["schemas"]["PortalCatalogProviderDetailDto"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/providers/{id}/contract": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -10181,6 +10495,15 @@ export interface components {
              */
             environment?: string | null;
         };
+        /** @description A Provider a trip can be given to: contracted, active and with an account. */
+        AssignableProviderDto: {
+            /**
+             * Format: int32
+             * @description The account id: what `Trip.ProviderId` stores.
+             */
+            providerId?: number;
+            name?: string | null;
+        };
         /**
          * What `POST /api/Auth/refresh` answers with: a new access token and the refresh
          *     token that replaces the one just spent.
@@ -11870,6 +12193,109 @@ export interface components {
             /** @description One of Raphael.Shared.DTOs.Routing.RoutingContract.Sources. */
             source?: string | null;
         };
+        /**
+         * A catalog category a clinic can see in the Booking Portal, with its groups.
+         * @description The catalog will have five or six fixed categories, some with groups and some without
+         *     (CATALOG_MODEL.md §4.4). Today a clinic sees only `providers`.
+         */
+        PortalCatalogCategoryDto: {
+            /** @description Stable key the portal routes on: `providers`. */
+            key?: string | null;
+            nameEn?: string | null;
+            nameEs?: string | null;
+            /** @description Empty when the category has no groups. */
+            groups?: components["schemas"]["CatalogCategoryDto"][] | null;
+        };
+        /** @description A catalog Provider's file in the portal. */
+        PortalCatalogProviderDetailDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            groupId?: number;
+            groupNameEn?: string | null;
+            groupNameEs?: string | null;
+            city?: string | null;
+            county?: string | null;
+            state?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            isActive?: boolean;
+            /** @description This clinic contracted it. */
+            contracted?: boolean;
+            /** @description It has an account in Raphael: trips can be given to it. */
+            operatesInRaphael?: boolean;
+            address?: string | null;
+            zip?: string | null;
+            contactName?: string | null;
+            /** Format: double */
+            latitude?: number | null;
+            /** Format: double */
+            longitude?: number | null;
+            npi?: string | null;
+            serviceLevel?: string | null;
+            coverageArea?: string | null;
+            emsLicense?: string | null;
+            /** Format: date-time */
+            licenseExpiresOn?: string | null;
+            planSegment?: string | null;
+            /** @description The caller may edit its contact details: a clinic admin who contracted it. */
+            canEdit?: boolean;
+            /** @description The caller may contract it or remove it: a clinic admin. */
+            canContract?: boolean;
+        };
+        /** @description The contact details a clinic admin may change on a Provider it contracted. */
+        PortalCatalogProviderEditDto: {
+            name?: string | null;
+            address?: string | null;
+            city?: string | null;
+            state?: string | null;
+            zip?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            contactName?: string | null;
+        };
+        /** @description A catalog Provider as a row of the portal's list. */
+        PortalCatalogProviderRowDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            groupId?: number;
+            groupNameEn?: string | null;
+            groupNameEs?: string | null;
+            city?: string | null;
+            county?: string | null;
+            state?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            isActive?: boolean;
+            /** @description This clinic contracted it. */
+            contracted?: boolean;
+            /** @description It has an account in Raphael: trips can be given to it. */
+            operatesInRaphael?: boolean;
+        };
+        /** @description One page of a portal catalog search, with what the filters can offer. */
+        PortalCatalogProviderRowDtoPortalCatalogPageDto: {
+            items?: components["schemas"]["PortalCatalogProviderRowDto"][] | null;
+            /** Format: int32 */
+            totalCount?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
+            groups?: components["schemas"]["CatalogFacetValueDto"][] | null;
+            counties?: components["schemas"]["CatalogFacetValueDto"][] | null;
+            cities?: components["schemas"]["CatalogFacetValueDto"][] | null;
+            /**
+             * Format: int32
+             * @description How many of the matching entries this clinic has contracted.
+             */
+            contractedCount?: number;
+        };
         ProblemDetails: {
             type?: string | null;
             title?: string | null;
@@ -12932,6 +13358,12 @@ export interface components {
             fundingSourceName?: string | null;
             pickupCity?: string | null;
             dropoffCity?: string | null;
+            /**
+             * Format: int32
+             * @description The Provider carrying out the trip; null when it is the super broker's.
+             */
+            providerId?: number | null;
+            providerName?: string | null;
         };
         /**
          * What the Booking Portal's tracking view shows for one trip: where, when it is expected, and

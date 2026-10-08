@@ -16,7 +16,11 @@
     "environment": "{name} environment — not production",
     "user": "User: {name}",
     "logout": "Logout",
-    "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY is not configured on the server."
+    "mapsKeyMissing": "GOOGLE_MAPS_BROWSER_KEY is not configured on the server.",
+    "tabs": {
+      "trips": "Trips",
+      "catalog": "Catalog"
+    }
   },
   "login": {
     "subtitle": "Sign in with your facility account.",
@@ -74,7 +78,9 @@
     "cancelDone": "Process completed successfully.",
     "cancelFailed": "Error: {message}",
     "cancelUnavailable": "Unable to cancel right now.",
-    "trackTrip": "Track Trip"
+    "trackTrip": "Track Trip",
+    "providerLabel": "Provider: {name}",
+    "providerDefault": "Raphael (default)"
   },
   "status": {
     "Assigned": "Assigned",
@@ -152,7 +158,10 @@
     "saveFailed": "Unable to save the booking right now.",
     "attachmentType": "The attachment must be a Word or PDF file.",
     "attachmentSize": "The attachment cannot be larger than 10 MB.",
-    "attachmentEmpty": "The attachment is empty."
+    "attachmentEmpty": "The attachment is empty.",
+    "provider": "Provider",
+    "providerDefault": "Raphael (default)",
+    "providerNoneContracted": "You have no contracted providers that operate in Raphael. Find them in the Catalog tab."
   },
   "notifications": {
     "title": "Live notifications",
@@ -267,5 +276,58 @@
     "saving": "Saving...",
     "changed": "Your password has been changed.",
     "failed": "The password could not be changed right now."
+  },
+  "catalog": {
+    "title": "Catalog",
+    "searchPlaceholder": "Search by name, city, phone…",
+    "groups": "Groups",
+    "allGroups": "All",
+    "county": "County",
+    "allCounties": "All counties",
+    "city": "City",
+    "allCities": "All cities",
+    "contractedFilter": "Contracted",
+    "all": "All",
+    "contracted": "Contracted",
+    "notContracted": "Not contracted",
+    "operates": "Operates in Raphael",
+    "inactive": "Inactive",
+    "summary": "{total, plural, one {# result} other {# results}} · {contracted} contracted",
+    "loading": "Loading…",
+    "loadFailed": "Unable to load the catalog right now.",
+    "colName": "Name",
+    "colGroup": "Group",
+    "colPlace": "City / County",
+    "colPhone": "Phone",
+    "colStatus": "Status",
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {page} of {pages}",
+    "contact": "Contact",
+    "regulatory": "Licensing and coverage",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website",
+    "contactName": "Contact person",
+    "serviceLevel": "Service level",
+    "coverageArea": "Coverage area",
+    "emsLicense": "EMS license",
+    "licenseExpires": "License expires",
+    "planSegment": "Plan segment",
+    "notOperatingYet": "This provider does not operate in Raphael yet: it is in your list, but trips cannot be given to it until it has an account.",
+    "contract": "Contract",
+    "remove": "Remove from contracted",
+    "edit": "Edit contact details",
+    "confirmRemove": "Remove {name} from your contracted providers? Trips already given to it keep it.",
+    "inactiveCannotContract": "An inactive provider cannot be contracted.",
+    "actionFailed": "The change could not be saved right now.",
+    "editWarning": "These details are shared: every facility and the office will see your changes.",
+    "name": "Name",
+    "street": "Street address",
+    "state": "State",
+    "zip": "Zip",
+    "save": "Save",
+    "saving": "Saving..."
   }
 }

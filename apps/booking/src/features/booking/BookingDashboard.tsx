@@ -249,6 +249,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
                     {format.dateTime(new Date(trip.date), DATE_FORMAT)}{trip.fromTime ? ` · ${toTimeInput(trip.fromTime)}` : ""}
                   </p>
                   <p className="mt-1 text-sm font-bold">{trip.customerName}</p>
+                  <p className="text-xs text-muted">{t("providerLabel", { name: trip.providerName ?? t("providerDefault") })}</p>
                   <p className="mt-2 break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</p>
                   <p className="mt-1 break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</p>
                   <div className="mt-3 flex justify-end">{rowActions(trip)}</div>
@@ -289,7 +290,10 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
                       <br />
                       {trip.fromTime && <span className="mt-1 inline-block rounded border border-border bg-slate-50 px-1.5 py-0.5">{toTimeInput(trip.fromTime)}</span>}
                     </td>
-                    <td className="px-3 text-xs font-bold">{trip.customerName}</td>
+                    <td className="px-3 text-xs">
+                      <span className="font-bold">{trip.customerName}</span>
+                      <span className="mt-1 block text-muted">{t("providerLabel", { name: trip.providerName ?? t("providerDefault") })}</span>
+                    </td>
                     <td className="px-3 py-2">
                       <span className="block break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</span>
                       <span className="mt-1 block break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</span>

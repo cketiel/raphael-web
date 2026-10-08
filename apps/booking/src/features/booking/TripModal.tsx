@@ -10,6 +10,7 @@ import { api } from "@/lib/bff";
 import { AddressInput } from "@/features/maps/AddressInput";
 import type { PlaceDetails } from "@/features/maps/places";
 import { TripMap, type LatLng } from "@/features/maps/TripMap";
+import { useAssignableProviders } from "@/features/catalog/catalogApi";
 import type { Customer, FundingContext, SpaceType } from "./catalogs";
 import {
   ATTACHMENT_EXTENSIONS, attachmentProblem, cityForSave, formatUsPhone, isValidDob, localToday,
@@ -135,6 +136,18 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
   const [distance, setDistance] = useState(() => (trip?.distance != null ? String(trip.distance) : "0"));
   const [leg, setLeg] = useState<LegResult | null>(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
+  // "" is Raphael, the default: the trip stays with the super broker.
+  const [providerId, setProviderId] = useState(() => (trip?.providerId != null ? String(trip.providerId) : ""));
+  // Only a clinic chooses among its contracted Providers; a broker user does not get the list.
+  const isClinic = funding?.kind === "integrator" || funding?.kind === "integrator-unlinked";
+  const assignable = useAssignableProviders();
+  const providerOptions = [
+    ...(assignable.data ?? []).map((p) => ({ id: String(p.providerId), name: p.name ?? "" })),
+    // The office may have given the trip to a Provider this clinic has not contracted: it stays an option.
+    ...(trip?.providerId != null && !(assignable.data ?? []).some((p) => p.providerId === trip.providerId)
+      ? [{ id: String(trip.providerId), name: trip.providerName ?? `#${trip.providerId}` }]
+      : []),
+  ];
   const fileRef = useRef<HTMLInputElement>(null);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
@@ -295,6 +308,11 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
       data.append("RoundTripDropoffComment", form.roundTripDropoffComment);
     }
     if (file) data.append("Attachment", file);
+    if (isClinic) {
+      // Always explicit: without SetProvider the backend leaves the trip's Provider as it is.
+      data.append("SetProvider", "true");
+      if (providerId) data.append("ProviderId", providerId);
+    }
 
     try {
       await feedback.busy(async () => {
@@ -389,6 +407,17 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
                     </>
                   )}
                 </Field>
+                {isClinic && (
+                  <Field label={t("provider")} className="col-span-4 text-xs font-semibold">
+                    <select className={input} value={providerId} onChange={(e) => setProviderId(e.target.value)}>
+                      <option value="">{t("providerDefault")}</option>
+                      {providerOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                    </select>
+                    {!assignable.isLoading && providerOptions.length === 0 && (
+                      <p className="mt-1 text-[0.7rem] font-normal text-muted">{t("providerNoneContracted")}</p>
+                    )}
+                  </Field>
+                )}
               </div>
             </Section>
 

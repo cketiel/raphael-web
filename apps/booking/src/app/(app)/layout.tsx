@@ -1,25 +1,22 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 import { FeedbackProvider } from "@/components/Feedback";
-import { BookingDashboard } from "@/features/booking/BookingDashboard";
+import { UserMenu } from "@/features/account/UserMenu";
 import { NotificationBell } from "@/features/realtime/NotificationBell";
 import { RealtimeProvider } from "@/features/realtime/RealtimeProvider";
 import { selectEnvironment } from "@/server/environments";
 import { getSession } from "@/server/session";
-import { UserMenu } from "@/features/account/UserMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { NavTabs } from "./NavTabs";
 
-export default async function DashboardPage() {
+/** Every signed-in page: the header, the section tabs and the live channels, opened once. */
+export default async function SignedInLayout({ children }: { children: ReactNode }) {
   const session = await getSession();
   if (!session.user || !session.refreshToken) redirect("/login");
 
   const t = await getTranslations();
   const environment = selectEnvironment();
-  // Read at request time, not at build time: changing the key in Azure's App Settings needs a
-  // restart, never a rebuild (CLIENT_CONFIG_POLICY). Public by Google's design: the referrer
-  // restriction and the daily quota are what protect it.
-  const mapsKey = process.env.GOOGLE_MAPS_BROWSER_KEY ?? "";
-  const mapId = process.env.GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID";
 
   return (
     <FeedbackProvider>
@@ -35,11 +32,8 @@ export default async function DashboardPage() {
           <LanguageSwitcher />
           <UserMenu username={session.user.username} />
         </nav>
-        {mapsKey ? (
-          <BookingDashboard isIntegrator={session.user.integratorId != null} mapsKey={mapsKey} mapId={mapId} />
-        ) : (
-          <p className="p-6 text-sm text-red-600">{t("nav.mapsKeyMissing")}</p>
-        )}
+        <NavTabs />
+        {children}
       </RealtimeProvider>
     </FeedbackProvider>
   );

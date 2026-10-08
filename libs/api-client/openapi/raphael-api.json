@@ -405,6 +405,15 @@
                   "RoundTripDropoffComment": {
                     "type": "string"
                   },
+                  "ProviderId": {
+                    "type": "integer",
+                    "description": "The Provider the clinic gives the trip to; null is the super broker. Applied only when\r\nRaphael.Shared.DTOs.PortalTripDto.SetProvider is true: the old Booking Web never sends it, and reading its\r\nsilence as \"super broker\" would wipe a Provider the office had assigned.",
+                    "format": "int32",
+                    "nullable": true
+                  },
+                  "SetProvider": {
+                    "type": "boolean"
+                  },
                   "TripId": {
                     "type": "string"
                   },
@@ -528,6 +537,12 @@
                   "style": "form"
                 },
                 "RoundTripDropoffComment": {
+                  "style": "form"
+                },
+                "ProviderId": {
+                  "style": "form"
+                },
+                "SetProvider": {
                   "style": "form"
                 },
                 "TripId": {
@@ -659,6 +674,15 @@
                   "RoundTripDropoffComment": {
                     "type": "string"
                   },
+                  "ProviderId": {
+                    "type": "integer",
+                    "description": "The Provider the clinic gives the trip to; null is the super broker. Applied only when\r\nRaphael.Shared.DTOs.PortalTripDto.SetProvider is true: the old Booking Web never sends it, and reading its\r\nsilence as \"super broker\" would wipe a Provider the office had assigned.",
+                    "format": "int32",
+                    "nullable": true
+                  },
+                  "SetProvider": {
+                    "type": "boolean"
+                  },
                   "TripId": {
                     "type": "string"
                   },
@@ -782,6 +806,12 @@
                   "style": "form"
                 },
                 "RoundTripDropoffComment": {
+                  "style": "form"
+                },
+                "ProviderId": {
+                  "style": "form"
+                },
+                "SetProvider": {
                   "style": "form"
                 },
                 "TripId": {
@@ -1089,6 +1119,412 @@
           },
           "404": {
             "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/categories": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalCatalogCategoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalCatalogCategoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalCatalogCategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/search": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "Term",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "GroupId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "CountyId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "City",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Contracted",
+            "in": "query",
+            "description": "True: only the ones this clinic contracted. False: only the ones it did not.",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderRowDtoPortalCatalogPageDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderRowDtoPortalCatalogPageDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderRowDtoPortalCatalogPageDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/assignable": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssignableProviderDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssignableProviderDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssignableProviderDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/{id}": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "description": "A name and zip that belong to another catalog entry answer 409 (global handler).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalCatalogProviderEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalCatalogProviderEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalCatalogProviderEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalCatalogProviderDetailDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/{id}/contract": {
+      "post": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "text/plain": {
                 "schema": {
@@ -11134,6 +11570,22 @@
         "additionalProperties": false,
         "description": "<br>\r\n            Deliberately two fields. This is the one version answer served without a token, so it\r\n            carries what an application needs before anybody has signed in — to check it is current,\r\n            and to refuse to show production data on a screen that was pointed at development by\r\n            mistake — and nothing that describes the inside of the system. The commit, the build\r\n            time and the state of the database live in Raphael.Shared.DTOs.ApiVersionDetailsDto, behind\r\n            authentication.\r\n            "
       },
+      "AssignableProviderDto": {
+        "type": "object",
+        "properties": {
+          "providerId": {
+            "type": "integer",
+            "description": "The account id: what `Trip.ProviderId` stores.",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A Provider a trip can be given to: contracted, active and with an account."
+      },
       "AuthTokenPairDto": {
         "title": "What `POST /api/Auth/refresh` answers with: a new access token and the refresh\r\ntoken that replaces the one just spent.",
         "type": "object",
@@ -15384,6 +15836,309 @@
         "additionalProperties": false,
         "description": "The browser key is the only one with Places enabled, so the map pages stay the caller —\r\nbut they ask here first, and hand back whatever they had to buy. Next time nobody pays."
       },
+      "PortalCatalogCategoryDto": {
+        "title": "A catalog category a clinic can see in the Booking Portal, with its groups.",
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Stable key the portal routes on: `providers`.",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "nameEs": {
+            "type": "string",
+            "nullable": true
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogCategoryDto"
+            },
+            "description": "Empty when the category has no groups.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The catalog will have five or six fixed categories, some with groups and some without\r\n(CATALOG_MODEL.md §4.4). Today a clinic sees only `providers`."
+      },
+      "PortalCatalogProviderDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupNameEs": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "contracted": {
+            "type": "boolean",
+            "description": "This clinic contracted it."
+          },
+          "operatesInRaphael": {
+            "type": "boolean",
+            "description": "It has an account in Raphael: trips can be given to it."
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "npi": {
+            "type": "string",
+            "nullable": true
+          },
+          "serviceLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverageArea": {
+            "type": "string",
+            "nullable": true
+          },
+          "emsLicense": {
+            "type": "string",
+            "nullable": true
+          },
+          "licenseExpiresOn": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "planSegment": {
+            "type": "string",
+            "nullable": true
+          },
+          "canEdit": {
+            "type": "boolean",
+            "description": "The caller may edit its contact details: a clinic admin who contracted it."
+          },
+          "canContract": {
+            "type": "boolean",
+            "description": "The caller may contract it or remove it: a clinic admin."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A catalog Provider's file in the portal."
+      },
+      "PortalCatalogProviderEditDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The contact details a clinic admin may change on a Provider it contracted."
+      },
+      "PortalCatalogProviderRowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupNameEs": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "contracted": {
+            "type": "boolean",
+            "description": "This clinic contracted it."
+          },
+          "operatesInRaphael": {
+            "type": "boolean",
+            "description": "It has an account in Raphael: trips can be given to it."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A catalog Provider as a row of the portal's list."
+      },
+      "PortalCatalogProviderRowDtoPortalCatalogPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PortalCatalogProviderRowDto"
+            },
+            "nullable": true
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogFacetValueDto"
+            },
+            "nullable": true
+          },
+          "counties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogFacetValueDto"
+            },
+            "nullable": true
+          },
+          "cities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogFacetValueDto"
+            },
+            "nullable": true
+          },
+          "contractedCount": {
+            "type": "integer",
+            "description": "How many of the matching entries this clinic has contracted.",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false,
+        "description": "One page of a portal catalog search, with what the filters can offer."
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -17933,6 +18688,16 @@
             "nullable": true
           },
           "dropoffCity": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerId": {
+            "type": "integer",
+            "description": "The Provider carrying out the trip; null when it is the super broker's.",
+            "format": "int32",
+            "nullable": true
+          },
+          "providerName": {
             "type": "string",
             "nullable": true
           }
