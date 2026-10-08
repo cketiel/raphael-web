@@ -4,8 +4,12 @@ import type { Schemas } from "@raphael/api-client";
 import { AdvancedMarker, Map, Pin, useMap } from "@vis.gl/react-google-maps";
 import { useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useState } from "react";
+import { IconOnTheWay, IconPin, IconTrack } from "@/components/ui/Icon";
+import { Modal } from "@/components/ui/Modal";
+import { Notice } from "@/components/ui/Surface";
+import { StatusBadge } from "@/features/booking/StatusBadge";
 import { api } from "@/lib/bff";
-import { ReportMapLoad, type LatLng } from "@/features/maps/TripMap";
+import { PIN, ReportMapLoad, type LatLng } from "@/features/maps/TripMap";
 import { useRealtime, type TripVehiclePosition } from "@/features/realtime/RealtimeProvider";
 
 type Tracking = Schemas["TripTrackingDto"];
@@ -44,7 +48,6 @@ interface TrackingModalProps {
  */
 export function TrackingModal({ tripId, mapId, onClose }: TrackingModalProps) {
   const t = useTranslations("tracking");
-  const tStatus = useTranslations("status");
   const tc = useTranslations("common");
   const { watchTrip, onTripStatus } = useRealtime();
   const [tracking, setTracking] = useState<Tracking | null>(null);
@@ -89,89 +92,77 @@ export function TrackingModal({ tripId, mapId, onClose }: TrackingModalProps) {
   const dropoff = tracking ? { lat: tracking.dropoffLatitude ?? 0, lng: tracking.dropoffLongitude ?? 0 } : null;
   const points = [pickup, dropoff, inProgress ? vehicle : null].filter((p): p is LatLng => !!p);
   const status = tracking?.status ?? "";
-  const statusText = status && tStatus.has(status) ? tStatus(status) : status;
 
   return (
-    <div className="fixed inset-0 z-[1050] flex items-stretch justify-center bg-slate-900/50 sm:items-start sm:overflow-y-auto sm:p-4" role="presentation">
-      <section role="dialog" aria-modal="true" aria-labelledby="tracking-title"
-        className="flex w-full flex-col bg-surface shadow-2xl sm:my-6 sm:max-w-5xl sm:rounded-2xl">
-        <div className="flex items-center justify-between gap-3 border-b border-border bg-slate-50 px-4 py-3 sm:rounded-t-2xl sm:px-6 sm:py-4">
-          <h2 id="tracking-title" className="text-lg font-bold text-brand">{t("title", { id: tripId })}</h2>
-          <button type="button" onClick={onClose} aria-label={tc("close")} className="text-2xl leading-none text-muted hover:text-foreground">×</button>
-        </div>
+    <Modal size="xl" icon={IconTrack} labelledBy="tracking-title" onClose={onClose}
+      title={t("title", { id: tripId })}
+      subtitle={tracking && <span className="mt-1 inline-flex"><StatusBadge status={status} /></span>}>
+      {failed ? (
+        <Notice tone="danger">{t("loadFailed")}</Notice>
+      ) : !tracking ? (
+        <p className="text-sm text-muted">{tc("loading")}</p>
+      ) : (
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,22rem)_1fr]">
+          <div className="space-y-4">
+            <Stop tone="pickup" label={t("pickup")} address={tracking.pickupAddress}
+              rows={[
+                [t("requested"), hhmm(tracking.requestedPickupTime)],
+                [t("eta"), hhmm(tracking.pickupEta)],
+                [t("arrived"), hhmm(tracking.pickupArrivedAt)],
+                [t("pickedUp"), hhmm(tracking.pickedUpAt)],
+              ]} />
+            <Stop tone="dropoff" label={t("dropoff")} address={tracking.dropoffAddress}
+              rows={[
+                [t("appointment"), hhmm(tracking.appointmentTime)],
+                [t("eta"), hhmm(tracking.dropoffEta)],
+                [t("arrived"), hhmm(tracking.dropoffArrivedAt)],
+                [t("droppedOff"), hhmm(tracking.droppedOffAt)],
+              ]} />
+            {!tracking.pickupEta && !tracking.dropoffEta && <p className="text-sm text-muted">{t("notRouted")}</p>}
+          </div>
 
-        {failed ? (
-          <p className="p-6 text-sm text-red-600">{t("loadFailed")}</p>
-        ) : !tracking ? (
-          <p className="p-6 text-sm text-muted">{tc("loading")}</p>
-        ) : (
-          <div className="grid flex-1 gap-4 overflow-y-auto p-4 sm:p-6 lg:grid-cols-[1fr_2fr]">
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="text-xs font-bold uppercase text-muted">{t("status")}</p>
-                <p className="mt-1 text-base font-bold">{statusText}</p>
-              </div>
-              <Stop color="#dc3545" label={t("pickup")} address={tracking.pickupAddress}
-                rows={[
-                  [t("requested"), hhmm(tracking.requestedPickupTime)],
-                  [t("eta"), hhmm(tracking.pickupEta)],
-                  [t("arrived"), hhmm(tracking.pickupArrivedAt)],
-                  [t("pickedUp"), hhmm(tracking.pickedUpAt)],
-                ]} />
-              <Stop color="#0d6efd" label={t("dropoff")} address={tracking.dropoffAddress}
-                rows={[
-                  [t("appointment"), hhmm(tracking.appointmentTime)],
-                  [t("eta"), hhmm(tracking.dropoffEta)],
-                  [t("arrived"), hhmm(tracking.dropoffArrivedAt)],
-                  [t("droppedOff"), hhmm(tracking.droppedOffAt)],
-                ]} />
-              {!tracking.pickupEta && !tracking.dropoffEta && <p className="text-xs text-muted">{t("notRouted")}</p>}
-            </div>
-
-            <div className="flex min-h-[320px] flex-col">
-              {!inProgress && (
-                <p role="status" className="mb-2 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  {t("onlyWhileInProgress")}
-                </p>
-              )}
-              {inProgress && !vehicle && (
-                <p role="status" className="mb-2 rounded-lg border border-border bg-slate-50 px-3 py-2 text-sm text-muted">{t("waitingPosition")}</p>
-              )}
-              <div className="h-[55vh] min-h-[320px] w-full overflow-hidden rounded-lg border border-slate-300 lg:h-full">
-                <Map mapId={mapId} defaultCenter={pickup ?? { lat: 25.7617, lng: -80.1918 }} defaultZoom={12} gestureHandling="greedy">
-                  {pickup && (
-                    <AdvancedMarker position={pickup} title={t("pickup")}>
-                      <Pin background="#dc3545" borderColor="#842029" glyphColor="#fff" />
-                    </AdvancedMarker>
-                  )}
-                  {dropoff && (
-                    <AdvancedMarker position={dropoff} title={t("dropoff")}>
-                      <Pin background="#0d6efd" borderColor="#084298" glyphColor="#fff" />
-                    </AdvancedMarker>
-                  )}
-                  {inProgress && vehicle && (
-                    <AdvancedMarker position={vehicle} title={t("vehicle")}>
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-[#198754] text-lg shadow-lg" aria-hidden="true">🚐</span>
-                    </AdvancedMarker>
-                  )}
-                  <FitPoints points={points} />
-                  <ReportMapLoad />
-                </Map>
-              </div>
+          <div className="flex min-h-[320px] flex-col gap-3">
+            {!inProgress && <Notice tone="warning"><span role="status">{t("onlyWhileInProgress")}</span></Notice>}
+            {inProgress && !vehicle && <Notice><span role="status">{t("waitingPosition")}</span></Notice>}
+            <div className="h-[55vh] min-h-[320px] w-full overflow-hidden rounded-xl border border-border lg:h-full">
+              <Map mapId={mapId} defaultCenter={pickup ?? { lat: 25.7617, lng: -80.1918 }} defaultZoom={12} gestureHandling="greedy">
+                {pickup && (
+                  <AdvancedMarker position={pickup} title={t("pickup")}>
+                    <Pin background={PIN.pickup.fill} borderColor={PIN.pickup.border} glyphColor="#fff" />
+                  </AdvancedMarker>
+                )}
+                {dropoff && (
+                  <AdvancedMarker position={dropoff} title={t("dropoff")}>
+                    <Pin background={PIN.dropoff.fill} borderColor={PIN.dropoff.border} glyphColor="#fff" />
+                  </AdvancedMarker>
+                )}
+                {inProgress && vehicle && (
+                  <AdvancedMarker position={vehicle} title={t("vehicle")}>
+                    <span className="flex size-10 items-center justify-center rounded-full border-[3px] border-white bg-success text-white shadow-lg" aria-hidden="true">
+                      <IconOnTheWay size={18} />
+                    </span>
+                  </AdvancedMarker>
+                )}
+                <FitPoints points={points} />
+                <ReportMapLoad />
+              </Map>
             </div>
           </div>
-        )}
-      </section>
-    </div>
+        </div>
+      )}
+    </Modal>
   );
 }
 
-function Stop({ color, label, address, rows }: { color: string; label: string; address: string | null | undefined; rows: [string, string | null][] }) {
+function Stop({ tone, label, address, rows }: { tone: "pickup" | "dropoff"; label: string; address: string | null | undefined; rows: [string, string | null][] }) {
   return (
-    <div className="rounded-lg border border-border p-3">
-      <p className="font-bold"><span style={{ color }}>●</span> {label}</p>
-      <p className="mt-1 break-words text-xs text-muted">{address}</p>
-      <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+    <div className="rounded-xl border border-border p-4">
+      <p className="flex items-center gap-2 font-bold">
+        <IconPin size={16} aria-hidden className={tone === "pickup" ? "text-danger" : "text-info"} />
+        {label}
+      </p>
+      <p className="mt-1 break-words text-sm text-muted">{address}</p>
+      <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
         {rows.map(([k, v]) => (
           <div key={k} className="contents">
             <dt className="text-muted">{k}</dt>

@@ -2,21 +2,30 @@
 
 import { APIProvider } from "@vis.gl/react-google-maps";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ComponentType } from "react";
 import { useFeedback } from "@/components/Feedback";
+import { Button } from "@/components/ui/Button";
+import { Field, Input } from "@/components/ui/Form";
+import {
+  IconBilling, IconCancelled, IconCheckCircle, IconEdit, IconExport, IconPin, IconPlus, IconProvider, IconSearch, IconTrack, IconTrips, IconWarning,
+} from "@/components/ui/Icon";
+import { Card, EmptyState, Notice, PageHeader } from "@/components/ui/Surface";
 import { useErrorText } from "@/i18n/useErrorText";
 import { api } from "@/lib/bff";
 import { useRealtime } from "@/features/realtime/RealtimeProvider";
 import { TrackingModal } from "@/features/tracking/TrackingModal";
 import { reportFundingIds, useCustomers, useFundingContext, useSpaceTypes } from "./catalogs";
 import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./productionReportCsv";
-import { localToday, statusBadgeClass, summarize, toTimeInput } from "./rules";
+import { localToday, summarize, toTimeInput } from "./rules";
+import { StatusBadge } from "./StatusBadge";
 import { tripMatches } from "./tripFilter";
 import { TripModal } from "./TripModal";
 import type { TripRead } from "./types";
 
 /** Day, month and year in the order the user reads them: 10/20/2026 in English, 20/10/2026 in Spanish. */
 const DATE_FORMAT = { year: "numeric", month: "2-digit", day: "2-digit" } as const;
+
+type IconComponent = ComponentType<{ size?: number | string; className?: string; "aria-hidden"?: boolean }>;
 
 interface BookingDashboardProps {
   isIntegrator: boolean;
@@ -32,6 +41,13 @@ interface Loaded {
   /** The range these trips were searched for: a live change outside it is not this list's business. */
   start: string;
   end: string;
+}
+
+/** The day after a "YYYY-MM-DD", in the same calendar. */
+function nextDay(day: string) {
+  const d = new Date(`${day}T12:00:00`);
+  d.setDate(d.getDate() + 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: BookingDashboardProps) {
@@ -82,16 +98,24 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: Bookin
     return { trips: trips ?? [], report: report ?? [], start: from, end: to };
   }
 
-  async function loadTrips() {
-    if (!start || !end) return;
+  async function loadTrips(from = start, to = end) {
+    if (!from || !to) return;
     await feedback.busy(async () => {
       try {
-        setLoaded(await fetchTrips(start, end));
+        setLoaded(await fetchTrips(from, to));
         setSelected(new Set());
       } catch (e) {
         await feedback.alert(errorText(e, t("loadFailed")));
       }
     });
+  }
+
+  /** A search the user asks for is a new list: the highlighted trip from a notification is done with. */
+  function search(from = start, to = end) {
+    setHighlightId(null);
+    setStart(from);
+    setEnd(to);
+    void loadTrips(from, to);
   }
 
   // Live status changes. A trip already on screen changes in place; one that is not, but falls in
@@ -166,22 +190,10 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: Bookin
     if (el) highlightRefs.current.set(`${layout}:${id}`, el);
     else highlightRefs.current.delete(`${layout}:${id}`);
   };
-  const highlightClass = (id: number) => (id === highlightId ? "ring-2 ring-amber-400 bg-amber-50" : "");
+  const isHighlighted = (id: number) => id === highlightId;
 
   const summary = loaded ? summarize(loaded.trips, loaded.report) : null;
   const allChecked = trips.length > 0 && trips.every((x) => selected.has(x.tripId ?? ""));
-
-  /** Track, edit and cancel: the same three buttons on the table and on the phone cards. */
-  const rowActions = (trip: TripRead) => (
-      <div className="inline-flex overflow-hidden rounded-lg border border-border shadow-sm">
-        <button onClick={() => setTrackingId(trip.id)} title={t("trackTrip")} aria-label={t("trackTrip")}
-          className="px-2.5 py-1 text-[#198754] hover:bg-emerald-50">📍</button>
-        <button onClick={() => setModal({ open: true, trip })} title={t("editTrip")} aria-label={t("editTrip")}
-          className="border-l border-border px-2.5 py-1 text-slate-600 hover:bg-slate-100">✎</button>
-        <button onClick={() => cancelTrips([trip.tripId ?? ""])} title={t("cancelTrip")} aria-label={t("cancelTrip")}
-          className="border-l border-border px-2.5 py-1 text-[#dc3545] hover:bg-red-50">✕</button>
-      </div>
-  );
 
   function toggle(id: string, on: boolean) {
     setSelected((s) => {
@@ -192,180 +204,197 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: Bookin
     });
   }
 
+  const tripDate = (trip: TripRead) => format.dateTime(new Date(trip.date), DATE_FORMAT);
+
+  /** Track, edit and cancel: the same three buttons on the table and on the phone cards. */
+  const rowActions = (trip: TripRead) => (
+    <div className="flex justify-end gap-1">
+      <Button variant="ghost" size="sm" iconOnly icon={IconTrack} label={t("trackTrip")} onClick={() => setTrackingId(trip.id)} />
+      <Button variant="ghost" size="sm" iconOnly icon={IconEdit} label={t("editTrip")} onClick={() => setModal({ open: true, trip })} />
+      <Button variant="ghost" size="sm" iconOnly icon={IconCancelled} label={t("cancelTrip")} onClick={() => cancelTrips([trip.tripId ?? ""])}
+        className="hover:!bg-danger-soft hover:!text-danger" />
+    </div>
+  );
+
+  const route = (trip: TripRead) => (
+    <div className="space-y-1.5">
+      <p className="flex items-start gap-2 text-sm leading-snug">
+        <IconPin size={15} aria-hidden className="mt-0.5 shrink-0 text-danger" />
+        <span className="break-words">{trip.pickupAddress}</span>
+      </p>
+      <p className="flex items-start gap-2 text-sm leading-snug">
+        <IconPin size={15} aria-hidden className="mt-0.5 shrink-0 text-info" />
+        <span className="break-words">{trip.dropoffAddress}</span>
+      </p>
+    </div>
+  );
+
+  const provider = (trip: TripRead) => (
+    <span className="mt-1 flex items-center gap-1.5 text-xs text-muted">
+      <IconProvider size={12} aria-hidden />
+      {trip.providerName ?? t("providerDefault")}
+    </span>
+  );
+
+  const today = localToday();
+  const highlightRow = "bg-amber-50 shadow-[inset_4px_0_0_#fbbf24]";
+
   return (
     <>
-      <div className="w-full px-3 py-4 sm:px-6 sm:py-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-xl font-bold text-slate-600">{t("title")}</h1>
-          <div className="flex gap-2">
-            {selected.size > 0 && (
-              <button onClick={() => cancelTrips([...selected])}
-                className="rounded-lg bg-[#dc3545] px-4 py-2 text-sm font-bold text-white shadow-sm">
-                {t("cancelSelected", { count: selected.size })}
-              </button>
-            )}
-            <button onClick={() => {
-                // The original re-read the funding source on every New Booking (app.js:593): an FS
-                // linked by an admin a minute ago enables booking without signing in again.
-                void funding.refetch();
-                setModal({ open: true, trip: null });
-              }}
-              className="rounded-lg bg-[#198754] px-4 py-2 text-sm font-bold text-white shadow-sm">
-              {t("newBooking")}
-            </button>
-          </div>
-        </div>
+      <PageHeader title={t("title")} description={t("subtitle")}
+        actions={<>
+          {(loaded?.report.length ?? 0) > 0 && (
+            <Button variant="secondary" icon={IconExport}
+              onClick={() => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }))}>
+              {t("exportReport")}
+            </Button>
+          )}
+          <Button icon={IconPlus} onClick={() => {
+            // The original re-read the funding source on every New Booking (app.js:593): an FS
+            // linked by an admin a minute ago enables booking without signing in again.
+            void funding.refetch();
+            setModal({ open: true, trip: null });
+          }}>
+            {t("newBooking")}
+          </Button>
+        </>} />
 
-        {/* Filters */}
-        <div className="mb-6 rounded-2xl bg-surface p-5 shadow-sm">
-          <div className="grid items-end gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[1fr_1fr_1.4fr]">
-            <label className="text-xs font-bold">{t("startDate")}
-              <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal" />
-            </label>
-            <label className="text-xs font-bold">{t("endDate")}
-              <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm font-normal" />
-            </label>
-            <div className="flex gap-2">
-              {/* An end before the start makes the backend throw (TripService.GetByDateRangeAsync → 500). */}
-              <button onClick={() => {
-                  // A search the user asks for is a new list: the highlighted trip from a notification is done with.
-                  setHighlightId(null);
-                  void loadTrips();
-                }} disabled={!start || !end || end < start}
-                className="w-full rounded-lg bg-brand py-2 text-sm font-bold text-white disabled:opacity-50">
-                {t("search")}
-              </button>
-              {(loaded?.report.length ?? 0) > 0 && (
-                <button onClick={() => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }))}
-                  className="w-full rounded-lg border border-[#198754] py-2 text-sm font-bold text-[#198754] hover:bg-[#198754] hover:text-white">
-                  {t("exportReport")}
-                </button>
-              )}
-            </div>
+      {/* Dates and search */}
+      <Card className="mb-5">
+        <div className="grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(0,11rem)_minmax(0,11rem)_auto_minmax(16rem,1fr)]">
+          <Field label={t("startDate")} htmlFor="trips-start">
+            <Input id="trips-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+          </Field>
+          <Field label={t("endDate")} htmlFor="trips-end">
+            <Input id="trips-end" type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} />
+          </Field>
+          <div className="flex flex-wrap gap-2 sm:col-span-2 xl:col-span-1">
+            {/* An end before the start makes the backend throw (TripService.GetByDateRangeAsync → 500). */}
+            <Button icon={IconSearch} onClick={() => search()} disabled={!start || !end || end < start}>{t("search")}</Button>
+            <Button variant="secondary" onClick={() => search(today, today)}>{t("today")}</Button>
+            <Button variant="secondary" onClick={() => search(nextDay(today), nextDay(today))}>{t("tomorrow")}</Button>
           </div>
-        </div>
-
-        {/* Find a trip among the loaded ones. Only in this browser: what is typed never leaves it. */}
-        {loaded && allTrips.length > 0 && (
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <input type="search" value={filter} onChange={(e) => {
+          {/* Find a trip among the loaded ones. Only in this browser: what is typed never leaves it. */}
+          <div className="sm:col-span-2 xl:col-span-1">
+            <label htmlFor="trips-filter" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("filterLabel")}</label>
+            <Input id="trips-filter" type="search" icon={IconSearch} value={filter} disabled={!loaded || allTrips.length === 0}
+              onChange={(e) => {
                 // A selection must never include trips the filter hides: "Cancel selected" would cancel them unseen.
                 setFilter(e.target.value);
                 setSelected(new Set());
               }}
-              placeholder={t("filterPlaceholder")} aria-label={t("filterLabel")}
-              className="min-w-0 flex-1 basis-72 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-brand" />
-            <span className="text-sm text-muted" aria-live="polite">{t("filterCount", { shown: trips.length, total: allTrips.length })}</span>
+              placeholder={t("filterPlaceholder")} />
           </div>
+        </div>
+      </Card>
+
+      {highlightMissing && (
+        <Notice tone="warning" className="mb-5 flex items-center gap-2">
+          <IconWarning size={16} aria-hidden className="shrink-0" />
+          {t("highlightMissing", { id: highlightId, date: format.dateTime(new Date(`${loaded!.start}T12:00:00`), DATE_FORMAT) })}
+        </Notice>
+      )}
+
+      {/* Summary */}
+      {summary && (
+        <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat icon={IconTrips} tone="bg-brand-50 text-brand" label={t("totalTrips")} value={summary.totalTrips} />
+          <Stat icon={IconCheckCircle} tone="bg-success-soft text-success" label={t("billedTrips")} value={summary.billedTrips} />
+          <Stat icon={IconCancelled} tone="bg-danger-soft text-danger" label={t("canceledTrips")} value={summary.canceledTrips} />
+          <Stat icon={IconBilling} tone="bg-slate-100 text-navy" label={t("totalBilledValue")} value={summary.totalBilledValue} />
+        </div>
+      )}
+
+      {/* The list */}
+      <Card padded={false} className="overflow-hidden">
+        <div className="flex flex-wrap items-center gap-3 border-b border-border px-4 py-3 sm:px-5">
+          <label className="flex items-center gap-2.5 text-sm font-semibold">
+            <input type="checkbox" className="size-[18px] accent-[var(--brand)]" aria-label={t("selectAll")} checked={allChecked} disabled={trips.length === 0}
+              onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((x) => x.tripId ?? "")) : new Set())} />
+            {selected.size > 0 ? t("selectedCount", { count: selected.size }) : t("selectAll")}
+          </label>
+          {selected.size > 0 && (
+            <Button variant="danger-outline" size="sm" icon={IconCancelled} onClick={() => cancelTrips([...selected])}>
+              {t("cancelSelected", { count: selected.size })}
+            </Button>
+          )}
+          {loaded && (
+            <span className="ml-auto text-sm text-muted" aria-live="polite">{t("filterCount", { shown: trips.length, total: allTrips.length })}</span>
+          )}
+        </div>
+
+        {loaded && allTrips.length === 0 && (
+          <EmptyState icon={IconTrips} title={t("emptyTitle")}>{t("emptyText")}</EmptyState>
         )}
         {filter && trips.length === 0 && allTrips.length > 0 && (
-          <p className="mb-4 rounded-2xl bg-surface p-4 text-sm text-muted shadow-sm">{t("noMatches", { term: filter })}</p>
-        )}
-        {highlightMissing && (
-          <p className="mb-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-            {t("highlightMissing", { id: highlightId, date: format.dateTime(new Date(`${loaded!.start}T12:00:00`), DATE_FORMAT) })}
-          </p>
-        )}
-
-        {/* Summary */}
-        {summary && (
-          <div className="mb-6 grid gap-3 md:grid-cols-4">
-            <Stat label={t("totalTrips")} value={summary.totalTrips} className="bg-[#0d6efd]" />
-            <Stat label={t("billedTrips")} value={summary.billedTrips} className="bg-[#198754]" />
-            <Stat label={t("canceledTrips")} value={summary.canceledTrips} className="bg-[#dc3545]" />
-            <Stat label={t("totalBilledValue")} value={summary.totalBilledValue} className="bg-[#212529]" />
-          </div>
+          <EmptyState icon={IconSearch} title={t("noMatches", { term: filter })} />
         )}
 
         {/* Phones and tablets: one card per trip, nothing to scroll sideways. */}
-        <ul className="grid gap-3 md:grid-cols-2 lg:hidden">
-          {trips.length > 0 && (
-            <li className="flex items-center gap-2 px-1 text-sm md:col-span-2">
-              <input type="checkbox" aria-label={t("selectAll")} checked={allChecked}
-                onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((x) => x.tripId ?? "")) : new Set())} />
-              <span className="text-muted">{t("selectAll")}</span>
-            </li>
-          )}
+        <ul className="divide-y divide-border lg:hidden">
           {trips.map((trip) => (
-            <li key={trip.id} ref={highlightRef("card", trip.id)} className={`rounded-2xl bg-surface p-4 shadow-sm ${highlightClass(trip.id)}`}>
+            <li key={trip.id} ref={highlightRef("card", trip.id)} className={`p-4 ${isHighlighted(trip.id) ? highlightRow : ""}`}>
               <div className="flex items-start gap-3">
-                <input type="checkbox" className="mt-1" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
-                  onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
+                <input type="checkbox" className="mt-1 size-[18px] accent-[var(--brand)]" aria-label={t("selectTrip", { id: trip.tripId || trip.id })}
+                  checked={selected.has(trip.tripId ?? "")} onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-bold">#{trip.tripId || trip.id}</span>
-                    <span className={`rounded-full px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-wide ${statusBadgeClass(trip.status)}`}>
-                      {statusLabel(trip.status)}
-                    </span>
+                    <span className="text-sm text-muted">{tripDate(trip)}{trip.fromTime ? ` · ${toTimeInput(trip.fromTime)}` : ""}</span>
+                    <span className="ml-auto"><StatusBadge status={trip.status} /></span>
                   </div>
-                  <p className="mt-1 text-xs text-muted">
-                    {format.dateTime(new Date(trip.date), DATE_FORMAT)}{trip.fromTime ? ` · ${toTimeInput(trip.fromTime)}` : ""}
-                  </p>
-                  <p className="mt-1 text-sm font-bold">{trip.customerName}</p>
-                  <p className="text-xs text-muted">{t("providerLabel", { name: trip.providerName ?? t("providerDefault") })}</p>
-                  <p className="mt-2 break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</p>
-                  <p className="mt-1 break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</p>
-                  <div className="mt-3 flex justify-end">{rowActions(trip)}</div>
+                  <p className="mt-2 font-semibold">{trip.customerName}</p>
+                  {provider(trip)}
+                  <div className="mt-3">{route(trip)}</div>
+                  <div className="mt-2">{rowActions(trip)}</div>
                 </div>
               </div>
             </li>
           ))}
         </ul>
 
-        {/* Wide screens: the table. Below 1024 px its route column wraps an address over seven lines. */}
-        <div className="hidden overflow-hidden rounded-2xl bg-surface shadow-sm lg:block">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-xs font-bold">
+        {/* Wide screens: the table. */}
+        {trips.length > 0 && (
+          <div className="hidden overflow-x-auto lg:block">
+            <table className="w-full text-left">
+              <thead className="bg-surface-2 text-xs font-semibold uppercase tracking-wide text-muted">
                 <tr>
-                  <th className="w-[3%] min-w-10 px-3 py-3">
-                    <input type="checkbox" aria-label={t("selectAll")} checked={allChecked}
-                      onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((x) => x.tripId ?? "")) : new Set())} />
-                  </th>
-                  <th className="w-[8%] min-w-[90px] px-3">{t("colTripId")}</th>
-                  <th className="w-[12%] min-w-[120px] px-3">{t("colDateTime")}</th>
-                  <th className="w-[15%] min-w-[150px] px-3">{t("colCustomer")}</th>
-                  <th className="px-3">{t("colRoute")}</th>
-                  <th className="w-[10%] min-w-[100px] px-3 text-center">{t("colStatus")}</th>
-                  <th className="w-[10%] min-w-[100px] px-3 text-center">{t("colActions")}</th>
+                  <th className="w-12 px-4 py-3"><span className="sr-only">{t("selectAll")}</span></th>
+                  <th className="w-24 px-3">{t("colTripId")}</th>
+                  <th className="w-28 px-3">{t("colDateTime")}</th>
+                  <th className="w-44 px-3 xl:w-56">{t("colCustomer")}</th>
+                  <th className="min-w-72 px-3">{t("colRoute")}</th>
+                  <th className="w-32 px-3">{t("colStatus")}</th>
+                  <th className="w-32 px-4 text-right">{t("colActions")}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {trips.map((trip) => (
-                  <tr key={trip.id} ref={highlightRef("row", trip.id)} className={`border-t border-border hover:bg-slate-50 ${highlightClass(trip.id)}`}>
-                    <td className="px-3 py-3">
-                      <input type="checkbox" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
-                        onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
+                  <tr key={trip.id} ref={highlightRef("row", trip.id)}
+                    className={`align-top transition-colors hover:bg-surface-2 ${isHighlighted(trip.id) ? highlightRow : ""}`}>
+                    <td className="px-4 py-3.5">
+                      <input type="checkbox" className="size-[18px] accent-[var(--brand)]" aria-label={t("selectTrip", { id: trip.tripId || trip.id })}
+                        checked={selected.has(trip.tripId ?? "")} onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
                     </td>
-                    <td className="px-3 font-bold">#{trip.tripId || trip.id}</td>
-                    <td className="px-3 text-xs">
-                      {format.dateTime(new Date(trip.date), DATE_FORMAT)}
-                      <br />
-                      {trip.fromTime && <span className="mt-1 inline-block rounded border border-border bg-slate-50 px-1.5 py-0.5">{toTimeInput(trip.fromTime)}</span>}
+                    <td className="px-3 py-3.5 font-bold">#{trip.tripId || trip.id}</td>
+                    <td className="px-3 py-3.5 text-sm">
+                      <span className="block">{tripDate(trip)}</span>
+                      {trip.fromTime && <span className="mt-0.5 block font-semibold text-foreground">{toTimeInput(trip.fromTime)}</span>}
                     </td>
-                    <td className="px-3 text-xs">
-                      <span className="font-bold">{trip.customerName}</span>
-                      <span className="mt-1 block text-muted">{t("providerLabel", { name: trip.providerName ?? t("providerDefault") })}</span>
+                    <td className="px-3 py-3.5">
+                      <span className="block font-semibold">{trip.customerName}</span>
+                      {provider(trip)}
                     </td>
-                    <td className="px-3 py-2">
-                      <span className="block break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</span>
-                      <span className="mt-1 block break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</span>
-                    </td>
-                    <td className="px-3 text-center">
-                      <span className={`inline-block min-w-[90px] rounded-full px-3 py-1.5 text-[0.75rem] font-semibold uppercase tracking-wide shadow-sm ${statusBadgeClass(trip.status)}`}>
-                        {statusLabel(trip.status)}
-                      </span>
-                    </td>
-                    <td className="px-3 text-center">
-                      {rowActions(trip)}
-                    </td>
+                    <td className="px-3 py-3.5">{route(trip)}</td>
+                    <td className="px-3 py-3.5"><StatusBadge status={trip.status} /></td>
+                    <td className="px-4 py-2.5">{rowActions(trip)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
+        )}
+      </Card>
 
       {/* Maps JavaScript loads only when a form or the tracking view opens, never with the dashboard. */}
       {trackingId !== null && (
@@ -392,11 +421,14 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: Bookin
   );
 }
 
-function Stat({ label, value, className }: { label: string; value: string | number; className: string }) {
+function Stat({ icon: Icon, tone, label, value }: { icon: IconComponent; tone: string; label: string; value: string | number }) {
   return (
-    <div className={`rounded-2xl p-5 text-white shadow-sm ${className}`}>
-      <p className="text-xs font-bold uppercase opacity-75">{label}</p>
-      <p className="mt-1 text-2xl font-bold">{value}</p>
-    </div>
+    <Card className="flex items-center gap-3 !p-4">
+      <span className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${tone}`}><Icon size={20} aria-hidden /></span>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
+        <p className="text-xl font-bold leading-tight text-foreground sm:text-2xl">{value}</p>
+      </div>
+    </Card>
   );
 }

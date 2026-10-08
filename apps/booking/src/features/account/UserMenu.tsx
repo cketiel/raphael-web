@@ -3,15 +3,22 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useFeedback } from "@/components/Feedback";
+import { IconChevronDown, IconKey, IconLogout } from "@/components/ui/Icon";
+import { Menu } from "@/components/ui/Menu";
 import { bff } from "@/lib/bff";
 import { ChangePasswordModal } from "./ChangePasswordModal";
 
-/** The signed-in user's menu in the header: change the password, or sign out. Room for "My account" later. */
+/** Two letters for the avatar: "ana.lopez" → "AL", "test" → "TE". */
+function initials(username: string) {
+  const parts = username.split(/[\s._-]+/).filter(Boolean);
+  return (parts.length > 1 ? parts[0][0] + parts[1][0] : username.slice(0, 2)).toUpperCase();
+}
+
+/** The signed-in user's menu in the top bar: change the password, or sign out. Room for "My account" later. */
 export function UserMenu({ username }: { username: string }) {
   const t = useTranslations("account");
   const tNav = useTranslations("nav");
   const feedback = useFeedback();
-  const [open, setOpen] = useState(false);
   const [changing, setChanging] = useState(false);
 
   async function signOut() {
@@ -22,33 +29,26 @@ export function UserMenu({ username }: { username: string }) {
   }
 
   return (
-    <div className="relative">
-      <button type="button" aria-haspopup="menu" aria-expanded={open} aria-label={t("menu", { name: username })}
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-lg border border-slate-500 px-2.5 py-1 text-sm hover:bg-white/10">
-        <span aria-hidden="true">👤</span>
-        <span className="hidden max-w-40 truncate font-bold sm:inline">{username}</span>
-        <span aria-hidden="true" className="text-xs">▾</span>
-      </button>
-
-      {open && (
-        <ul role="menu" className="absolute right-0 top-full z-[1200] mt-2 w-56 overflow-hidden rounded-xl border border-border bg-surface py-1 text-sm text-foreground shadow-2xl">
-          <li className="truncate px-4 py-2 text-xs text-muted sm:hidden">{tNav("user", { name: username })}</li>
-          <li>
-            <button type="button" role="menuitem" onClick={() => { setOpen(false); setChanging(true); }}
-              className="w-full px-4 py-2 text-left hover:bg-slate-100">{t("changePassword")}</button>
-          </li>
-          <li>
-            <button type="button" role="menuitem" onClick={() => void signOut()}
-              className="w-full border-t border-border px-4 py-2 text-left text-[#dc3545] hover:bg-red-50">{tNav("logout")}</button>
-          </li>
-        </ul>
-      )}
+    <>
+      <Menu label={t("menu", { name: username })}
+        buttonClassName="flex h-10 items-center gap-2 rounded-[var(--radius)] pl-1 pr-2 hover:bg-surface-2"
+        trigger={
+          <>
+            <span className="flex size-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white" aria-hidden="true">{initials(username)}</span>
+            <span className="hidden max-w-36 truncate text-sm font-semibold text-foreground sm:inline">{username}</span>
+            <IconChevronDown size={13} aria-hidden className="hidden text-muted sm:inline" />
+          </>
+        }
+        header={<><p className="text-xs text-muted">{tNav("signedInAs")}</p><p className="truncate font-semibold">{username}</p></>}
+        items={[
+          { key: "password", label: t("changePassword"), icon: IconKey, onSelect: () => setChanging(true) },
+          { key: "logout", label: tNav("logout"), icon: IconLogout, danger: true, onSelect: () => void signOut() },
+        ]} />
 
       {changing && (
         <ChangePasswordModal onClose={() => setChanging(false)}
           onChanged={() => { setChanging(false); void feedback.alert(t("changed")); }} />
       )}
-    </div>
+    </>
   );
 }

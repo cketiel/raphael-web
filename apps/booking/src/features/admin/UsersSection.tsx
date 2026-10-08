@@ -6,6 +6,7 @@ import { useFeedback } from "@/components/Feedback";
 import { useErrorText } from "@/i18n/useErrorText";
 import { PASSWORD_MIN_LENGTH } from "@/features/account/passwordRules";
 import { useRoles, useUserActions, useUsers, type AdminUser, type AdminUserCreate } from "./adminApi";
+import { IconCheckCircle, IconDisable, IconEdit, IconKey, IconUsers } from "@/components/ui/Icon";
 import { FormModal, Panel, PrimaryButton, SelectField, SmallButton, TextField } from "./ui";
 
 /** A password the admin sets for someone else: the same rules as one's own (passwordRules.ts). */
@@ -39,11 +40,11 @@ export function UsersSection() {
 
   const actions = (u: AdminUser) => (
     <div className="flex flex-wrap justify-end gap-1.5">
-      <SmallButton onClick={() => setDialog({ kind: "edit", user: u })}>{t("edit")}</SmallButton>
+      <SmallButton icon={IconEdit} onClick={() => setDialog({ kind: "edit", user: u })}>{t("edit")}</SmallButton>
       {!u.isCurrentUser && (
         <>
-          <SmallButton onClick={() => setDialog({ kind: "password", user: u })}>{t("setPassword")}</SmallButton>
-          <SmallButton tone={u.isActive ? "danger" : "success"} onClick={() => void toggleActive(u)} disabled={setActive.isPending}>
+          <SmallButton icon={IconKey} onClick={() => setDialog({ kind: "password", user: u })}>{t("setPassword")}</SmallButton>
+          <SmallButton tone={u.isActive ? "danger" : "success"} icon={u.isActive ? IconDisable : IconCheckCircle} onClick={() => void toggleActive(u)} disabled={setActive.isPending}>
             {u.isActive ? t("disable") : t("enable")}
           </SmallButton>
         </>
@@ -54,7 +55,7 @@ export function UsersSection() {
   const list = users.data ?? [];
 
   return (
-    <Panel title={t("usersTitle")} action={<PrimaryButton onClick={() => setDialog({ kind: "create" })}>{t("newUser")}</PrimaryButton>}>
+    <Panel title={t("usersTitle")} icon={IconUsers} action={<PrimaryButton onClick={() => setDialog({ kind: "create" })}>{t("newUser")}</PrimaryButton>}>
       {users.isError && <p className="text-sm text-red-600">{t("loadFailed")}</p>}
       {users.isLoading && <p className="text-sm text-muted">{t("loading")}</p>}
 

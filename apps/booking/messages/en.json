@@ -22,7 +22,10 @@
       "catalog": "Catalog",
       "notifications": "Notifications",
       "admin": "Admin"
-    }
+    },
+    "sections": "Sections",
+    "product": "Booking Portal",
+    "signedInAs": "Signed in as"
   },
   "login": {
     "subtitle": "Sign in with your facility account.",
@@ -30,7 +33,14 @@
     "password": "Password",
     "submit": "LOGIN",
     "submitting": "Authenticating...",
-    "failed": "Unable to sign in right now."
+    "failed": "Unable to sign in right now.",
+    "heroTitle": "Every trip of your facility, in one place.",
+    "heroText": "Book non-emergency medical transport, follow it live and keep your providers at hand.",
+    "featureTrips": "Book and edit trips in seconds",
+    "featureLive": "Live notices as trips move",
+    "featureCatalog": "Your contracted providers",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "errors": {
     "missing_credentials": "Enter your username and password.",
@@ -52,9 +62,9 @@
     "password_change_failed": "The password could not be changed."
   },
   "dashboard": {
-    "title": "Trip Management",
+    "title": "Trips",
     "cancelSelected": "Cancel Selected ({count})",
-    "newBooking": "+ New Booking",
+    "newBooking": "New Booking",
     "startDate": "Start Date",
     "endDate": "End Date",
     "search": "Search",
@@ -84,10 +94,16 @@
     "providerLabel": "Provider: {name}",
     "providerDefault": "Raphael (default)",
     "filterPlaceholder": "Find a trip: number, patient, phone, address, provider…",
-    "filterLabel": "Find a trip in the loaded dates",
+    "filterLabel": "Find a trip",
     "filterCount": "{shown} of {total} trips",
     "noMatches": "No trip in these dates matches “{term}”.",
-    "highlightMissing": "Trip #{id} is not among the trips of {date}. It may have been moved to another day."
+    "highlightMissing": "Trip #{id} is not among the trips of {date}. It may have been moved to another day.",
+    "subtitle": "Book, follow and manage your facility's trips.",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "selectedCount": "{count, plural, one {# trip selected} other {# trips selected}}",
+    "emptyTitle": "No trips on these dates",
+    "emptyText": "Choose other dates, or book a new trip."
   },
   "status": {
     "Assigned": "Assigned",
@@ -106,7 +122,7 @@
   },
   "trip": {
     "title": "Trip Registration",
-    "patientSection": "1. Patient Information",
+    "patientSection": "Patient Information",
     "searchPatient": "Search by name or code...",
     "riderIdShort": "ID: {id}",
     "phone": "Phone",
@@ -119,7 +135,7 @@
     "homeAddress": "Home Address",
     "city": "City",
     "zip": "Zip",
-    "logisticsSection": "2. Logistics",
+    "logisticsSection": "Logistics",
     "date": "Date",
     "pickupTime": "Pickup",
     "apptTime": "Appt",
@@ -133,7 +149,7 @@
     "fundingPlaceholder": "Select or type Funding Source...",
     "fundingDisabled": "Booking Disabled: No FS linked",
     "fundingMissing": "Contact Raphael's Admin: Missing linked Funding Source.",
-    "routeSection": "3. Route Selection",
+    "routeSection": "Route Selection",
     "pickupAddress": "Pickup Address",
     "dropoffAddress": "Dropoff Address",
     "cityValue": "City: <b>{city}</b>",
@@ -168,7 +184,13 @@
     "attachmentEmpty": "The attachment is empty.",
     "provider": "Provider",
     "providerDefault": "Raphael (default)",
-    "providerNoneContracted": "You have no contracted providers that operate in Raphael. Find them in the Catalog tab."
+    "providerNoneContracted": "You have no contracted providers that operate in Raphael. Find them in the Catalog tab.",
+    "editTitle": "Edit trip #{id}",
+    "subtitle": "Patient, schedule and route. Fields marked * are required.",
+    "addressConfirmed": "Address confirmed on the map",
+    "addressPlaceholder": "Start typing an address or a place…",
+    "mapHint": "Drag a pin to adjust the exact pickup or drop-off point.",
+    "attachmentHint": "Word or PDF, optional."
   },
   "notifications": {
     "title": "Notifications",
@@ -218,7 +240,8 @@
       "completed": "Completed",
       "cancelled": "Cancelled",
       "reactivated": "Reactivated"
-    }
+    },
+    "emptyTitle": "No notices here"
   },
   "csv": {
     "yes": "Yes",
@@ -356,7 +379,10 @@
     "zip": "Zip",
     "save": "Save",
     "saving": "Saving...",
-    "colActions": "Actions"
+    "colActions": "Actions",
+    "subtitle": "Find providers and keep the ones your facility works with.",
+    "emptyTitle": "No providers match these filters",
+    "emptyText": "Try another name, city or group."
   },
   "admin": {
     "title": "Administration",
@@ -479,6 +505,7 @@
     "lessOrEqualMaxQty": "Less or equal (max qty)",
     "freeQty": "Free quantity",
     "fromDate": "From",
-    "toDate": "To"
+    "toDate": "To",
+    "subtitle": "Your organization's users, details and billing."
   }
 }

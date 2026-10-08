@@ -22,7 +22,10 @@
       "catalog": "Catálogo",
       "notifications": "Notificaciones",
       "admin": "Admin"
-    }
+    },
+    "sections": "Secciones",
+    "product": "Booking Portal",
+    "signedInAs": "Sesión iniciada como"
   },
   "login": {
     "subtitle": "Inicia sesión con la cuenta de tu centro.",
@@ -30,7 +33,14 @@
     "password": "Contraseña",
     "submit": "ENTRAR",
     "submitting": "Autenticando...",
-    "failed": "No se puede iniciar sesión ahora mismo."
+    "failed": "No se puede iniciar sesión ahora mismo.",
+    "heroTitle": "Todos los viajes de tu centro, en un solo lugar.",
+    "heroText": "Reserva transporte médico no urgente, síguelo en vivo y ten a mano a tus providers.",
+    "featureTrips": "Reserva y edita viajes en segundos",
+    "featureLive": "Avisos en vivo según avanzan los viajes",
+    "featureCatalog": "Tus providers contratados",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña"
   },
   "errors": {
     "missing_credentials": "Escribe tu usuario y tu contraseña.",
@@ -52,9 +62,9 @@
     "password_change_failed": "No se ha podido cambiar la contraseña."
   },
   "dashboard": {
-    "title": "Gestión de viajes",
+    "title": "Viajes",
     "cancelSelected": "Cancelar seleccionados ({count})",
-    "newBooking": "+ Nueva reserva",
+    "newBooking": "Nueva reserva",
     "startDate": "Fecha de inicio",
     "endDate": "Fecha de fin",
     "search": "Buscar",
@@ -84,10 +94,16 @@
     "providerLabel": "Proveedor: {name}",
     "providerDefault": "Raphael (por defecto)",
     "filterPlaceholder": "Buscar un viaje: número, paciente, teléfono, dirección, provider…",
-    "filterLabel": "Buscar un viaje en las fechas cargadas",
+    "filterLabel": "Buscar un viaje",
     "filterCount": "{shown} de {total} viajes",
     "noMatches": "Ningún viaje de estas fechas coincide con «{term}».",
-    "highlightMissing": "El viaje #{id} no está entre los viajes del {date}. Puede que lo hayan movido a otro día."
+    "highlightMissing": "El viaje #{id} no está entre los viajes del {date}. Puede que lo hayan movido a otro día.",
+    "subtitle": "Reserva, sigue y gestiona los viajes de tu centro.",
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "selectedCount": "{count, plural, one {# viaje seleccionado} other {# viajes seleccionados}}",
+    "emptyTitle": "No hay viajes en estas fechas",
+    "emptyText": "Elige otras fechas o reserva un viaje nuevo."
   },
   "status": {
     "Assigned": "Asignado",
@@ -106,7 +122,7 @@
   },
   "trip": {
     "title": "Registro de viaje",
-    "patientSection": "1. Datos del paciente",
+    "patientSection": "Datos del paciente",
     "searchPatient": "Buscar por nombre o código...",
     "riderIdShort": "ID: {id}",
     "phone": "Teléfono",
@@ -119,7 +135,7 @@
     "homeAddress": "Dirección del domicilio",
     "city": "Ciudad",
     "zip": "Zip",
-    "logisticsSection": "2. Logística",
+    "logisticsSection": "Logística",
     "date": "Fecha",
     "pickupTime": "Recogida",
     "apptTime": "Cita",
@@ -133,7 +149,7 @@
     "fundingPlaceholder": "Selecciona o escribe la fuente de financiamiento...",
     "fundingDisabled": "Reservas desactivadas: no hay fuente de financiamiento vinculada",
     "fundingMissing": "Contacta con el administrador de Raphael: falta la fuente de financiamiento vinculada.",
-    "routeSection": "3. Ruta",
+    "routeSection": "Ruta",
     "pickupAddress": "Dirección de recogida",
     "dropoffAddress": "Dirección de entrega",
     "cityValue": "Ciudad: <b>{city}</b>",
@@ -168,7 +184,13 @@
     "attachmentEmpty": "El adjunto está vacío.",
     "provider": "Proveedor",
     "providerDefault": "Raphael (por defecto)",
-    "providerNoneContracted": "No tienes proveedores contratados que operen en Raphael. Búscalos en la pestaña Catálogo."
+    "providerNoneContracted": "No tienes proveedores contratados que operen en Raphael. Búscalos en la pestaña Catálogo.",
+    "editTitle": "Editar viaje #{id}",
+    "subtitle": "Paciente, horario y ruta. Los campos con * son obligatorios.",
+    "addressConfirmed": "Dirección confirmada en el mapa",
+    "addressPlaceholder": "Empieza a escribir una dirección o un lugar…",
+    "mapHint": "Arrastra un pin para ajustar el punto exacto de recogida o entrega.",
+    "attachmentHint": "Word o PDF, opcional."
   },
   "notifications": {
     "title": "Notificaciones",
@@ -218,7 +240,8 @@
       "completed": "Completados",
       "cancelled": "Cancelados",
       "reactivated": "Reactivados"
-    }
+    },
+    "emptyTitle": "No hay avisos aquí"
   },
   "csv": {
     "yes": "Sí",
@@ -356,7 +379,10 @@
     "zip": "Zip",
     "save": "Guardar",
     "saving": "Guardando...",
-    "colActions": "Acciones"
+    "colActions": "Acciones",
+    "subtitle": "Busca providers y guarda los que trabajan con tu centro.",
+    "emptyTitle": "Ningún provider coincide con estos filtros",
+    "emptyText": "Prueba con otro nombre, ciudad o grupo."
   },
   "admin": {
     "title": "Administración",
@@ -479,6 +505,7 @@
     "lessOrEqualMaxQty": "Menor o igual (cant. máx.)",
     "freeQty": "Cantidad gratuita",
     "fromDate": "Desde",
-    "toDate": "Hasta"
+    "toDate": "Hasta",
+    "subtitle": "Los usuarios, los datos y la facturación de tu organización."
   }
 }

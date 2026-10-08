@@ -1,23 +1,29 @@
 import type { ProductionRow } from "./productionReportCsv";
 import type { TripRead } from "./types";
 
-/** Status pill colours of the original portal (styles.css:61-80). Unknown statuses fall back to primary blue. */
-const STATUS_COLORS: Record<string, string> = {
-  assigned: "bg-[#198754] text-white",
-  accepted: "bg-[#0dcaf0] text-white",
-  scheduled: "bg-[#0d6efd] text-white",
-  waiting: "bg-[#ffc107] text-[#212529]",
-  late: "bg-[#fd7e14] text-white",
-  inprogress: "bg-[#6610f2] text-white",
-  finished: "bg-[#6c757d] text-white",
-  canceled: "bg-[#dc3545] text-white",
-  billed: "bg-[#20c997] text-white",
-  payed: "bg-[#14a44d] text-white",
+/**
+ * Status colours. The same families as the original portal (styles.css:61-80), so a dispatcher who
+ * knew the old pills reads the new ones at once, but as soft labels with a coloured dot: a list of
+ * forty solid pills was the loudest thing on the page. Unknown statuses fall back to blue.
+ */
+const STATUS_STYLES: Record<string, { badge: string; dot: string }> = {
+  assigned: { badge: "bg-emerald-50 text-emerald-800 ring-emerald-600/25", dot: "bg-emerald-500" },
+  accepted: { badge: "bg-cyan-50 text-cyan-800 ring-cyan-600/25", dot: "bg-cyan-500" },
+  scheduled: { badge: "bg-blue-50 text-blue-800 ring-blue-600/25", dot: "bg-blue-600" },
+  waiting: { badge: "bg-amber-50 text-amber-800 ring-amber-500/30", dot: "bg-amber-400" },
+  late: { badge: "bg-orange-50 text-orange-800 ring-orange-500/30", dot: "bg-orange-500" },
+  inprogress: { badge: "bg-violet-50 text-violet-800 ring-violet-600/25", dot: "bg-violet-600" },
+  finished: { badge: "bg-slate-100 text-slate-700 ring-slate-500/25", dot: "bg-slate-500" },
+  canceled: { badge: "bg-red-50 text-red-800 ring-red-600/25", dot: "bg-red-600" },
+  billed: { badge: "bg-teal-50 text-teal-800 ring-teal-600/25", dot: "bg-teal-500" },
+  payed: { badge: "bg-green-50 text-green-800 ring-green-600/25", dot: "bg-green-600" },
 };
 
-export function statusBadgeClass(status: string | null | undefined) {
-  if (!status) return STATUS_COLORS.assigned;
-  return STATUS_COLORS[status.toLowerCase()] ?? "bg-[#0d6efd] text-white";
+const DEFAULT_STATUS = { badge: "bg-blue-50 text-blue-800 ring-blue-600/25", dot: "bg-blue-600" };
+
+export function statusStyle(status: string | null | undefined) {
+  if (!status) return STATUS_STYLES.assigned;
+  return STATUS_STYLES[status.toLowerCase()] ?? DEFAULT_STATUS;
 }
 
 export function isCanceled(trip: TripRead) {

@@ -21,6 +21,7 @@ import {
   type Rate,
   type RateEdit,
 } from "./adminApi";
+import { IconBilling, IconBuilding, IconCancelled, IconDelete, IconEdit, IconList } from "@/components/ui/Icon";
 import { CheckField, FormModal, Notice, Panel, PrimaryButton, SelectField, SmallButton, TextField, toDateInput } from "./ui";
 
 /**
@@ -50,10 +51,10 @@ function FundingSourcePanel({ fs, loading, failed }: { fs: FundingSource | null 
 
   const action = fs === null
     ? <PrimaryButton onClick={() => setEditing(true)}>{t("createFundingSource")}</PrimaryButton>
-    : fs?.canEdit && <SmallButton onClick={() => setEditing(true)}>{t("edit")}</SmallButton>;
+    : fs?.canEdit && <SmallButton icon={IconEdit} onClick={() => setEditing(true)}>{t("edit")}</SmallButton>;
 
   return (
-    <Panel title={t("fundingSourceTitle")} action={action}>
+    <Panel title={t("fundingSourceTitle")} icon={IconBuilding} action={action}>
       {failed && <p className="text-sm text-red-600">{t("loadFailed")}</p>}
       {loading && <p className="text-sm text-muted">{t("loading")}</p>}
       {fs === null && <Notice tone="warning">{t("noFundingSource")}</Notice>}
@@ -162,8 +163,7 @@ function BillingItemsPanel() {
   const list = items.data ?? [];
 
   return (
-    <Panel title={t("billingItemsTitle")} action={<PrimaryButton onClick={() => setDialog({ item: null })}>{t("newBillingItem")}</PrimaryButton>}>
-      <p className="mb-3 text-sm text-muted">{t("billingItemsHelp")}</p>
+    <Panel title={t("billingItemsTitle")} icon={IconList} description={t("billingItemsHelp")} action={<PrimaryButton onClick={() => setDialog({ item: null })}>{t("newBillingItem")}</PrimaryButton>}>
       {items.isError && <p className="text-sm text-red-600">{t("loadFailed")}</p>}
       {items.isSuccess && list.length === 0 && <p className="text-sm text-muted">{t("noBillingItems")}</p>}
       {list.length > 0 && (
@@ -177,8 +177,8 @@ function BillingItemsPanel() {
                 </p>
               </div>
               <div className="flex gap-1.5">
-                <SmallButton onClick={() => setDialog({ item })}>{t("edit")}</SmallButton>
-                <SmallButton tone="danger" onClick={() => void del(item)} disabled={Boolean(item.isAssigned) || remove.isPending}
+                <SmallButton icon={IconEdit} onClick={() => setDialog({ item })}>{t("edit")}</SmallButton>
+                <SmallButton tone="danger" icon={IconDelete} onClick={() => void del(item)} disabled={Boolean(item.isAssigned) || remove.isPending}
                   title={item.isAssigned ? t("cannotDeleteAssigned") : undefined}>
                   {t("delete")}
                 </SmallButton>
@@ -275,9 +275,8 @@ function RatesPanel({ canEdit }: { canEdit: boolean }) {
   const hasOwnItems = (items.data?.length ?? 0) > 0;
 
   return (
-    <Panel title={t("ratesTitle")}
+    <Panel title={t("ratesTitle")} icon={IconBilling} description={t("ratesHelp")}
       action={canEdit && <PrimaryButton onClick={() => (hasOwnItems ? setDialog({ rate: null }) : void feedback.alert(t("createItemFirst")))}>{t("newRate")}</PrimaryButton>}>
-      <p className="mb-3 text-sm text-muted">{t("ratesHelp")}</p>
       {rates.isError && <p className="text-sm text-red-600">{t("loadFailed")}</p>}
       {rates.isSuccess && list.length === 0 && <p className="text-sm text-muted">{t("noRates")}</p>}
       {list.length > 0 && (
@@ -314,8 +313,8 @@ function RatesPanel({ canEdit }: { canEdit: boolean }) {
                   <td className="px-3 py-2">
                     {r.canEdit && (
                       <div className="flex justify-end gap-1.5">
-                        <SmallButton onClick={() => setDialog({ rate: r })}>{t("edit")}</SmallButton>
-                        {!isClosed(r) && <SmallButton tone="danger" onClick={() => void close(r)} disabled={edit.isPending}>{t("closeRate")}</SmallButton>}
+                        <SmallButton icon={IconEdit} onClick={() => setDialog({ rate: r })}>{t("edit")}</SmallButton>
+                        {!isClosed(r) && <SmallButton tone="danger" icon={IconCancelled} onClick={() => void close(r)} disabled={edit.isPending}>{t("closeRate")}</SmallButton>}
                       </div>
                     )}
                   </td>

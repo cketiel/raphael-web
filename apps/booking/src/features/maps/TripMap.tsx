@@ -5,6 +5,15 @@ import { useTranslations } from "next-intl";
 import { useEffect } from "react";
 import { reportUsage } from "./places";
 
+/**
+ * Pickup red and drop-off blue, the same in every map and beside every address (design tokens
+ * --danger and --info). Hex here because the marker library styles its own element.
+ */
+export const PIN = {
+  pickup: { fill: "#c62828", border: "#7f1d1d" },
+  dropoff: { fill: "#1d6fb8", border: "#0f3f6b" },
+} as const;
+
 export interface LatLng {
   lat: number;
   lng: number;
@@ -18,7 +27,7 @@ function RouteLine({ encoded }: { encoded: string | null }) {
   useEffect(() => {
     if (!map || !geometry || !encoded) return;
     const path = geometry.encoding.decodePath(encoded);
-    const line = new google.maps.Polyline({ path, map, strokeColor: "#0d6efd", strokeWeight: 5, strokeOpacity: 0.6 });
+    const line = new google.maps.Polyline({ path, map, strokeColor: PIN.dropoff.fill, strokeWeight: 5, strokeOpacity: 0.6 });
     const bounds = new google.maps.LatLngBounds();
     path.forEach((p) => bounds.extend(p));
     map.fitBounds(bounds, 40);
@@ -77,10 +86,10 @@ export function TripMap({ mapId, pickup, dropoff, polyline, onPinMoved }: TripMa
     <div className="h-[380px] w-full overflow-hidden rounded-lg border border-slate-300">
       <Map mapId={mapId} defaultCenter={pickup} defaultZoom={12} gestureHandling="greedy">
         <AdvancedMarker position={pickup} draggable onDragEnd={dragEnd("pickup")} title={t("pinPickup")}>
-          <Pin background="#dc3545" borderColor="#842029" glyphColor="#fff" />
+          <Pin background={PIN.pickup.fill} borderColor={PIN.pickup.border} glyphColor="#fff" />
         </AdvancedMarker>
         <AdvancedMarker position={dropoff} draggable onDragEnd={dragEnd("dropoff")} title={t("pinDropoff")}>
-          <Pin background="#0d6efd" borderColor="#084298" glyphColor="#fff" />
+          <Pin background={PIN.dropoff.fill} borderColor={PIN.dropoff.border} glyphColor="#fff" />
         </AdvancedMarker>
         <RouteLine encoded={polyline} />
         <ReportMapLoad />

@@ -1,32 +1,101 @@
 @import "tailwindcss";
 
-/* Tokens taken from the Raphael Ecosystem Portal design: deep navy, blue-to-teal accent. */
+/*
+ * Raphael design tokens, shared by Booking, the ETA page and (when designed) the Ecosystem Portal.
+ * The brand scale comes from the Raphael mark (public/brand/raphael-mark.png): ocean blue #005070
+ * to #50a0c0. Provisional until the Stitch design (WEB_STACK.md §6.2, block 4): every screen reads
+ * these names, so a new palette is a change here, not in the screens.
+ */
 :root {
-  --background: #f6f8fb;
-  --foreground: #0f172a;
+  /* Surfaces and text */
+  --background: #f3f6f9;
+  --foreground: #0f1f2e;
   --surface: #ffffff;
-  --border: #e2e8f0;
-  --muted: #64748b;
-  --brand: #2563eb;
-  --brand-2: #14b8a6;
-  --navy: #0b1222;
+  --surface-2: #f7f9fb;
+  --border: #dbe3ea;
+  --border-strong: #c3cfd9;
+  --muted: #5b6b7b;
+
+  /* Brand (from the mark) */
+  --brand-50: #eef6fa;
+  --brand-100: #d7ebf4;
+  --brand-200: #b0d6e8;
+  --brand-500: #2a86b5;
+  --brand: #1f6f99;          /* primary actions: 5.6:1 on white */
+  --brand-700: #175a7d;
+  --brand-800: #0f4562;
+  --navy: #0b2f45;           /* sidebar and dark surfaces */
+  --navy-2: #0f3a55;
+  --brand-2: #4fa3c2;        /* accent */
+
+  /* Meaning */
+  --success: #15803d;
+  --success-soft: #dcfce7;
+  --danger: #c62828;
+  --danger-soft: #fde8e8;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --info: #1d6fb8;
+  --info-soft: #e0efff;
+
+  /* Shape */
+  --radius: 10px;
+  --shadow-card: 0 1px 2px rgb(15 31 46 / 0.06), 0 1px 3px rgb(15 31 46 / 0.08);
+  --shadow-pop: 0 10px 30px rgb(15 31 46 / 0.18);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-muted: var(--muted);
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-500: var(--brand-500);
   --color-brand: var(--brand);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
   --color-brand-2: var(--brand-2);
   --color-navy: var(--navy);
+  --color-navy-2: var(--navy-2);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --radius-ui: var(--radius);
+  --shadow-card: var(--shadow-card);
+  --shadow-pop: var(--shadow-pop);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  /* 16 px base, as Bootstrap: form controls read at the size of body text, never smaller. */
+  font-size: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Keyboard focus is always visible, never only a colour change. */
+:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
+}
+
+/* Date and time pickers keep the brand colour and the system look on every platform. */
+input[type="date"],
+input[type="time"] {
+  accent-color: var(--brand);
 }

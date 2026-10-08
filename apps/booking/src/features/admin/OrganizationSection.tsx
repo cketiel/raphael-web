@@ -5,6 +5,7 @@ import { useState, type ReactNode } from "react";
 import { useFeedback } from "@/components/Feedback";
 import { useErrorText } from "@/i18n/useErrorText";
 import { fetchApiKey, useOrganization, useOrganizationActions, type Organization, type OrganizationEdit } from "./adminApi";
+import { IconBuilding, IconCopy, IconEdit, IconHide, IconKey, IconShow } from "@/components/ui/Icon";
 import { FormModal, Panel, SmallButton, TextField } from "./ui";
 
 /** The clinic's own record. Contact details are its own; name, state and funding source are the office's. */
@@ -16,7 +17,7 @@ export function OrganizationSection() {
 
   return (
     <div className="grid gap-4 xl:grid-cols-2">
-      <Panel title={t("organizationTitle")} action={o && <SmallButton onClick={() => setEditing(true)}>{t("editContact")}</SmallButton>}>
+      <Panel title={t("organizationTitle")} icon={IconBuilding} action={o && <SmallButton icon={IconEdit} onClick={() => setEditing(true)}>{t("editContact")}</SmallButton>}>
         {org.isError && <p className="text-sm text-red-600">{t("loadFailed")}</p>}
         {o && (
           <dl className="space-y-2 text-sm">
@@ -71,19 +72,18 @@ function ApiKeyPanel() {
   }
 
   return (
-    <Panel title={t("apiKeyTitle")}>
-      <p className="mb-3 text-sm text-muted">{t("apiKeyHelp")}</p>
+    <Panel title={t("apiKeyTitle")} icon={IconKey} description={t("apiKeyHelp")}>
       <div className="flex flex-wrap items-center gap-2">
         <code className="min-w-0 flex-1 basis-64 break-all rounded-lg border border-border bg-slate-50 px-3 py-2 font-mono text-xs">
           {key ?? "•".repeat(32)}
         </code>
         {key ? (
           <>
-            <SmallButton onClick={() => void copy()}>{copied ? t("copied") : t("copy")}</SmallButton>
-            <SmallButton onClick={() => setKey(null)}>{t("hide")}</SmallButton>
+            <SmallButton icon={IconCopy} onClick={() => void copy()}>{copied ? t("copied") : t("copy")}</SmallButton>
+            <SmallButton icon={IconHide} onClick={() => setKey(null)}>{t("hide")}</SmallButton>
           </>
         ) : (
-          <SmallButton onClick={() => void show()}>{t("show")}</SmallButton>
+          <SmallButton icon={IconShow} onClick={() => void show()}>{t("show")}</SmallButton>
         )}
       </div>
       <p className="mt-3 text-xs text-muted">{t("apiKeyWarning")}</p>

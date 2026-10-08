@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { useFeedback } from "@/components/Feedback";
+import { Button } from "@/components/ui/Button";
+import { IconCheckCircle, IconClose } from "@/components/ui/Icon";
 import { useErrorText } from "@/i18n/useErrorText";
 import { useProviderActions, type ProviderRow } from "./catalogApi";
 
@@ -27,13 +29,14 @@ export function ContractButton({ row }: { row: ProviderRow }) {
     }
   }
 
-  return (
-    <button type="button" onClick={(e) => void toggle(e)} disabled={contract.isPending || (on && !row.isActive)}
-      title={on && !row.isActive ? t("inactiveCannotContract") : undefined}
-      className={`rounded-lg px-3 py-1.5 text-xs font-bold disabled:opacity-50 ${
-        on ? "bg-[#198754] text-white" : "border border-[#dc3545] text-[#dc3545] hover:bg-red-50"
-      }`}>
-      {on ? t("contract") : t("remove")}
-    </button>
+  return on ? (
+    <Button size="sm" variant="success" icon={IconCheckCircle} loading={contract.isPending} disabled={!row.isActive}
+      title={!row.isActive ? t("inactiveCannotContract") : undefined} onClick={(e) => void toggle(e)}>
+      {t("contract")}
+    </Button>
+  ) : (
+    <Button size="sm" variant="danger-outline" icon={IconClose} loading={contract.isPending} onClick={(e) => void toggle(e)}>
+      {t("remove")}
+    </Button>
   );
 }

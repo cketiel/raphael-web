@@ -2,12 +2,19 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { IconBilling, IconBuilding, IconUsers } from "@/components/ui/Icon";
+import { PageHeader } from "@/components/ui/Surface";
+import { Tabs } from "@/components/ui/Tabs";
 import { BillingSection } from "./BillingSection";
 import { OrganizationSection } from "./OrganizationSection";
 import { UsersSection } from "./UsersSection";
 
-const SECTIONS = ["users", "organization", "billing"] as const;
-type Section = (typeof SECTIONS)[number];
+const SECTIONS = [
+  { key: "users", icon: IconUsers },
+  { key: "organization", icon: IconBuilding },
+  { key: "billing", icon: IconBilling },
+] as const;
+type Section = (typeof SECTIONS)[number]["key"];
 
 /** The clinic's administration: its users, its own record and API key, and what it is billed with. */
 export function AdminPage() {
@@ -15,27 +22,14 @@ export function AdminPage() {
   const [section, setSection] = useState<Section>("users");
 
   return (
-    <div className="w-full px-3 py-4 sm:px-6 sm:py-6">
-      <h1 className="mb-4 text-xl font-bold text-slate-600">{t("title")}</h1>
-
-      <div className="mb-4 overflow-x-auto [scrollbar-width:none]">
-        <ul className="flex min-w-max gap-1 rounded-xl bg-surface p-1 shadow-sm" role="tablist" aria-label={t("title")}>
-          {SECTIONS.map((key) => (
-            <li key={key}>
-              <button type="button" role="tab" aria-selected={key === section} onClick={() => setSection(key)}
-                className={`whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold ${
-                  key === section ? "bg-brand text-white" : "text-muted hover:bg-slate-50 hover:text-foreground"
-                }`}>
-                {t(`sections.${key}`)}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <>
+      <PageHeader title={t("title")} description={t("subtitle")} />
+      <Tabs label={t("title")} value={section} onChange={setSection}
+        items={SECTIONS.map((s) => ({ key: s.key, label: t(`sections.${s.key}`), icon: s.icon }))} />
 
       {section === "users" && <UsersSection />}
       {section === "organization" && <OrganizationSection />}
       {section === "billing" && <BillingSection />}
-    </div>
+    </>
   );
 }

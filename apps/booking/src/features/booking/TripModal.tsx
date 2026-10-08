@@ -2,9 +2,15 @@
 
 import type { Schemas } from "@raphael/api-client";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useFeedback } from "@/components/Feedback";
 import { InfoTip } from "@/components/InfoTip";
+import { Button } from "@/components/ui/Button";
+import { Check, Field, FormSection, Input, Select, Textarea } from "@/components/ui/Form";
+import {
+  IconAttachment, IconCheckCircle, IconMap, IconPatient, IconPhone, IconRoundTrip, IconSearch, IconTrips,
+} from "@/components/ui/Icon";
+import { Modal } from "@/components/ui/Modal";
 import { useErrorText } from "@/i18n/useErrorText";
 import { api } from "@/lib/bff";
 import { AddressInput } from "@/features/maps/AddressInput";
@@ -326,194 +332,192 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
     }
   }
 
-  const input = "w-full rounded-lg border border-border px-3 py-2 text-sm outline-none focus:border-brand";
-  const small = "text-xs font-semibold text-muted";
+  const fileAccept = `${ATTACHMENT_EXTENSIONS.join(",")},application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document`;
 
   return (
-    <div className="fixed inset-0 z-[1050] flex items-start justify-center overflow-y-auto bg-slate-900/50 p-4" role="presentation">
-      <form onSubmit={save} role="dialog" aria-modal="true" aria-labelledby="trip-modal-title"
-        className="my-6 w-full max-w-6xl rounded-2xl bg-surface shadow-2xl">
-        <div className="flex items-center justify-between border-b border-border bg-slate-50 px-6 py-4">
-          <h2 id="trip-modal-title" className="text-lg font-bold text-brand">{t("title")}</h2>
-          <button type="button" onClick={onClose} aria-label={tc("close")} className="text-2xl leading-none text-muted hover:text-foreground">×</button>
-        </div>
-
-        <div className="grid gap-6 p-6 md:grid-cols-2">
-          {/* Left column: patient and trip details */}
-          <div>
-            <Section title={t("patientSection")}>
-              <div className="relative mb-2">
-                <input className={input} placeholder={t("searchPatient")} autoComplete="off" required
-                  value={form.custName}
-                  onChange={(e) => { set("custName", e.target.value); setSuggestOpen(true); }}
-                  onBlur={() => setTimeout(() => setSuggestOpen(false), 150)} />
-                {suggestOpen && customerMatches.length > 0 && (
-                  <ul className="absolute z-[1060] mt-1 max-h-[250px] w-full overflow-y-auto rounded-lg border border-border bg-surface shadow-lg">
-                    {customerMatches.map((c) => (
-                      <li key={c.id}>
-                        <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => selectCustomer(c)}
-                          className="w-full px-3 py-2 text-left hover:bg-slate-100">
-                          <span className="block text-sm font-bold text-brand">{c.fullName}</span>
-                          <span className="text-xs text-muted">{t("riderIdShort", { id: c.riderId || tc("notAvailable") })}</span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <Field label={t("phone")} className={small}><input type="tel" inputMode="tel" autoComplete="off" className={input} placeholder="(786) 555-0100" required value={form.custPhone}
+    <Modal size="xl" icon={IconTrips} labelledBy="trip-modal-title" onClose={onClose} onSubmit={save}
+      title={trip ? t("editTitle", { id: trip.tripId || trip.id }) : t("title")}
+      subtitle={trip ? trip.customerName : t("subtitle")}
+      footer={<>
+        {bookingDisabled && <p className="mr-auto text-sm text-danger">{t("fundingMissing")}</p>}
+        <Button variant="secondary" onClick={onClose}>{tc("close")}</Button>
+        <Button type="submit" icon={IconCheckCircle} disabled={bookingDisabled || !funding} className="min-w-44">{t("save")}</Button>
+      </>}>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+        {/* Left column: patient, logistics and route */}
+        <div className="space-y-7">
+          <FormSection step={1} title={t("patientSection")}>
+            <div className="relative mb-3">
+              <Input icon={IconSearch} placeholder={t("searchPatient")} autoComplete="off" required aria-label={t("searchPatient")}
+                value={form.custName}
+                onChange={(e) => { set("custName", e.target.value); setSuggestOpen(true); }}
+                onBlur={() => setTimeout(() => setSuggestOpen(false), 150)} />
+              {suggestOpen && customerMatches.length > 0 && (
+                <ul className="absolute z-[1060] mt-1.5 max-h-64 w-full overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-pop">
+                  {customerMatches.map((c) => (
+                    <li key={c.id}>
+                      <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => selectCustomer(c)}
+                        className="flex w-full items-center gap-3 px-3.5 py-2.5 text-left hover:bg-brand-50">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700"><IconPatient size={14} aria-hidden /></span>
+                        <span className="min-w-0">
+                          <span className="block truncate font-semibold">{c.fullName}</span>
+                          <span className="block text-sm text-muted">{t("riderIdShort", { id: c.riderId || tc("notAvailable") })}</span>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label={t("phone")} htmlFor="trip-phone" required>
+                <Input id="trip-phone" type="tel" inputMode="tel" autoComplete="off" icon={IconPhone} placeholder="(786) 555-0100" required value={form.custPhone}
                   onChange={(e) => set("custPhone", e.target.value)}
-                  onBlur={() => { const p = normalizeUsPhone(form.custPhone); if (p) set("custPhone", formatUsPhone(p)); }} /></Field>
-                <Field label={t("dob")} className={small}><input type="date" className={input} required min={MIN_DOB} max={localToday()} value={form.custDOB} onChange={(e) => set("custDOB", e.target.value)} /></Field>
-                <Field label={t("riderId")} className={small}><input className={input} placeholder={t("riderId")} value={form.riderId} onChange={(e) => set("riderId", e.target.value)} /></Field>
-                <Field label={t("gender")} className={small}>
-                  <select className={input} required value={form.custGender} onChange={(e) => set("custGender", e.target.value)}>
-                    <option value="" disabled hidden>{t("genderSelect")}</option>
-                    <option value="Male">{t("male")}</option>
-                    <option value="Female">{t("female")}</option>
-                  </select>
-                </Field>
-                <Field label={t("homeAddress")} className={`${small} col-span-2`}><input className={input} placeholder={t("homeAddress")} required value={form.custAddress} onChange={(e) => set("custAddress", e.target.value)} /></Field>
-                <Field label={t("city")} className={small}><input className={input} placeholder={t("city")} required value={form.custCity} onChange={(e) => set("custCity", e.target.value)} /></Field>
-                <Field label={t("zip")} className={small}><input className={input} placeholder={t("zip")} required value={form.custZip} onChange={(e) => set("custZip", e.target.value)} /></Field>
-              </div>
-            </Section>
+                  onBlur={() => { const p = normalizeUsPhone(form.custPhone); if (p) set("custPhone", formatUsPhone(p)); }} />
+              </Field>
+              <Field label={t("dob")} htmlFor="trip-dob" required>
+                <Input id="trip-dob" type="date" required min={MIN_DOB} max={localToday()} value={form.custDOB} onChange={(e) => set("custDOB", e.target.value)} />
+              </Field>
+              <Field label={t("riderId")} htmlFor="trip-rider">
+                <Input id="trip-rider" placeholder={t("riderId")} value={form.riderId} onChange={(e) => set("riderId", e.target.value)} />
+              </Field>
+              <Field label={t("gender")} htmlFor="trip-gender" required>
+                <Select id="trip-gender" required value={form.custGender} onChange={(e) => set("custGender", e.target.value)}>
+                  <option value="" disabled hidden>{t("genderSelect")}</option>
+                  <option value="Male">{t("male")}</option>
+                  <option value="Female">{t("female")}</option>
+                </Select>
+              </Field>
+              <Field label={t("homeAddress")} htmlFor="trip-home" required className="col-span-2">
+                <Input id="trip-home" placeholder={t("homeAddress")} required value={form.custAddress} onChange={(e) => set("custAddress", e.target.value)} />
+              </Field>
+              <Field label={t("city")} htmlFor="trip-city" required>
+                <Input id="trip-city" placeholder={t("city")} required value={form.custCity} onChange={(e) => set("custCity", e.target.value)} />
+              </Field>
+              <Field label={t("zip")} htmlFor="trip-zip" required>
+                <Input id="trip-zip" placeholder={t("zip")} required value={form.custZip} onChange={(e) => set("custZip", e.target.value)} />
+              </Field>
+            </div>
+          </FormSection>
 
-            <Section title={t("logisticsSection")}>
-              <div className="grid grid-cols-4 gap-2">
-                <Field label={t("date")} className="col-span-2 text-xs font-semibold"><input type="date" className={input} required value={form.tripDate} onChange={(e) => set("tripDate", e.target.value)} /></Field>
-                <Field label={t("pickupTime")} className="text-xs font-semibold"><input type="time" className={input} required value={form.tripPickup} onChange={(e) => set("tripPickup", e.target.value)} /></Field>
-                <Field label={t("apptTime")} className="text-xs font-semibold"><input type="time" className={input} value={form.tripAppt} onChange={(e) => set("tripAppt", e.target.value)} /></Field>
-                <Field className="col-span-2 text-xs font-semibold"
-                  label={<>{t("spaceType")}<InfoTip label={t("spaceTypeHelp")}><b>AMB:</b> {t("spaceTypeAmb")}<br /><b>WCH:</b> {t("spaceTypeWch")}<br /><b>STR:</b> {t("spaceTypeStr")}</InfoTip></>}>
-                  <input list="spaceList" className={input} placeholder={t("spaceTypePlaceholder")} required value={form.spaceType} onChange={(e) => set("spaceType", e.target.value)} />
-                  <datalist id="spaceList">{spaceTypes.map((s) => <option key={s.id} value={s.name} />)}</datalist>
-                </Field>
-                <Field label={t("fundingSource")} className="col-span-2 text-xs font-semibold">
-                  {funding?.kind === "broker" ? (
-                    <>
-                      <input list="fundingList" className={input} placeholder={t("fundingPlaceholder")} value={form.fundingSource} onChange={(e) => set("fundingSource", e.target.value)} />
-                      <datalist id="fundingList">{funding.all.map((f) => <option key={f.id} value={f.name} />)}</datalist>
-                    </>
-                  ) : (
-                    <>
-                      <input readOnly value={fundingName} placeholder={bookingDisabled ? t("fundingDisabled") : tc("loading")}
-                        aria-invalid={bookingDisabled}
-                        className={`${input} bg-slate-100 ${bookingDisabled ? "border-red-500" : ""}`} />
-                      {bookingDisabled && (
-                        <p className="mt-1 text-[0.7rem] text-red-600">{t("fundingMissing")}</p>
-                      )}
-                    </>
-                  )}
-                </Field>
-                {isClinic && (
-                  <Field label={t("provider")} className="col-span-4 text-xs font-semibold">
-                    <select className={input} value={providerId} onChange={(e) => setProviderId(e.target.value)}>
-                      <option value="">{t("providerDefault")}</option>
-                      {providerOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                    </select>
-                    {!assignable.isLoading && providerOptions.length === 0 && (
-                      <p className="mt-1 text-[0.7rem] font-normal text-muted">{t("providerNoneContracted")}</p>
-                    )}
-                  </Field>
+          <FormSection step={2} title={t("logisticsSection")}>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Field label={t("date")} htmlFor="trip-date" required className="col-span-2">
+                <Input id="trip-date" type="date" required value={form.tripDate} onChange={(e) => set("tripDate", e.target.value)} />
+              </Field>
+              <Field label={t("pickupTime")} htmlFor="trip-pickup-time" required>
+                <Input id="trip-pickup-time" type="time" required value={form.tripPickup} onChange={(e) => set("tripPickup", e.target.value)} />
+              </Field>
+              <Field label={t("apptTime")} htmlFor="trip-appt-time">
+                <Input id="trip-appt-time" type="time" value={form.tripAppt} onChange={(e) => set("tripAppt", e.target.value)} />
+              </Field>
+              <Field label={t("spaceType")} htmlFor="trip-space" required className="col-span-2"
+                tip={<InfoTip label={t("spaceTypeHelp")}><b>AMB:</b> {t("spaceTypeAmb")}<br /><b>WCH:</b> {t("spaceTypeWch")}<br /><b>STR:</b> {t("spaceTypeStr")}</InfoTip>}>
+                <Input id="trip-space" list="spaceList" placeholder={t("spaceTypePlaceholder")} required value={form.spaceType} onChange={(e) => set("spaceType", e.target.value)} />
+                <datalist id="spaceList">{spaceTypes.map((s) => <option key={s.id} value={s.name} />)}</datalist>
+              </Field>
+              <Field label={t("fundingSource")} htmlFor="trip-funding" className="col-span-2"
+                error={bookingDisabled ? t("fundingMissing") : undefined}>
+                {funding?.kind === "broker" ? (
+                  <>
+                    <Input id="trip-funding" list="fundingList" placeholder={t("fundingPlaceholder")} value={form.fundingSource} onChange={(e) => set("fundingSource", e.target.value)} />
+                    <datalist id="fundingList">{funding.all.map((f) => <option key={f.id} value={f.name} />)}</datalist>
+                  </>
+                ) : (
+                  <Input id="trip-funding" readOnly value={fundingName} placeholder={bookingDisabled ? t("fundingDisabled") : tc("loading")}
+                    aria-invalid={bookingDisabled} />
                 )}
-              </div>
-            </Section>
+              </Field>
+              {isClinic && (
+                <Field label={t("provider")} htmlFor="trip-provider" className="col-span-2 sm:col-span-4"
+                  hint={!assignable.isLoading && providerOptions.length === 0 ? t("providerNoneContracted") : undefined}>
+                  <Select id="trip-provider" value={providerId} onChange={(e) => setProviderId(e.target.value)}>
+                    <option value="">{t("providerDefault")}</option>
+                    {providerOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </Select>
+                </Field>
+              )}
+            </div>
+          </FormSection>
 
-            <Section title={t("routeSection")}>
-              <AddressInput id="pickupAddr" placeholder={t("pickupAddress")} required value={pickup.address}
-                icon={<span className="text-[#dc3545]">●</span>}
-                onTextChange={(text) => setPickup((p) => ({ ...p, address: text, resolved: false }))}
-                onPlace={(p) => placeChosen("pickup", p)} />
-              <div className="mt-1 mb-3 flex justify-between px-1 text-xs text-muted">
-                <span>{t.rich("cityValue", { city: cityText(pickup.city), b: (chunks) => <b>{chunks}</b> })}</span>
-                <span>{t.rich("distanceValue", { distance, b: (chunks) => <b>{chunks}</b> })}</span>
+          <FormSection step={3} title={t("routeSection")}>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="pickupAddr" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("pickupAddress")}<span className="text-danger" aria-hidden="true"> *</span></label>
+                <AddressInput id="pickupAddr" tone="pickup" resolved={pickup.resolved} placeholder={t("addressPlaceholder")} required value={pickup.address}
+                  onTextChange={(text) => setPickup((p) => ({ ...p, address: text, resolved: false }))}
+                  onPlace={(p) => placeChosen("pickup", p)} />
+                <p className="mt-1.5 text-sm text-muted">{t.rich("cityValue", { city: cityText(pickup.city), b: (chunks) => <b className="text-foreground">{chunks}</b> })}</p>
               </div>
-              <AddressInput id="dropoffAddr" placeholder={t("dropoffAddress")} required value={dropoff.address}
-                icon={<span className="text-[#0d6efd]">●</span>}
-                onTextChange={(text) => setDropoff((p) => ({ ...p, address: text, resolved: false }))}
-                onPlace={(p) => placeChosen("dropoff", p)} />
-              <div className="mt-1 mb-3 px-1 text-xs text-muted">{t.rich("cityValue", { city: cityText(dropoff.city), b: (chunks) => <b>{chunks}</b> })}</div>
+              <div>
+                <label htmlFor="dropoffAddr" className="mb-1.5 block text-sm font-semibold text-slate-700">{t("dropoffAddress")}<span className="text-danger" aria-hidden="true"> *</span></label>
+                <AddressInput id="dropoffAddr" tone="dropoff" resolved={dropoff.resolved} placeholder={t("addressPlaceholder")} required value={dropoff.address}
+                  onTextChange={(text) => setDropoff((p) => ({ ...p, address: text, resolved: false }))}
+                  onPlace={(p) => placeChosen("dropoff", p)} />
+                <p className="mt-1.5 text-sm text-muted">{t.rich("cityValue", { city: cityText(dropoff.city), b: (chunks) => <b className="text-foreground">{chunks}</b> })}</p>
+              </div>
 
               {/* Only when booking: nothing links a return to its outbound trip, so an edit cannot
                   find the one already booked. The backend refuses it too; the return is edited on its own. */}
               {!trip && (
-                <div className="rounded-lg border border-border bg-slate-50 p-2">
-                  <label className="flex items-center gap-2 text-sm font-bold">
-                    <input type="checkbox" role="switch" checked={form.isRoundTrip} onChange={(e) => set("isRoundTrip", e.target.checked)} />
-                    {t("roundTrip")}
-                  </label>
+                <div className="rounded-xl border border-border bg-surface-2 px-4 py-2">
+                  <Check role="switch" label={<span className="flex items-center gap-2 font-semibold"><IconRoundTrip size={16} aria-hidden className="text-brand" />{t("roundTrip")}</span>}
+                    checked={form.isRoundTrip} onChange={(e) => set("isRoundTrip", e.target.checked)} />
                   {form.isRoundTrip && (
                     // Required here and by the backend, which used to skip a return without a time and say nothing.
-                    <input type="time" aria-label={t("returnTime")} required className={`${input} mt-2`} value={form.returnTime} onChange={(e) => set("returnTime", e.target.value)} />
+                    <Field label={t("returnTime")} htmlFor="trip-return" required className="mb-2 mt-1 max-w-48">
+                      <Input id="trip-return" type="time" required value={form.returnTime} onChange={(e) => set("returnTime", e.target.value)} />
+                    </Field>
                   )}
                 </div>
               )}
-            </Section>
-          </div>
-
-          {/* Right column: map and notes */}
-          <div className="md:border-l md:border-border md:pl-6">
-            <p className="mb-2 text-sm font-bold text-muted">{t("mapTitle")}</p>
-            <TripMap mapId={mapId} pickup={pickup.coords} dropoff={dropoff.coords} polyline={polyline} onPinMoved={pinMoved} />
-
-            <div className="mt-3 space-y-2">
-              <Field className={small}
-                label={<>{t("pickupInstructions")}<InfoTip label={t("pickupExamples")}>{t.rich("pickupExamplesText", { br: () => <br /> })}</InfoTip></>}>
-                <textarea className={input} rows={2} placeholder={t("pickupPlaceholder")} value={form.pickupComment} onChange={(e) => set("pickupComment", e.target.value)} />
-              </Field>
-              <Field className={small}
-                label={<>{t("dropoffInstructions")}<InfoTip label={t("dropoffExamples")}>{t.rich("dropoffExamplesText", { br: () => <br /> })}</InfoTip></>}>
-                <textarea className={input} rows={2} placeholder={t("dropoffPlaceholder")} value={form.dropoffComment} onChange={(e) => set("dropoffComment", e.target.value)} />
-              </Field>
-
-              {form.isRoundTrip && (
-                <div className="rounded-lg border border-border bg-slate-50 p-2">
-                  <p className="text-xs font-bold text-brand">{t("returnNotes")}</p>
-                  <textarea className={`${input} mt-1`} rows={1} placeholder={t("returnPickupPlaceholder")} value={form.roundTripPickupComment} onChange={(e) => set("roundTripPickupComment", e.target.value)} />
-                  <textarea className={`${input} mt-2`} rows={1} placeholder={t("returnDropoffPlaceholder")} value={form.roundTripDropoffComment} onChange={(e) => set("roundTripDropoffComment", e.target.value)} />
-                </div>
-              )}
-
-              <Field label={t("attachment")} className={small}>
-                <input ref={fileRef} type="file" accept={`${ATTACHMENT_EXTENSIONS.join(",")},application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document`}
-                  onChange={async (e) => {
-                    const problem = attachmentProblem(e.target.files?.[0]);
-                    if (problem) { e.target.value = ""; await feedback.alert(t(problem)); }
-                  }}
-                  className={`${input} file:mr-3 file:rounded file:border-0 file:bg-slate-100 file:px-3 file:py-1`} />
-              </Field>
             </div>
+          </FormSection>
+        </div>
+
+        {/* Right column: map and notes */}
+        <div className="space-y-5 lg:border-l lg:border-border lg:pl-8">
+          <div>
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <IconMap size={16} aria-hidden className="text-brand" />
+              <p className="font-bold">{t("mapTitle")}</p>
+              <span className="ml-auto rounded-full bg-brand-50 px-3 py-1 text-sm font-semibold text-brand-800">
+                {t.rich("distanceValue", { distance, b: (chunks) => <b>{chunks}</b> })}
+              </span>
+            </div>
+            <div className="overflow-hidden rounded-xl border border-border">
+              <TripMap mapId={mapId} pickup={pickup.coords} dropoff={dropoff.coords} polyline={polyline} onPinMoved={pinMoved} />
+            </div>
+            <p className="mt-1.5 text-xs text-muted">{t("mapHint")}</p>
           </div>
+
+          <Field label={t("pickupInstructions")} htmlFor="trip-pickup-notes"
+            tip={<InfoTip label={t("pickupExamples")}>{t.rich("pickupExamplesText", { br: () => <br /> })}</InfoTip>}>
+            <Textarea id="trip-pickup-notes" rows={2} placeholder={t("pickupPlaceholder")} value={form.pickupComment} onChange={(e) => set("pickupComment", e.target.value)} />
+          </Field>
+          <Field label={t("dropoffInstructions")} htmlFor="trip-dropoff-notes"
+            tip={<InfoTip label={t("dropoffExamples")}>{t.rich("dropoffExamplesText", { br: () => <br /> })}</InfoTip>}>
+            <Textarea id="trip-dropoff-notes" rows={2} placeholder={t("dropoffPlaceholder")} value={form.dropoffComment} onChange={(e) => set("dropoffComment", e.target.value)} />
+          </Field>
+
+          {form.isRoundTrip && (
+            <div className="space-y-3 rounded-xl border border-brand-200 bg-brand-50/60 p-4">
+              <p className="flex items-center gap-2 text-sm font-bold text-brand-800"><IconRoundTrip size={15} aria-hidden />{t("returnNotes")}</p>
+              <Textarea rows={2} aria-label={t("returnPickupPlaceholder")} placeholder={t("returnPickupPlaceholder")} value={form.roundTripPickupComment} onChange={(e) => set("roundTripPickupComment", e.target.value)} />
+              <Textarea rows={2} aria-label={t("returnDropoffPlaceholder")} placeholder={t("returnDropoffPlaceholder")} value={form.roundTripDropoffComment} onChange={(e) => set("roundTripDropoffComment", e.target.value)} />
+            </div>
+          )}
+
+          <Field label={<span className="flex items-center gap-1.5"><IconAttachment size={14} aria-hidden />{t("attachment")}</span>} htmlFor="trip-file" hint={t("attachmentHint")}>
+            <input id="trip-file" ref={fileRef} type="file" accept={fileAccept}
+              onChange={async (e) => {
+                const problem = attachmentProblem(e.target.files?.[0]);
+                if (problem) { e.target.value = ""; await feedback.alert(t(problem)); }
+              }}
+              className="block w-full rounded-[var(--radius)] border border-dashed border-border-strong bg-surface px-3 py-2.5 text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-3 file:py-1.5 file:font-semibold file:text-brand-800 hover:border-brand-500" />
+          </Field>
         </div>
-
-        <div className="flex justify-end gap-2 border-t border-border bg-slate-50 px-6 py-4">
-          <button type="button" onClick={onClose} className="rounded-lg bg-slate-500 px-4 py-2 text-sm font-bold text-white">{tc("close")}</button>
-          <button type="submit" disabled={bookingDisabled || !funding}
-            className="rounded-lg bg-brand px-10 py-2 text-sm font-bold uppercase text-white shadow-sm disabled:opacity-50">
-            {t("save")}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <fieldset className="mb-4">
-      <legend className="mb-2 text-sm font-bold">{title}</legend>
-      {children}
-    </fieldset>
-  );
-}
-
-function Field({ label, className, children }: { label: ReactNode; className?: string; children: ReactNode }) {
-  return (
-    <label className={`block ${className ?? ""}`}>
-      <span className="mb-1 block">{label}</span>
-      {children}
-    </label>
+      </div>
+    </Modal>
   );
 }

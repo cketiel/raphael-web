@@ -2,25 +2,44 @@
 
 import Link from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
+import { Button } from "@/components/ui/Button";
+import {
+  IconCancelled, IconCheck, IconCheckAll, IconChevronLeft, IconChevronRight, IconCompleted, IconInbox, IconOnTheWay, IconReactivated, IconScheduled,
+} from "@/components/ui/Icon";
+import { Badge, Card, EmptyState, Notice, PageHeader, type Tone } from "@/components/ui/Surface";
+import { Tabs } from "@/components/ui/Tabs";
 import { useRealtime } from "@/features/realtime/RealtimeProvider";
 import { useNotifications, type ClinicNotification } from "./NotificationsProvider";
 import { tripLink, useDescribe } from "./useDescribe";
+
+type IconComponent = ComponentType<{ size?: number | string; className?: string; "aria-hidden"?: boolean }>;
 
 /**
  * The tabs, as data, in the order a trip lives them (Raphael.Desktop NotificationCenterViewModel.BuildTabs).
  * Reactivations have their own tab: a clinic must see at a glance that a cancelled trip is back.
  */
 const TABS = [
-  { key: "all", event: null },
-  { key: "scheduled", event: "TRIP_SCHEDULED" },
-  { key: "started", event: "DRIVER_STARTED_TRIP" },
-  { key: "completed", event: "DRIVER_COMPLETED_TRIP" },
-  { key: "cancelled", event: "TRIP_CANCELLED" },
-  { key: "reactivated", event: "TRIP_REACTIVATED" },
+  { key: "all", event: null, icon: IconInbox },
+  { key: "scheduled", event: "TRIP_SCHEDULED", icon: IconScheduled },
+  { key: "started", event: "DRIVER_STARTED_TRIP", icon: IconOnTheWay },
+  { key: "completed", event: "DRIVER_COMPLETED_TRIP", icon: IconCompleted },
+  { key: "cancelled", event: "TRIP_CANCELLED", icon: IconCancelled },
+  { key: "reactivated", event: "TRIP_REACTIVATED", icon: IconReactivated },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
+
+/** How each kind of notice looks: its icon and colour, the same in the list and in its tab. */
+const EVENT_LOOK: Record<string, { icon: IconComponent; tone: Tone; tile: string }> = {
+  TRIP_SCHEDULED: { icon: IconScheduled, tone: "info", tile: "bg-info-soft text-info" },
+  DRIVER_STARTED_TRIP: { icon: IconOnTheWay, tone: "warning", tile: "bg-warning-soft text-warning" },
+  DRIVER_COMPLETED_TRIP: { icon: IconCompleted, tone: "success", tile: "bg-success-soft text-success" },
+  TRIP_CANCELLED: { icon: IconCancelled, tone: "danger", tile: "bg-danger-soft text-danger" },
+  TRIP_REACTIVATED: { icon: IconReactivated, tone: "violet", tile: "bg-violet-100 text-violet-700" },
+};
+
+const DEFAULT_LOOK = { icon: IconInbox, tone: "neutral" as Tone, tile: "bg-slate-100 text-slate-600" };
 
 /**
  * Rows per page. Fifty, as in the Desktop: a week of a busy clinic is well over a thousand notices,
@@ -50,64 +69,47 @@ export function NotificationCenter() {
   const unreadHere = rows.filter((n) => !isRead(n.id)).map((n) => n.id);
 
   return (
-    <div className="w-full px-3 py-4 sm:px-6 sm:py-6">
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <h1 className="mr-auto text-xl font-bold text-slate-600">{t("title")}</h1>
-        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLE[status]}`}>{t(status)}</span>
-        <button type="button" onClick={() => markRead(unreadHere)} disabled={unreadHere.length === 0}
-          className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-semibold hover:bg-slate-50 disabled:opacity-40">
-          {t("markAllRead")}
-        </button>
-      </div>
-      <p className="mb-4 text-sm text-muted">{t("window")}</p>
+    <>
+      <PageHeader title={t("title")} description={t("window")}
+        actions={<>
+          <Badge tone={STATUS_TONE[status]} className="!py-1">
+            <span className={`size-2 rounded-full ${STATUS_DOT[status]}`} aria-hidden="true" />{t(status)}
+          </Badge>
+          <Button variant="secondary" icon={IconCheckAll} onClick={() => markRead(unreadHere)} disabled={unreadHere.length === 0}>
+            {t("markAllRead")}
+          </Button>
+        </>} />
 
-      {/* Tabs: they scroll sideways on a phone rather than wrap into a wall of buttons. */}
-      <div className="mb-4 overflow-x-auto [scrollbar-width:none]">
-        <ul className="flex min-w-max gap-1 rounded-xl bg-surface p-1 shadow-sm" role="tablist" aria-label={t("title")}>
-          {TABS.map((x) => {
-            const active = x.key === tab;
-            const unread = unreadIn(x.key);
-            return (
-              <li key={x.key}>
-                <button type="button" role="tab" aria-selected={active} onClick={() => { setTab(x.key); setPage(1); }}
-                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold ${
-                    active ? "bg-brand text-white" : "text-muted hover:bg-slate-50 hover:text-foreground"
-                  }`}>
-                  {t(`tabs.${x.key}`)}
-                  <span className={`rounded-full px-1.5 text-[0.7rem] ${active ? "bg-white/25" : "bg-slate-100"}`}>{inTab(x.key).length}</span>
-                  {unread > 0 && <span className="size-2 rounded-full bg-red-600" aria-label={t("unreadCount", { count: unread })} />}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <Tabs label={t("title")} value={tab} onChange={(k) => { setTab(k); setPage(1); }}
+        items={TABS.map((x) => ({ key: x.key, label: t(`tabs.${x.key}`), icon: x.icon, count: inTab(x.key).length, attention: unreadIn(x.key) > 0 }))} />
 
-      {isError && <p className="mb-3 text-sm text-red-700">{t("loadFailed")}</p>}
+      {isError && <Notice tone="danger" className="mb-4">{t("loadFailed")}</Notice>}
 
-      {isLoading ? (
-        <p className="text-sm text-muted">{t("loading")}</p>
-      ) : rows.length === 0 ? (
-        <p className="rounded-2xl bg-surface p-6 text-sm text-muted shadow-sm">{t("empty")}</p>
-      ) : (
-        <ul className="divide-y divide-border overflow-hidden rounded-2xl bg-surface shadow-sm">
-          {visible.map((n) => (
-            <Row key={n.id} n={n} read={isRead(n.id)} onRead={() => markRead([n.id])}
-              describe={describe} when={format.dateTime(new Date(n.createdAtUtc), { dateStyle: "medium", timeStyle: "short" })} />
-          ))}
-        </ul>
-      )}
+      <Card padded={false} className="overflow-hidden">
+        {isLoading ? (
+          <p className="p-6 text-sm text-muted">{t("loading")}</p>
+        ) : rows.length === 0 ? (
+          <EmptyState icon={IconInbox} title={t("emptyTitle")}>{t("empty")}</EmptyState>
+        ) : (
+          <ul className="divide-y divide-border">
+            {visible.map((n) => (
+              <Row key={n.id} n={n} read={isRead(n.id)} onRead={() => markRead([n.id])} describe={describe}
+                when={format.dateTime(new Date(n.createdAtUtc), { dateStyle: "medium", timeStyle: "short" })} />
+            ))}
+          </ul>
+        )}
+      </Card>
 
       {pages > 1 && (
-        <div className="mt-4 flex items-center justify-center gap-3 text-sm">
-          <button type="button" disabled={current <= 1} onClick={() => setPage(current - 1)}
-            className="rounded-lg border border-border px-4 py-2 font-semibold disabled:opacity-40">{t("previous")}</button>
-          <span>{t("pageOf", { page: current, pages })}</span>
-          <button type="button" disabled={current >= pages} onClick={() => setPage(current + 1)}
-            className="rounded-lg border border-border px-4 py-2 font-semibold disabled:opacity-40">{t("next")}</button>
+        <div className="mt-5 flex items-center justify-center gap-3 text-sm">
+          <Button variant="secondary" icon={IconChevronLeft} disabled={current <= 1} onClick={() => setPage(current - 1)}>{t("previous")}</Button>
+          <span className="font-semibold">{t("pageOf", { page: current, pages })}</span>
+          <Button variant="secondary" disabled={current >= pages} onClick={() => setPage(current + 1)}>
+            {t("next")}<IconChevronRight size={16} aria-hidden />
+          </Button>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -121,28 +123,28 @@ function Row({ n, read, onRead, describe, when }: {
   const t = useTranslations("notifications");
   const { title, body } = describe(n);
   const link = tripLink(n);
+  const look = EVENT_LOOK[n.businessEventCode] ?? DEFAULT_LOOK;
 
   return (
-    <li className={`flex flex-wrap items-start gap-3 p-4 sm:flex-nowrap ${read ? "" : "bg-sky-50/60"}`}>
-      <span aria-hidden="true" className={`mt-1.5 size-2.5 shrink-0 rounded-full ${read ? "bg-transparent" : "bg-brand"}`} />
+    <li className={`flex flex-wrap items-start gap-3 px-4 py-4 sm:flex-nowrap sm:px-5 ${read ? "" : "bg-brand-50/50"}`}>
+      <span className={`relative flex size-10 shrink-0 items-center justify-center rounded-xl ${look.tile}`}>
+        <look.icon size={18} aria-hidden />
+        {!read && <span className="absolute -right-1 -top-1 size-3 rounded-full bg-brand ring-2 ring-surface" aria-hidden="true" />}
+      </span>
       <div className="min-w-0 flex-1">
-        <p className={`text-sm ${read ? "font-semibold text-slate-700" : "font-bold"}`}>
-          <span className={`mr-2 inline-block rounded-full px-2 py-0.5 text-[0.7rem] font-semibold ${EVENT_STYLE[n.businessEventCode] ?? "bg-slate-100 text-slate-700"}`}>{title}</span>
-          {!read && <span className="sr-only">{t("unread")}</span>}
+        <p className={`text-[0.95rem] ${read ? "font-semibold text-slate-700" : "font-bold text-foreground"}`}>
+          {title}
+          {!read && <span className="sr-only"> · {t("unread")}</span>}
         </p>
-        <p className="mt-1 text-sm text-slate-700">{body}</p>
+        <p className="mt-0.5 text-sm text-slate-600">{body}</p>
         <p className="mt-1 text-xs text-muted">{when}</p>
       </div>
-      <div className="flex w-full shrink-0 justify-end gap-2 sm:w-auto">
-        {!read && (
-          <button type="button" onClick={onRead} className="rounded-lg px-3 py-1.5 text-xs font-semibold text-muted hover:bg-slate-100">
-            {t("markRead")}
-          </button>
-        )}
+      <div className="flex w-full shrink-0 justify-end gap-2 sm:w-auto sm:self-center">
+        {!read && <Button variant="ghost" size="sm" icon={IconCheck} onClick={onRead}>{t("markRead")}</Button>}
         {link && (
           <Link href={`/?trip=${link.tripId}&date=${link.date}`} onClick={onRead}
-            className="rounded-lg bg-brand px-3 py-1.5 text-xs font-bold text-white hover:opacity-90">
-            {t("viewTrip")}
+            className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius)] bg-brand px-3 text-sm font-semibold text-white hover:bg-brand-700">
+            {t("viewTrip")}<IconChevronRight size={14} aria-hidden />
           </Link>
         )}
       </div>
@@ -150,17 +152,5 @@ function Row({ n, read, onRead, describe, when }: {
   );
 }
 
-const STATUS_STYLE = {
-  connecting: "bg-amber-100 text-amber-800",
-  connected: "bg-emerald-100 text-emerald-800",
-  reconnecting: "bg-amber-100 text-amber-800",
-  disconnected: "bg-red-100 text-red-800",
-} as const;
-
-const EVENT_STYLE: Record<string, string> = {
-  TRIP_SCHEDULED: "bg-sky-100 text-sky-800",
-  DRIVER_STARTED_TRIP: "bg-amber-100 text-amber-800",
-  DRIVER_COMPLETED_TRIP: "bg-emerald-100 text-emerald-800",
-  TRIP_CANCELLED: "bg-red-100 text-red-800",
-  TRIP_REACTIVATED: "bg-violet-100 text-violet-800",
-};
+const STATUS_TONE = { connecting: "warning", connected: "success", reconnecting: "warning", disconnected: "danger" } as const;
+const STATUS_DOT = { connecting: "bg-amber-400", connected: "bg-emerald-500", reconnecting: "bg-amber-400", disconnected: "bg-red-500" } as const;

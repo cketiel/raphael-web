@@ -2,6 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { Button } from "./ui/Button";
+import { IconInfo, IconWarning } from "./ui/Icon";
 
 /**
  * The original portal used the browser's alert(), confirm() and a full-screen spinner.
@@ -65,28 +67,30 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {children}
 
       {pending > 0 && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-white/80" aria-busy="true" aria-live="polite">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand border-t-transparent" role="status">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-white/70 backdrop-blur-[1px]" aria-busy="true" aria-live="polite">
+          <div className="size-11 animate-spin rounded-full border-4 border-brand-200 border-t-brand" role="status">
             <span className="sr-only">{t("loading")}</span>
           </div>
         </div>
       )}
 
       {dialog && (
-        <div className="fixed inset-0 z-[3100] flex items-center justify-center bg-slate-900/40 p-4" role="presentation">
+        <div className="fixed inset-0 z-[3100] flex items-center justify-center bg-slate-900/55 p-4" role="presentation">
           <div role={dialog.kind === "confirm" ? "alertdialog" : "dialog"} aria-modal="true" aria-describedby="feedback-message"
-            className="w-full max-w-md rounded-2xl bg-surface p-6 shadow-2xl">
-            <p id="feedback-message" className="whitespace-pre-line text-sm">{dialog.message}</p>
+            className="w-full max-w-md rounded-2xl bg-surface p-6 shadow-pop">
+            <div className="flex items-start gap-4">
+              <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${
+                dialog.kind === "confirm" ? "bg-warning-soft text-warning" : "bg-brand-100 text-brand-700"
+              }`}>
+                {dialog.kind === "confirm" ? <IconWarning size={18} aria-hidden /> : <IconInfo size={19} aria-hidden />}
+              </span>
+              <p id="feedback-message" className="whitespace-pre-line pt-2 text-[0.95rem] leading-relaxed">{dialog.message}</p>
+            </div>
             <div className="mt-6 flex justify-end gap-2">
               {dialog.kind === "confirm" && (
-                <button onClick={() => close(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-semibold">
-                  {t("cancel")}
-                </button>
+                <Button variant="secondary" onClick={() => close(false)}>{t("cancel")}</Button>
               )}
-              <button ref={okRef} autoFocus onClick={() => close(true)}
-                className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white">
-                {t("ok")}
-              </button>
+              <Button ref={okRef} autoFocus onClick={() => close(true)} className="min-w-24">{t("ok")}</Button>
             </div>
           </div>
         </div>

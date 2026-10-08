@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildProductionCsv, CSV_HEADERS, formatCell, productionReportFileName, toCsvRow } from "./productionReportCsv";
 import {
   attachmentProblem, cityForSave, formatUsPhone, isValidDob, localToday, normalizeUsPhone,
-  searchCustomers, statusBadgeClass, summarize, toTimeInput,
+  searchCustomers, statusStyle, summarize, toTimeInput,
 } from "./rules";
 import type { TripRead } from "./types";
 
@@ -56,10 +56,10 @@ describe("summary cards", () => {
 
 describe("status badges", () => {
   it("maps known statuses case-insensitively and falls back to primary blue", () => {
-    expect(statusBadgeClass("InProgress")).toContain("#6610f2");
-    expect(statusBadgeClass("Waiting")).toContain("text-[#212529]");
-    expect(statusBadgeClass("Arrived")).toContain("#0d6efd");
-    expect(statusBadgeClass(null)).toContain("#198754");
+    expect(statusStyle("InProgress").dot).toBe("bg-violet-600");
+    expect(statusStyle("Waiting").badge).toContain("amber");
+    expect(statusStyle("Arrived")).toEqual(statusStyle("SomethingNew"));
+    expect(statusStyle(null)).toEqual(statusStyle("Assigned"));
   });
 });
 
