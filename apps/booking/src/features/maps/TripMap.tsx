@@ -32,7 +32,7 @@ function RouteLine({ encoded }: { encoded: string | null }) {
 const reportedMaps = new WeakSet<google.maps.Map>();
 
 /** Google bills a Dynamic Maps load per map shown: report exactly one per map, as Desktop does per page. */
-function ReportMapLoad() {
+export function ReportMapLoad() {
   const map = useMap();
   useEffect(() => {
     if (!map || reportedMaps.has(map)) return;

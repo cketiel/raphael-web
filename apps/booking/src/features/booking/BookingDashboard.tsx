@@ -6,6 +6,8 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { useFeedback } from "@/components/Feedback";
 import { useErrorText } from "@/i18n/useErrorText";
 import { api } from "@/lib/bff";
+import { useRealtime } from "@/features/realtime/RealtimeProvider";
+import { TrackingModal } from "@/features/tracking/TrackingModal";
 import { reportFundingIds, useCustomers, useFundingContext, useSpaceTypes } from "./catalogs";
 import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./productionReportCsv";
 import { localToday, statusBadgeClass, summarize, toTimeInput } from "./rules";
@@ -24,6 +26,9 @@ interface BookingDashboardProps {
 interface Loaded {
   trips: TripRead[];
   report: ProductionRow[];
+  /** The range these trips were searched for: a live change outside it is not this list's business. */
+  start: string;
+  end: string;
 }
 
 export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashboardProps) {
@@ -43,6 +48,8 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [modal, setModal] = useState<{ open: boolean; trip: TripRead | null }>({ open: false, trip: null });
+  const [trackingId, setTrackingId] = useState<number | null>(null);
+  const { onTripStatus } = useRealtime();
 
   const fundingIds = reportFundingIds(funding.data);
 
@@ -59,23 +66,45 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
   };
 
   /** my-trips, then the production report for the same range (Booking Web app.js:159-179). */
+  async function fetchTrips(from: string, to: string): Promise<Loaded> {
+    const query = new URLSearchParams({ startDate: from, endDate: to });
+    const trips = await api<TripRead[]>(`BookingPortal/my-trips?${query}`);
+    // Without funding sources the backend would apply no filter at all, so the report is not asked for.
+    const report = fundingIds.length
+      ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}&fundingSourceIds=${fundingIds.join(",")}`)
+      : [];
+    return { trips: trips ?? [], report: report ?? [], start: from, end: to };
+  }
+
   async function loadTrips() {
     if (!start || !end) return;
     await feedback.busy(async () => {
       try {
-        const query = new URLSearchParams({ startDate: start, endDate: end });
-        const trips = await api<TripRead[]>(`BookingPortal/my-trips?${query}`);
-        // Without funding sources the backend would apply no filter at all, so the report is not asked for.
-        const report = fundingIds.length
-          ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}&fundingSourceIds=${fundingIds.join(",")}`)
-          : [];
-        setLoaded({ trips: trips ?? [], report: report ?? [] });
+        setLoaded(await fetchTrips(start, end));
         setSelected(new Set());
       } catch (e) {
         await feedback.alert(errorText(e, t("loadFailed")));
       }
     });
   }
+
+  // Live status changes. A trip already on screen changes in place; one that is not, but falls in
+  // the searched range (a new booking, a reactivation), brings the list again in the background.
+  const onStatusChanged = useEffectEvent((change: { tripId: number; status: string; isCancelled: boolean; date: string }) => {
+    if (!loaded) return;
+    if (loaded.trips.some((x) => x.id === change.tripId)) {
+      setLoaded({
+        ...loaded,
+        trips: loaded.trips.map((x) => (x.id === change.tripId ? { ...x, status: change.status, isCancelled: change.isCancelled } : x)),
+      });
+      return;
+    }
+    const day = change.date.slice(0, 10);
+    if (day >= loaded.start && day <= loaded.end) {
+      void fetchTrips(loaded.start, loaded.end).then(setLoaded).catch(() => undefined);
+    }
+  });
+  useEffect(() => onTripStatus((c) => onStatusChanged(c)), [onTripStatus]);
 
   // First load once the funding sources are known, as the original loaded catalogs before trips.
   const onFundingReady = useEffectEvent(() => void loadTrips());
@@ -115,6 +144,18 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
   const summary = loaded ? summarize(loaded.trips, loaded.report) : null;
   const allChecked = trips.length > 0 && trips.every((x) => selected.has(x.tripId ?? ""));
 
+  /** Track, edit and cancel: the same three buttons on the table and on the phone cards. */
+  const rowActions = (trip: TripRead) => (
+      <div className="inline-flex overflow-hidden rounded-lg border border-border shadow-sm">
+        <button onClick={() => setTrackingId(trip.id)} title={t("trackTrip")} aria-label={t("trackTrip")}
+          className="px-2.5 py-1 text-[#198754] hover:bg-emerald-50">📍</button>
+        <button onClick={() => setModal({ open: true, trip })} title={t("editTrip")} aria-label={t("editTrip")}
+          className="border-l border-border px-2.5 py-1 text-slate-600 hover:bg-slate-100">✎</button>
+        <button onClick={() => cancelTrips([trip.tripId ?? ""])} title={t("cancelTrip")} aria-label={t("cancelTrip")}
+          className="border-l border-border px-2.5 py-1 text-[#dc3545] hover:bg-red-50">✕</button>
+      </div>
+  );
+
   function toggle(id: string, on: boolean) {
     setSelected((s) => {
       const next = new Set(s);
@@ -126,7 +167,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
 
   return (
     <>
-      <div className="w-full px-6 py-6">
+      <div className="w-full px-3 py-4 sm:px-6 sm:py-6">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-xl font-bold text-slate-600">{t("title")}</h1>
           <div className="flex gap-2">
@@ -183,8 +224,42 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
           </div>
         )}
 
-        {/* Trips table */}
-        <div className="overflow-hidden rounded-2xl bg-surface shadow-sm">
+        {/* Phones and tablets: one card per trip, nothing to scroll sideways. */}
+        <ul className="grid gap-3 md:grid-cols-2 lg:hidden">
+          {trips.length > 0 && (
+            <li className="flex items-center gap-2 px-1 text-sm md:col-span-2">
+              <input type="checkbox" aria-label={t("selectAll")} checked={allChecked}
+                onChange={(e) => setSelected(e.target.checked ? new Set(trips.map((x) => x.tripId ?? "")) : new Set())} />
+              <span className="text-muted">{t("selectAll")}</span>
+            </li>
+          )}
+          {trips.map((trip) => (
+            <li key={trip.id} className="rounded-2xl bg-surface p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <input type="checkbox" className="mt-1" aria-label={t("selectTrip", { id: trip.tripId || trip.id })} checked={selected.has(trip.tripId ?? "")}
+                  onChange={(e) => toggle(trip.tripId ?? "", e.target.checked)} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-bold">#{trip.tripId || trip.id}</span>
+                    <span className={`rounded-full px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-wide ${statusBadgeClass(trip.status)}`}>
+                      {statusLabel(trip.status)}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-muted">
+                    {format.dateTime(new Date(trip.date), DATE_FORMAT)}{trip.fromTime ? ` · ${toTimeInput(trip.fromTime)}` : ""}
+                  </p>
+                  <p className="mt-1 text-sm font-bold">{trip.customerName}</p>
+                  <p className="mt-2 break-words text-[0.85rem] leading-tight"><span className="text-[#dc3545]">●</span> {trip.pickupAddress}</p>
+                  <p className="mt-1 break-words text-[0.85rem] leading-tight"><span className="text-[#0d6efd]">●</span> {trip.dropoffAddress}</p>
+                  <div className="mt-3 flex justify-end">{rowActions(trip)}</div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Wide screens: the table. Below 1024 px its route column wraps an address over seven lines. */}
+        <div className="hidden overflow-hidden rounded-2xl bg-surface shadow-sm lg:block">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50 text-xs font-bold">
@@ -225,12 +300,7 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
                       </span>
                     </td>
                     <td className="px-3 text-center">
-                      <div className="inline-flex overflow-hidden rounded-lg border border-border shadow-sm">
-                        <button onClick={() => setModal({ open: true, trip })} title={t("editTrip")} aria-label={t("editTrip")}
-                          className="px-2.5 py-1 text-slate-600 hover:bg-slate-100">✎</button>
-                        <button onClick={() => cancelTrips([trip.tripId ?? ""])} title={t("cancelTrip")} aria-label={t("cancelTrip")}
-                          className="border-l border-border px-2.5 py-1 text-[#dc3545] hover:bg-red-50">✕</button>
-                      </div>
+                      {rowActions(trip)}
                     </td>
                   </tr>
                 ))}
@@ -240,7 +310,12 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId }: BookingDashbo
         </div>
       </div>
 
-      {/* Maps JavaScript loads only when the form opens, never with the dashboard. */}
+      {/* Maps JavaScript loads only when a form or the tracking view opens, never with the dashboard. */}
+      {trackingId !== null && (
+        <APIProvider apiKey={mapsKey} language={locale} region="US">
+          <TrackingModal tripId={trackingId} mapId={mapId} onClose={() => setTrackingId(null)} />
+        </APIProvider>
+      )}
       {modal.open && <APIProvider apiKey={mapsKey} language={locale} region="US"><TripModal
         key={modal.trip?.id ?? "new"}
         trip={modal.trip}

@@ -535,6 +535,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/BookingPortal/trips/{id}/tracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of the clinic's trips, for its tracking view: places, route ETAs and what already happened.
+         * @description The Trip query filter keeps it to the caller's integrator: another clinic's trip is a 404.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["TripTrackingDto"];
+                        "application/json": components["schemas"]["TripTrackingDto"];
+                        "text/json": components["schemas"]["TripTrackingDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/BookingPortal/my-funding-source": {
         parameters: {
             query?: never;
@@ -12878,6 +12932,64 @@ export interface components {
             fundingSourceName?: string | null;
             pickupCity?: string | null;
             dropoffCity?: string | null;
+        };
+        /**
+         * What the Booking Portal's tracking view shows for one trip: where, when it is expected, and
+         *     what has already happened.
+         * @description Times are the business's wall-clock hours of the trip's day, as the route computes them
+         *     (TIME_POLICY): shown as they are, never converted. The ETAs are the route's own
+         *     (`Schedule.ETATime`), so they cost nothing to read; they are null until the trip is routed.
+         */
+        TripTrackingDto: {
+            /** Format: int32 */
+            tripId?: number;
+            status?: string | null;
+            isCancelled?: boolean;
+            /** @description True while the vehicle may be shown: driver on the way, at the door, or carrying the patient. */
+            inProgress?: boolean;
+            /** Format: date-time */
+            date?: string;
+            pickupAddress?: string | null;
+            /** Format: double */
+            pickupLatitude?: number;
+            /** Format: double */
+            pickupLongitude?: number;
+            dropoffAddress?: string | null;
+            /** Format: double */
+            dropoffLatitude?: number;
+            /** Format: double */
+            dropoffLongitude?: number;
+            /**
+             * Format: date-span
+             * @description The pickup time the clinic booked.
+             */
+            requestedPickupTime?: string | null;
+            /**
+             * Format: date-span
+             * @description The appointment time the clinic booked.
+             */
+            appointmentTime?: string | null;
+            /** Format: date-span */
+            pickupEta?: string | null;
+            /** Format: date-span */
+            dropoffEta?: string | null;
+            /**
+             * Format: date-span
+             * @description When the driver reached the pickup.
+             */
+            pickupArrivedAt?: string | null;
+            /**
+             * Format: date-span
+             * @description When the patient got on board.
+             */
+            pickedUpAt?: string | null;
+            /** Format: date-span */
+            dropoffArrivedAt?: string | null;
+            /**
+             * Format: date-span
+             * @description When the patient was left at the destination.
+             */
+            droppedOffAt?: string | null;
         };
         TripTypeUpdateDto: {
             /** Format: int32 */

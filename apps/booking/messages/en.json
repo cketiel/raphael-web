@@ -66,7 +66,8 @@
     "cancelPartial": "Process completed. {attempted} of {total} trip(s) could be canceled; the rest are in a status that does not allow it.",
     "cancelDone": "Process completed successfully.",
     "cancelFailed": "Error: {message}",
-    "cancelUnavailable": "Unable to cancel right now."
+    "cancelUnavailable": "Unable to cancel right now.",
+    "trackTrip": "Track Trip"
   },
   "status": {
     "Assigned": "Assigned",
@@ -152,21 +153,99 @@
     "connecting": "connecting",
     "connected": "connected",
     "reconnecting": "reconnecting",
-    "disconnected": "disconnected"
+    "disconnected": "disconnected",
+    "events": {
+      "TRIP_SCHEDULED": {
+        "title": "Trip scheduled",
+        "body": "Trip #{tripId} on {date} at {time} has a vehicle assigned."
+      },
+      "DRIVER_STARTED_TRIP": {
+        "title": "Driver on the way",
+        "body": "The driver is heading to the pickup of trip #{tripId}."
+      },
+      "TRIP_CANCELLED": {
+        "title": "Trip cancelled",
+        "body": "Trip #{tripId} on {date} at {time} was cancelled."
+      },
+      "TRIP_REACTIVATED": {
+        "title": "Trip reactivated",
+        "body": "Trip #{tripId} on {date} at {time} is active again."
+      },
+      "DRIVER_COMPLETED_TRIP": {
+        "title": "Trip completed",
+        "body": "Trip #{tripId} was completed: the patient reached the destination."
+      }
+    }
   },
   "csv": {
     "yes": "Yes",
     "no": "No",
     "fileName": "Production_Report_{date}.csv",
     "headers": [
-      "Date", "Req Pickup", "Appointment", "Patient", "Pickup Address", "Dropoff Address", "Space",
-      "Charge", "Paid", "Pickup Comment", "Dropoff Comment", "Type", "Pickup Phone", "Dropoff Phone",
-      "Authorization", "Funding Source", "Distance", "Run", "Driver", "Pickup Arrive", "Pickup Perform",
-      "Dropoff Arrive", "Dropoff Perform", "Will Call", "Canceled", "VIN", "Pickup Odometer",
-      "Will Call Time", "Vehicle", "Vehicle Plate", "Trip Id", "Pickup GPS Arrive Distance",
-      "Dropoff GPS Arrive Distance", "Pickup City", "Pickup State", "Pickup Zip", "Dropoff City",
-      "Dropoff State", "Dropoff Zip", "Patient Address", "DOB", "Driver No-Show Reason",
-      "Pickup Lat", "Pickup Lon", "Dropoff Lat", "Dropoff Lon", "Created"
+      "Date",
+      "Req Pickup",
+      "Appointment",
+      "Patient",
+      "Pickup Address",
+      "Dropoff Address",
+      "Space",
+      "Charge",
+      "Paid",
+      "Pickup Comment",
+      "Dropoff Comment",
+      "Type",
+      "Pickup Phone",
+      "Dropoff Phone",
+      "Authorization",
+      "Funding Source",
+      "Distance",
+      "Run",
+      "Driver",
+      "Pickup Arrive",
+      "Pickup Perform",
+      "Dropoff Arrive",
+      "Dropoff Perform",
+      "Will Call",
+      "Canceled",
+      "VIN",
+      "Pickup Odometer",
+      "Will Call Time",
+      "Vehicle",
+      "Vehicle Plate",
+      "Trip Id",
+      "Pickup GPS Arrive Distance",
+      "Dropoff GPS Arrive Distance",
+      "Pickup City",
+      "Pickup State",
+      "Pickup Zip",
+      "Dropoff City",
+      "Dropoff State",
+      "Dropoff Zip",
+      "Patient Address",
+      "DOB",
+      "Driver No-Show Reason",
+      "Pickup Lat",
+      "Pickup Lon",
+      "Dropoff Lat",
+      "Dropoff Lon",
+      "Created"
     ]
+  },
+  "tracking": {
+    "title": "Trip #{id}",
+    "status": "Status",
+    "pickup": "Pickup",
+    "dropoff": "Dropoff",
+    "vehicle": "Vehicle",
+    "requested": "Requested",
+    "appointment": "Appointment",
+    "eta": "ETA",
+    "arrived": "Arrived",
+    "pickedUp": "Picked up",
+    "droppedOff": "Dropped off",
+    "notRouted": "The ETAs appear once the trip has been routed.",
+    "onlyWhileInProgress": "The vehicle can only be seen while the trip is in progress.",
+    "waitingPosition": "Waiting for the vehicle's next position…",
+    "loadFailed": "Unable to load this trip right now."
   }
 }

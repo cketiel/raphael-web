@@ -999,6 +999,68 @@
         }
       }
     },
+    "/api/BookingPortal/trips/{id}/tracking": {
+      "get": {
+        "tags": [
+          "BookingPortal"
+        ],
+        "summary": "One of the clinic's trips, for its tracking view: places, route ETAs and what already happened.",
+        "description": "The Trip query filter keeps it to the caller's integrator: another clinic's trip is a 404.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripTrackingDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripTrackingDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripTrackingDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/BookingPortal/my-funding-source": {
       "get": {
         "tags": [
@@ -17876,6 +17938,102 @@
           }
         },
         "additionalProperties": false
+      },
+      "TripTrackingDto": {
+        "title": "What the Booking Portal's tracking view shows for one trip: where, when it is expected, and\r\nwhat has already happened.",
+        "type": "object",
+        "properties": {
+          "tripId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCancelled": {
+            "type": "boolean"
+          },
+          "inProgress": {
+            "type": "boolean",
+            "description": "True while the vehicle may be shown: driver on the way, at the door, or carrying the patient."
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pickupAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "pickupLatitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "pickupLongitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "dropoffAddress": {
+            "type": "string",
+            "nullable": true
+          },
+          "dropoffLatitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "dropoffLongitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "requestedPickupTime": {
+            "type": "string",
+            "description": "The pickup time the clinic booked.",
+            "format": "date-span",
+            "nullable": true
+          },
+          "appointmentTime": {
+            "type": "string",
+            "description": "The appointment time the clinic booked.",
+            "format": "date-span",
+            "nullable": true
+          },
+          "pickupEta": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "dropoffEta": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "pickupArrivedAt": {
+            "type": "string",
+            "description": "When the driver reached the pickup.",
+            "format": "date-span",
+            "nullable": true
+          },
+          "pickedUpAt": {
+            "type": "string",
+            "description": "When the patient got on board.",
+            "format": "date-span",
+            "nullable": true
+          },
+          "dropoffArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "droppedOffAt": {
+            "type": "string",
+            "description": "When the patient was left at the destination.",
+            "format": "date-span",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Times are the business's wall-clock hours of the trip's day, as the route computes them\r\n(TIME_POLICY): shown as they are, never converted. The ETAs are the route's own\r\n(`Schedule.ETATime`), so they cost nothing to read; they are null until the trip is routed."
       },
       "TripTypeUpdateDto": {
         "type": "object",

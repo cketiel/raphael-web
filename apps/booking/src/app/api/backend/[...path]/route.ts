@@ -11,6 +11,7 @@ import { getSession } from "@/server/session";
 const ALLOWED: ReadonlyArray<{ method: string; pattern: RegExp; brokerOnly?: boolean }> = [
   { method: "GET", pattern: /^BookingPortal\/my-trips$/ },
   { method: "GET", pattern: /^BookingPortal\/my-funding-source$/ },
+  { method: "GET", pattern: /^BookingPortal\/trips\/\d{1,10}\/tracking$/ },
   { method: "POST", pattern: /^BookingPortal\/sync-single$/ },
   { method: "POST", pattern: /^BookingPortal\/cancel-multiple$/ },
   { method: "GET", pattern: /^Customers$/ },

@@ -66,7 +66,8 @@
     "cancelPartial": "Proceso terminado. Se han podido cancelar {attempted} de {total} viaje(s); el resto está en un estado que no lo permite.",
     "cancelDone": "Proceso terminado correctamente.",
     "cancelFailed": "Error: {message}",
-    "cancelUnavailable": "No se puede cancelar ahora mismo."
+    "cancelUnavailable": "No se puede cancelar ahora mismo.",
+    "trackTrip": "Seguir viaje"
   },
   "status": {
     "Assigned": "Asignado",
@@ -152,21 +153,99 @@
     "connecting": "conectando",
     "connected": "conectado",
     "reconnecting": "reconectando",
-    "disconnected": "desconectado"
+    "disconnected": "desconectado",
+    "events": {
+      "TRIP_SCHEDULED": {
+        "title": "Viaje programado",
+        "body": "El viaje #{tripId} del {date} a las {time} ya tiene vehículo asignado."
+      },
+      "DRIVER_STARTED_TRIP": {
+        "title": "Conductor en camino",
+        "body": "El conductor va hacia la recogida del viaje #{tripId}."
+      },
+      "TRIP_CANCELLED": {
+        "title": "Viaje cancelado",
+        "body": "El viaje #{tripId} del {date} a las {time} se ha cancelado."
+      },
+      "TRIP_REACTIVATED": {
+        "title": "Viaje reactivado",
+        "body": "El viaje #{tripId} del {date} a las {time} vuelve a estar activo."
+      },
+      "DRIVER_COMPLETED_TRIP": {
+        "title": "Viaje completado",
+        "body": "El viaje #{tripId} se ha completado: el paciente llegó a su destino."
+      }
+    }
   },
   "csv": {
     "yes": "Sí",
     "no": "No",
     "fileName": "Informe_de_produccion_{date}.csv",
     "headers": [
-      "Fecha", "Recogida solicitada", "Cita", "Paciente", "Dirección de recogida", "Dirección de entrega", "Espacio",
-      "Importe", "Pagado", "Comentario de recogida", "Comentario de entrega", "Tipo", "Teléfono de recogida", "Teléfono de entrega",
-      "Autorización", "Fuente de financiamiento", "Distancia", "Ruta", "Conductor", "Llegada a recogida", "Recogida realizada",
-      "Llegada a entrega", "Entrega realizada", "Will Call", "Cancelado", "VIN", "Odómetro en recogida",
-      "Hora de Will Call", "Vehículo", "Matrícula", "Trip Id", "Distancia GPS a la recogida",
-      "Distancia GPS a la entrega", "Ciudad de recogida", "Estado de recogida", "Zip de recogida", "Ciudad de entrega",
-      "Estado de entrega", "Zip de entrega", "Dirección del paciente", "Fecha de nacimiento", "Motivo de no presentación",
-      "Lat. recogida", "Lon. recogida", "Lat. entrega", "Lon. entrega", "Creado"
+      "Fecha",
+      "Recogida solicitada",
+      "Cita",
+      "Paciente",
+      "Dirección de recogida",
+      "Dirección de entrega",
+      "Espacio",
+      "Importe",
+      "Pagado",
+      "Comentario de recogida",
+      "Comentario de entrega",
+      "Tipo",
+      "Teléfono de recogida",
+      "Teléfono de entrega",
+      "Autorización",
+      "Fuente de financiamiento",
+      "Distancia",
+      "Ruta",
+      "Conductor",
+      "Llegada a recogida",
+      "Recogida realizada",
+      "Llegada a entrega",
+      "Entrega realizada",
+      "Will Call",
+      "Cancelado",
+      "VIN",
+      "Odómetro en recogida",
+      "Hora de Will Call",
+      "Vehículo",
+      "Matrícula",
+      "Trip Id",
+      "Distancia GPS a la recogida",
+      "Distancia GPS a la entrega",
+      "Ciudad de recogida",
+      "Estado de recogida",
+      "Zip de recogida",
+      "Ciudad de entrega",
+      "Estado de entrega",
+      "Zip de entrega",
+      "Dirección del paciente",
+      "Fecha de nacimiento",
+      "Motivo de no presentación",
+      "Lat. recogida",
+      "Lon. recogida",
+      "Lat. entrega",
+      "Lon. entrega",
+      "Creado"
     ]
+  },
+  "tracking": {
+    "title": "Viaje #{id}",
+    "status": "Estado",
+    "pickup": "Recogida",
+    "dropoff": "Entrega",
+    "vehicle": "Vehículo",
+    "requested": "Solicitada",
+    "appointment": "Cita",
+    "eta": "ETA",
+    "arrived": "Llegada",
+    "pickedUp": "Recogido",
+    "droppedOff": "Entregado",
+    "notRouted": "Las ETA aparecen cuando el viaje ya está ruteado.",
+    "onlyWhileInProgress": "El vehículo solo se puede ver mientras el viaje está en curso.",
+    "waitingPosition": "Esperando la próxima posición del vehículo…",
+    "loadFailed": "No se puede cargar este viaje ahora mismo."
   }
 }
