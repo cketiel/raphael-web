@@ -9,7 +9,7 @@ import { useProviderActions, useProviderDetail, type ProviderDetail, type Provid
 
 /**
  * One Provider's file. A clinic's admin contracts it or removes it, and corrects its contact
- * details once contracted (CATALOG_MODEL.md §7, C). What one clinic edits, everybody sees.
+ * details, contracted or not (CATALOG_MODEL.md §7, C). What one clinic edits, everybody sees.
  */
 export function ProviderDetailModal({ id, onClose }: { id: number; isClinicAdmin: boolean; onClose: () => void }) {
   const t = useTranslations("catalog");
