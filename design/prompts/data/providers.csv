@@ -1,0 +1,8 @@
+name,group,city,county,state,phone,contracted,operates_in_raphael,active
+Coastal Care Transit,NEMT companies,Miami,Miami-Dade,FL,(305) 555-0400,yes,yes,yes
+Bayside Medical Rides,NEMT companies,Fort Lauderdale,Broward,FL,(954) 555-0410,yes,yes,yes
+Everglades Wheelchair Van,NEMT companies,Homestead,Miami-Dade,FL,(305) 555-0420,yes,no,yes
+Sunshine Stretcher Services,Private ambulance companies,Hialeah,Miami-Dade,FL,(305) 555-0430,no,no,yes
+Palm Coast Medical Transport,NEMT companies,West Palm Beach,Palm Beach,FL,(561) 555-0440,no,yes,yes
+Gulfstream Mobility,NEMT brokers,Tampa,Hillsborough,FL,(813) 555-0450,no,no,yes
+Keys Care Shuttle,NEMT companies,Key Largo,Monroe,FL,(305) 555-0460,no,no,no

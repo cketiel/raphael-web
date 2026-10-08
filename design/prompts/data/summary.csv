@@ -1,0 +1,5 @@
+metric,value,note
+total_trips,10,All trips of the facility on 2026-10-20
+billable_trips,9,Total minus canceled
+canceled_trips,1,Trip 40240
+total_billed_value,$612.40,From the production report of the same date

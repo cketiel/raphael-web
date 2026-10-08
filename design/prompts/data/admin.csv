@@ -1,0 +1,14 @@
+section,name,detail_1,detail_2,detail_3,state
+user,Ana López,@ana.lopez,Admin,ana.lopez@sunrisedialysis.example,Active (you)
+user,Miguel Santos,@msantos,Booking,(305) 555-0201,Active
+user,Grace Park,@gpark,Booking,(305) 555-0202,Active
+user,Daniel Reyes,@dreyes,Booking,(305) 555-0203,Disabled
+organization,Sunrise Dialysis Center,(305) 555-0100,1840 NW 7th Ave Miami FL 33136,Contact: Ana López,Active
+funding_source,Sunrise Dialysis Center,Account SDC-2041,Patient signature at pickup: yes,Odometer required: no,Editable
+billing_item,Wheelchair base fee,UNIT,Copay: no,has rates,
+billing_item,Mileage,MILE,Copay: no,has rates,
+billing_item,After-hours surcharge,UNIT,Copay: no,no rates yet,
+rate,Wheelchair base fee,WCH,$35.00,Oct 1 2026 → Dec 31 2026,Own
+rate,Mileage,WCH,$2.25 per mile,Oct 1 2026 → Dec 31 2026,Own
+rate,Loading Fee,STR,$120.00,Aug 15 2026 → Jan 1 2030,Office (read only)
+rate,Miles,AMB,$1.75 per mile,Aug 15 2026 → Jan 1 2030,Office (read only)

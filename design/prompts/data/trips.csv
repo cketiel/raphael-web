@@ -1,0 +1,11 @@
+trip_id,date,pickup_time,appointment_time,patient,phone,space_type,status,pickup_place,pickup_address,pickup_city,dropoff_place,dropoff_address,dropoff_city,provider,miles,round_trip
+40231,2026-10-20,06:15,07:00,Marta Gutiérrez,(305) 555-0142,WCH,Finished,Home,2150 SW 8th St,Miami,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Raphael (default),4.8,yes
+40232,2026-10-20,07:30,08:15,Robert Chen,(786) 555-0177,AMB,Finished,Home,9120 SW 72nd St,Kendall,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Coastal Care Transit,14.2,yes
+40233,2026-10-20,08:45,09:30,Luis Fernández,(305) 555-0119,WCH,InProgress,Home,455 NW 42nd Ave,Miami,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Raphael (default),5.6,yes
+40234,2026-10-20,09:20,10:00,Dorothy Williams,(954) 555-0163,STR,Arrived,Palm Gardens Rehab,3300 Hollywood Blvd,Hollywood,Jackson Memorial Hospital,1611 NW 12th Ave,Miami,Bayside Medical Rides,21.7,no
+40235,2026-10-20,10:30,11:15,Ana Torres,(305) 555-0108,AMB,Accepted,Home,1201 Brickell Bay Dr,Miami,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Raphael (default),3.9,yes
+40236,2026-10-20,11:00,11:45,James O'Neil,(786) 555-0191,WCH,Assigned,Home,7600 Biscayne Blvd,Miami,Mount Sinai Medical Center,4300 Alton Rd,Miami Beach,Coastal Care Transit,8.3,no
+40237,2026-10-20,12:30,13:15,Carmen Ruiz,(305) 555-0135,AMB,Scheduled,Home,620 W 49th St,Hialeah,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Raphael (default),7.1,yes
+40238,2026-10-20,13:45,14:30,Harold Brooks,(954) 555-0128,BWCH,Scheduled,Home,2800 N Ocean Dr,Hollywood,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Bayside Medical Rides,19.4,yes
+40239,2026-10-20,14:00,14:45,Rosa Delgado,(305) 555-0154,WCH,Late,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Home,3401 SW 22nd St,Miami,Raphael (default),5.2,no
+40240,2026-10-20,15:30,,Peter Novak,(786) 555-0183,AMB,Canceled,Home,15400 SW 104th St,Kendall,Sunrise Dialysis Center,1840 NW 7th Ave,Miami,Raphael (default),16.0,yes

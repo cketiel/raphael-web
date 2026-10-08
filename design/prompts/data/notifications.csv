@@ -1,0 +1,8 @@
+kind,title,body,time,read,trip_id
+DRIVER_STARTED_TRIP,Driver on the way,The driver is heading to the pickup of trip #40233.,09:12 AM today,no,40233
+TRIP_SCHEDULED,Trip scheduled,Trip #40238 on Oct 20 at 13:45 has a vehicle assigned.,08:55 AM today,no,40238
+DRIVER_COMPLETED_TRIP,Trip completed,Trip #40232 was completed: the patient reached the destination.,08:11 AM today,no,40232
+TRIP_CANCELLED,Trip cancelled,Trip #40240 on Oct 20 at 15:30 was cancelled.,07:48 AM today,yes,40240
+DRIVER_COMPLETED_TRIP,Trip completed,Trip #40231 was completed: the patient reached the destination.,06:58 AM today,yes,40231
+TRIP_REACTIVATED,Trip reactivated,Trip #40236 on Oct 20 at 11:00 is active again.,Yesterday 5:20 PM,yes,40236
+TRIP_SCHEDULED,Trip scheduled,Trip #40237 on Oct 20 at 12:30 has a vehicle assigned.,Yesterday 4:02 PM,yes,40237
