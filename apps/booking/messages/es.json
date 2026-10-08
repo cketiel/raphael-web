@@ -36,7 +36,14 @@
     "not_found": "No encontrado.",
     "service_unavailable": "El servicio no está disponible ahora mismo. Inténtalo de nuevo en un momento.",
     "server_error": "Algo ha fallado en el servidor. Inténtalo de nuevo en un momento.",
-    "invalid_language": "Idioma no admitido."
+    "invalid_language": "Idioma no admitido.",
+    "password_required": "Rellena todos los campos.",
+    "password_too_short": "La contraseña nueva debe tener al menos {min} caracteres.",
+    "password_needs_letters_and_digits": "La contraseña nueva debe tener letras y números.",
+    "password_same_as_current": "La contraseña nueva tiene que ser distinta de la actual.",
+    "password_mismatch": "La contraseña nueva y su confirmación no coinciden.",
+    "wrong_current_password": "La contraseña actual no es correcta.",
+    "password_change_failed": "No se ha podido cambiar la contraseña."
   },
   "dashboard": {
     "title": "Gestión de viajes",
@@ -247,5 +254,18 @@
     "onlyWhileInProgress": "El vehículo solo se puede ver mientras el viaje está en curso.",
     "waitingPosition": "Esperando la próxima posición del vehículo…",
     "loadFailed": "No se puede cargar este viaje ahora mismo."
+  },
+  "account": {
+    "menu": "Menú de la cuenta de {name}",
+    "changePassword": "Cambiar contraseña",
+    "currentPassword": "Contraseña actual",
+    "newPassword": "Contraseña nueva",
+    "confirmPassword": "Repite la contraseña nueva",
+    "rules": "Al menos {min} caracteres, con letras y números.",
+    "showPasswords": "Mostrar contraseñas",
+    "save": "Cambiar contraseña",
+    "saving": "Guardando...",
+    "changed": "Tu contraseña se ha cambiado.",
+    "failed": "No se puede cambiar la contraseña ahora mismo."
   }
 }

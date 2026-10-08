@@ -6,8 +6,8 @@ import { NotificationBell } from "@/features/realtime/NotificationBell";
 import { RealtimeProvider } from "@/features/realtime/RealtimeProvider";
 import { selectEnvironment } from "@/server/environments";
 import { getSession } from "@/server/session";
+import { UserMenu } from "@/features/account/UserMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-import { SignOutButton } from "./SignOutButton";
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -30,11 +30,10 @@ export default async function DashboardPage() {
           </div>
         )}
         <nav className="flex flex-wrap items-center gap-2 bg-navy px-4 py-3 text-white shadow-sm sm:gap-4 sm:px-6">
-          <span className="mr-auto font-bold sm:mr-0">{t("common.appName")}</span>
-          <span className="ml-auto hidden text-sm font-bold sm:inline">{t("nav.user", { name: session.user.username })}</span>
+          <span className="mr-auto font-bold">{t("common.appName")}</span>
           <NotificationBell />
           <LanguageSwitcher />
-          <SignOutButton />
+          <UserMenu username={session.user.username} />
         </nav>
         {mapsKey ? (
           <BookingDashboard isIntegrator={session.user.integratorId != null} mapsKey={mapsKey} mapId={mapId} />

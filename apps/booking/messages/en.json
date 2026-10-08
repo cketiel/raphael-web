@@ -36,7 +36,14 @@
     "not_found": "Not found.",
     "service_unavailable": "The service is not available right now. Try again in a moment.",
     "server_error": "Something went wrong on the server. Try again in a moment.",
-    "invalid_language": "Unsupported language."
+    "invalid_language": "Unsupported language.",
+    "password_required": "Fill in every field.",
+    "password_too_short": "The new password must have at least {min} characters.",
+    "password_needs_letters_and_digits": "The new password must contain letters and numbers.",
+    "password_same_as_current": "The new password must be different from the current one.",
+    "password_mismatch": "The new password and its confirmation do not match.",
+    "wrong_current_password": "The current password is incorrect.",
+    "password_change_failed": "The password could not be changed."
   },
   "dashboard": {
     "title": "Trip Management",
@@ -247,5 +254,18 @@
     "onlyWhileInProgress": "The vehicle can only be seen while the trip is in progress.",
     "waitingPosition": "Waiting for the vehicle's next position…",
     "loadFailed": "Unable to load this trip right now."
+  },
+  "account": {
+    "menu": "Account menu for {name}",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "rules": "At least {min} characters, with letters and numbers.",
+    "showPasswords": "Show passwords",
+    "save": "Change password",
+    "saving": "Saving...",
+    "changed": "Your password has been changed.",
+    "failed": "The password could not be changed right now."
   }
 }
