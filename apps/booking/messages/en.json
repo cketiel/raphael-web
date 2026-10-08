@@ -103,7 +103,8 @@
     "tomorrow": "Tomorrow",
     "selectedCount": "{count, plural, one {# trip selected} other {# trips selected}}",
     "emptyTitle": "No trips on these dates",
-    "emptyText": "Choose other dates, or book a new trip."
+    "emptyText": "Choose other dates, or book a new trip.",
+    "exportNothing": "No billable trips in these dates to export."
   },
   "status": {
     "Assigned": "Assigned",

@@ -103,7 +103,8 @@
     "tomorrow": "Mañana",
     "selectedCount": "{count, plural, one {# viaje seleccionado} other {# viajes seleccionados}}",
     "emptyTitle": "No hay viajes en estas fechas",
-    "emptyText": "Elige otras fechas o reserva un viaje nuevo."
+    "emptyText": "Elige otras fechas o reserva un viaje nuevo.",
+    "exportNothing": "No hay viajes facturables en estas fechas para exportar."
   },
   "status": {
     "Assigned": "Asignado",

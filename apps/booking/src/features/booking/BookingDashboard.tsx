@@ -243,12 +243,13 @@ export function BookingDashboard({ isIntegrator, mapsKey, mapId, focus }: Bookin
     <>
       <PageHeader title={t("title")} description={t("subtitle")}
         actions={<>
-          {(loaded?.report.length ?? 0) > 0 && (
-            <Button variant="secondary" icon={IconExport}
-              onClick={() => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }))}>
-              {t("exportReport")}
-            </Button>
-          )}
+          {/* Always on screen, as in the original portal: a key action nobody should have to look for.
+              Disabled, with the reason, when the dates loaded have no billable rows to export. */}
+          <Button variant="secondary" icon={IconExport} disabled={(loaded?.report.length ?? 0) === 0}
+            title={(loaded?.report.length ?? 0) === 0 ? t("exportNothing") : undefined}
+            onClick={() => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }))}>
+            {t("exportReport")}
+          </Button>
           <Button icon={IconPlus} onClick={() => {
             // The original re-read the funding source on every New Booking (app.js:593): an FS
             // linked by an admin a minute ago enables booking without signing in again.
