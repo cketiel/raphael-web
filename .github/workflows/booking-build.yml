@@ -37,9 +37,7 @@ jobs:
       # silently ignored and the first artifact kept the symlinked layout. CI only, never committed.
       - name: Install (flat node_modules)
         run: |
-          printf '
-nodeLinker: hoisted
-' >> pnpm-workspace.yaml
+          echo 'nodeLinker: hoisted' >> pnpm-workspace.yaml
           pnpm install --frozen-lockfile
           test ! -d node_modules/.pnpm || { echo "::error::node_modules is still pnpm's symlinked layout."; exit 1; }
 
