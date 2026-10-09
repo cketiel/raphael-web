@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Versión** | 1.0 |
+| **Versión** | 1.1 |
 | **Fecha** | 2026-10-08 |
 | **Herramienta** | [claude.ai/design](https://claude.ai/design): planes de pago de Claude; consume su límite de uso |
 | **Basado en** | [creative-brief.md](creative-brief.md) v1.0 |
@@ -12,7 +12,7 @@
 2. **Adjunta:**
    - `creative-brief.md`;
    - los seis CSV de `data/` y su `README.md`;
-   - las 2–4 imágenes elegidas de la dirección de arte (`design/proposals/art-direction/…`);
+   - las 4 imágenes elegidas de la dirección de arte (`design/proposals/art-direction/2026-10-08/`) y su `notes.md`;
    - el logo `apps/booking/public/brand/raphael-mark.png`.
 
 ---
@@ -21,7 +21,7 @@
 ```text
 Eres el diseñador principal del «Raphael Booking Portal», la web donde centros de diálisis, clínicas y hospitales reservan transporte médico no urgente para sus pacientes y lo siguen en vivo. Te adjunto el brief creativo, seis archivos CSV con los datos del escenario, imágenes de dirección de arte y el logo. Léelos completos antes de empezar.
 
-Primera ronda, exploración. Quiero ver 3 direcciones visuales claramente distintas entre sí para UNA sola pantalla: «Viajes» (Trips), la página principal, en PC (1440 px), con los 10 viajes del 20/10/2026 de la sección 8 del brief y el menú lateral completo. La interfaz va en inglés. Toma las imágenes adjuntas como punto de partida del lenguaje visual, no como algo que copiar.
+Primera ronda, exploración. Quiero ver 3 direcciones visuales claramente distintas entre sí para UNA sola pantalla: «Viajes» (Trips), la página principal, en PC (1440 px), con los 10 viajes del 20/10/2026 de la sección 8 del brief y el menú lateral completo. La interfaz va en inglés. Toma las imágenes adjuntas como punto de partida del lenguaje visual, no como algo que copiar. El color del nombre «Raphael» no está decidido: aunque en alguna imagen aparezca en rojo, no lo pongas rojo.
 
 El menú lateral es la seña de identidad del producto: en cada dirección tiene que ser vistoso y profesional a la vez.
 
@@ -69,3 +69,4 @@ Usa exclusivamente los datos de los adjuntos. Al final explícame las decisiones
 | Versión | Fecha | Cambios |
 |---|---|---|
 | 1.0 | 2026-10-08 | Primera versión |
+| 1.1 | 2026-10-08 | Ronda 1: el color del nombre «Raphael» no está decidido; imágenes de `art-direction/2026-10-08/` |

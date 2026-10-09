@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Versión** | 1.0 |
+| **Versión** | 1.1 |
 | **Fecha** | 2026-10-08 |
 | **Herramienta** | [stitch.withgoogle.com](https://stitch.withgoogle.com) (gratuito, con límite mensual) |
 | **Basado en** | [creative-brief.md](creative-brief.md) v1.0 |
@@ -11,7 +11,7 @@
 ## Cómo trabajar
 1. Proyecto nuevo de tipo **Web**: «Raphael Booking · Web». La tableta se diseña en este mismo proyecto, a 1024 px (horizontal) y 768 px (vertical).
 2. **Modo:** el de exploración para S1 y S2, y el de mayor calidad para las pantallas buenas.
-3. **Adjunta con el icono de imagen** las imágenes elegidas de la dirección de arte (`design/proposals/art-direction/…`) y el logo (`apps/booking/public/brand/raphael-mark.png`).
+3. **Adjunta con el icono de imagen** las 4 imágenes elegidas de la dirección de arte (`design/proposals/art-direction/2026-10-08/`) y el logo (`apps/booking/public/brand/raphael-mark.png`).
 4. **Una pantalla por prompt y un cambio por retoque.** Haz captura tras cada acierto. Para alternativas, usa **Create Variant**.
 5. Los prompts van en inglés y los textos de la interfaz entre comillas, en inglés (idioma por defecto del portal).
 6. Longitud: `python scripts/measure_prompts.py design/prompts/stitch-web.md` (objetivo, menos de 1.800 caracteres por prompt).
@@ -22,15 +22,15 @@
 > 🇪🇸 El contexto del producto y la página principal con 6 de los 10 viajes del escenario (uno de cada estado importante).
 
 ```text
-Desktop web app (1440 px) called "Raphael Booking Portal" where dialysis centers and hospitals book non-emergency medical transport for patients and follow each trip live. Vibe: calm, trustworthy, precise, quietly warm healthcare logistics. Brand: the attached pin logo, ocean blue #005070 to #50a0c0. Not a ride-hailing app, not an emergency app, not a gray spreadsheet. All UI text in English.
+Desktop web app (1440 px), "Raphael Booking Portal", where dialysis centers and hospitals book non-emergency medical transport for patients and follow each trip live. Vibe: calm, trustworthy, precise, quietly warm healthcare logistics. Brand: the attached pin logo, ocean blue #005070 to #50a0c0. Wordmark color undecided: never red. Not ride-hailing, not an emergency app, not a gray spreadsheet. UI text in English.
 
 Screen "Trips":
-- Left sidebar, the visual signature: logo "Raphael" + "Booking Portal", items with icons "Trips" (active), "Catalog", "Notifications" (badge "3"), "Admin"; clinic "Sunrise Dialysis Center" at the bottom.
-- Top bar right: language button "EN", bell with "3", avatar "AL" + "Ana López".
+- Left sidebar, the visual signature: logo "Raphael" + "Booking Portal", icon items "Trips" (active), "Catalog", "Notifications" (badge "3"), "Admin"; clinic "Sunrise Dialysis Center" at the bottom.
+- Top bar: language button "EN", bell with "3", avatar "AL" + "Ana López".
 - Header: "Trips", "Book, follow and manage your facility's trips.", buttons "Export Report" and "New Booking" (primary).
 - Filter card: "Start Date" 10/20/2026, "End Date" 10/20/2026, "Search", "Today", "Tomorrow", search field "Find a trip".
 - 4 summary cards with icons: "Total trips 10", "Billable trips 9", "Canceled trips 1", "Total billed value $612.40".
-- Trips table, "Select all" checkbox, columns Trip, Time, Patient, Route, Status, Actions (track, edit, cancel icons). Route = red pin pickup line + blue pin destination line:
+- Trips table, "Select all" checkbox, columns Trip, Time, Patient, Route, Status, Actions (track, edit, cancel icons). Route: red pin pickup + blue pin destination:
 #40231 06:15 Marta Gutiérrez WCH, 2150 SW 8th St → Sunrise Dialysis Center, Finished (gray)
 #40233 08:45 Luis Fernández WCH, 455 NW 42nd Ave → Sunrise Dialysis Center, In progress (violet)
 #40234 09:20 Dorothy Williams STR, Palm Gardens Rehab → Jackson Memorial Hospital, Arrived (blue)
@@ -154,3 +154,4 @@ Guarda capturas, la exportación (código o Figma) y el **DESIGN.md exportado** 
 | Versión | Fecha | Cambios |
 |---|---|---|
 | 1.0 | 2026-10-08 | Primera versión |
+| 1.1 | 2026-10-08 | S1: el color del nombre «Raphael» no está decidido; imágenes de `art-direction/2026-10-08/` |

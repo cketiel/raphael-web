@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import packageJson from "./package.json";
 
 // Headers for every response, API routes included. The CSP itself is set per request in
 // src/proxy.ts because it carries a fresh nonce.
@@ -14,6 +15,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
+  // Inlined at build time. The release tag must match the version the portal shows (GIT_WORKFLOW).
+  env: { APP_VERSION: packageJson.version },
   transpilePackages: ["@raphael/api-client"],
   // next-intl finds its request config through this alias. Its plugin would set it, but the plugin
   // loads @swc/core's native binary, which does not start on this machine; the alias is all it adds here.

@@ -39,7 +39,7 @@ export function UserMenu({ username }: { username: string }) {
             <IconChevronDown size={13} aria-hidden className="hidden text-muted sm:inline" />
           </>
         }
-        header={<><p className="text-xs text-muted">{tNav("signedInAs")}</p><p className="truncate font-semibold">{username}</p></>}
+        header={<><p className="text-xs text-muted">{tNav("signedInAs")}</p><p className="truncate font-semibold">{username}</p><p className="mt-1 text-xs text-muted">v{process.env.APP_VERSION}</p></>}
         items={[
           { key: "password", label: t("changePassword"), icon: IconKey, onSelect: () => setChanging(true) },
           { key: "logout", label: tNav("logout"), icon: IconLogout, danger: true, onSelect: () => void signOut() },

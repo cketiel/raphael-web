@@ -68,7 +68,7 @@ export function AppShell({ username, isClinicAdmin, environmentBanner, children 
             );
           })}
         </nav>
-        <p className="px-6 pb-5 text-xs text-white/40">© Raphael</p>
+        <p className="px-6 pb-5 text-xs text-white/40">© Raphael · v{process.env.APP_VERSION}</p>
       </aside>
 
       <div className="flex min-h-dvh flex-col lg:pl-64">
