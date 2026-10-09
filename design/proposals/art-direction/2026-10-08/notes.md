@@ -24,3 +24,6 @@ El rojo significa a la vez **recogida** y **Canceled**. El brief manda las dos c
 
 ## Resto de variantes
 Las demás (G1-b…e, G2-a/b/d/e, G3-b, G4-a/b/d/e, G5-a/b) quedan en la carpeta superior como historial de exploración. No se adjuntan.
+
+## Segunda opción (`mi eleccion/`)
+G1-c, G2-a, G3-b, G4-a, G4-b y G4-d: la elección del usuario, guardada **solo** por si el diseño inicial no convence. No se adjuntaron a las herramientas; Stitch se hizo con las cuatro de arriba.
