@@ -1,0 +1,18 @@
+Login (archivo nuevo, no toqué ninguna otra pantalla): PC Daylight EN con error y menú de idioma abierto, PC Harbor night EN con el botón cargando, PC Daylight ES, y teléfono 390 × 844 en los dos temas.
+
+Decisiones
+
+El pin va grande (124 px) y centrado sobre el halo radial de accent al 34 %, el mismo gesto del menú lateral; «RAPHAEL» en blanco, 0.34em de espaciado, como la cabecera del menú.
+El panel de marca es oscuro en ambos temas (en noche baja un paso: #083C53 → #03151E) para que la identidad no parpadee al cambiar de tema; solo el panel derecho cambia.
+Las cinco ventajas comparten un mismo azulejo de 40 px con icono Phosphor; en teléfono quedan solo las dos nuevas, al pie, para no empujar el formulario fuera de pantalla.
+El error vive bajo el botón como bloque tintado con icono (no solo texto rojo) y además marca el campo de contraseña; el estado cargando sustituye la etiqueta por «SIGNING IN…» con spinner, conservando el alto de 48 px.
+Descartado: mostrar el halo también detrás del formulario (ensuciaba la lectura de los campos); centrar la marca en una tarjeta blanca como en la captura (perdía el contraste del pin); traducir «LOGIN» a «INICIAR SESIÓN» (demasiado largo para la caja: «ENTRAR», como pediste).
+
+Tokens que añadiría a DESIGN.md
+
+brand-halo: radial-gradient(circle, rgba(110,195,224,.34), rgba(110,195,224,.12) 42%, transparent 68%) y su versión -dark al .30/.10 — hoy el halo está escrito a mano en menú y login.
+sidebar-tile (rgba(255,255,255,.10) + anillo rgba(154,213,236,.30)): el azulejo de icono que ya usan las ventajas y los chips del menú.
+on-sidebar-faint: #9FC3D4 para el pie «© Raphael · NEMT» (el on-sidebar-variant resultaba demasiado presente).
+button-primary-lg: 48 px (52 en teléfono), letterSpacing .08em, para acciones a todo el ancho.
+field-height-touch: 48px para teléfono, frente a los 44 px de PC.
+status-error-inline: fondo error-container + anillo, que hoy no existe como componente.
