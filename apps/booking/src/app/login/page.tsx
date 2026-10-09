@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useState, type ComponentType, type FormEvent, type InputHTMLAttributes, type ReactNode } from "react";
+import { useState, type ComponentType, type FormEvent } from "react";
+import { Field, Input } from "@/components/ui/Form";
 import {
-  PhBellRinging, PhBuildings, PhCalendarPlus, PhCircleNotch, PhClockCountdown, PhEye, PhEyeSlash,
-  PhKey, PhPath, PhSignIn, PhUserCircle, PhWarningCircle,
+  IconHide, IconKey, IconShow, IconUser,
+  PhBellRinging, PhBuildings, PhCalendarPlus, PhCircleNotch, PhClockCountdown, PhPath, PhSignIn, PhWarningCircle,
 } from "@/components/ui/Icon";
 import { LanguageSwitch } from "@/features/preferences/LanguageSwitch";
 import { ThemeToggle } from "@/features/preferences/ThemeToggle";
@@ -107,18 +108,18 @@ export default function LoginPage() {
             <p className="mt-[7px] text-center text-[13.5px] text-[var(--ds-on-surface-variant)] lg:mt-2 lg:text-sm">{t("login.subtitle")}</p>
 
             <div className="mt-[22px] flex flex-col gap-3.5 lg:mt-7 lg:gap-4">
-              <Field id="username" label={t("login.user")}>
-                <LoginInput id="username" name="username" icon={PhUserCircle} autoComplete="username" required autoFocus />
+              {/* The two fields keep the kit's look, the same as every form inside the portal (user's choice). */}
+              <Field label={t("login.user")} htmlFor="username">
+                <Input id="username" name="username" icon={IconUser} autoComplete="username" required autoFocus />
               </Field>
-              <Field id="password" label={t("login.password")}>
-                <LoginInput id="password" name="password" icon={PhKey} type={show ? "text" : "password"} autoComplete="current-password" required
-                  invalid={error !== null}
-                  trailing={
-                    <button type="button" onClick={() => setShow((s) => !s)} aria-label={show ? t("login.hidePassword") : t("login.showPassword")}
-                      className="flex h-full w-9 items-center justify-center text-[var(--ds-on-surface-variant)] hover:text-[var(--ds-on-surface)]">
-                      {show ? <PhEyeSlash size={19} aria-hidden /> : <PhEye size={19} aria-hidden />}
-                    </button>
-                  } />
+              <Field label={t("login.password")} htmlFor="password">
+                <div className="relative">
+                  <Input id="password" name="password" icon={IconKey} type={show ? "text" : "password"} autoComplete="current-password" required className="pr-11" />
+                  <button type="button" onClick={() => setShow((v) => !v)} aria-label={show ? t("login.hidePassword") : t("login.showPassword")}
+                    className="absolute inset-y-0 right-1 flex w-9 items-center justify-center text-muted hover:text-foreground">
+                    {show ? <IconHide size={17} aria-hidden /> : <IconShow size={17} aria-hidden />}
+                  </button>
+                </div>
               </Field>
 
               <button type="submit" disabled={busy}
@@ -154,30 +155,5 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
-  );
-}
-
-function Field({ id, label, children }: { id: string; label: string; children: ReactNode }) {
-  return (
-    <div>
-      <label htmlFor={id} className="mb-[7px] block text-[13px] font-semibold">{label}</label>
-      {children}
-    </div>
-  );
-}
-
-function LoginInput({ icon: Icon, invalid = false, trailing, className = "", ...props }: InputHTMLAttributes<HTMLInputElement> & {
-  icon: PhIcon;
-  invalid?: boolean;
-  trailing?: ReactNode;
-}) {
-  return (
-    <div className={`flex h-12 items-center gap-2.5 rounded-lg bg-[var(--ds-surface)] pl-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--ds-primary)] focus-within:outline-solid lg:h-11 ${trailing ? "pr-1" : "pr-3"} ${
-      invalid ? "border-[1.5px] border-[var(--ds-error)]" : "border border-[var(--ds-outline)]"}`}>
-      <Icon size={19} aria-hidden className="flex-none text-[var(--ds-on-surface-variant)]" />
-      <input {...props} aria-invalid={invalid || undefined}
-        className={`h-full min-w-0 flex-1 bg-transparent text-[15px] text-[var(--ds-on-surface)] outline-none focus-visible:outline-none lg:text-sm ${className}`} />
-      {trailing}
-    </div>
   );
 }
