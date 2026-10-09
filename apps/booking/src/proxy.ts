@@ -49,7 +49,9 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      // brand/ is the public mark (logos). Without the exclusion a signed-out visitor was sent
+      // to /login for it, so the login page itself showed a broken logo.
+      source: "/((?!api|_next/static|_next/image|favicon.ico|brand/).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

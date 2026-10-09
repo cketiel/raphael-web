@@ -12,6 +12,10 @@
     "en": "English",
     "es": "Español"
   },
+  "theme": {
+    "dark": "Switch to dark theme",
+    "light": "Switch to light theme"
+  },
   "nav": {
     "environment": "{name} environment — not production",
     "user": "User: {name}",
@@ -32,7 +36,7 @@
     "user": "User",
     "password": "Password",
     "submit": "LOGIN",
-    "submitting": "Authenticating...",
+    "submitting": "SIGNING IN…",
     "failed": "Unable to sign in right now.",
     "heroTitle": "Every trip of your facility, in one place.",
     "heroText": "Book non-emergency medical transport, follow it live and keep your providers at hand.",
@@ -40,7 +44,10 @@
     "featureLive": "Live notices as trips move",
     "featureCatalog": "Your contracted providers",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "featureEta": "Live ETA for every trip",
+    "featureRoute": "Follow the route and the vehicle in real time",
+    "checking": "Checking your credentials…"
   },
   "errors": {
     "missing_credentials": "Enter your username and password.",
@@ -59,7 +66,8 @@
     "password_same_as_current": "The new password must be different from the current one.",
     "password_mismatch": "The new password and its confirmation do not match.",
     "wrong_current_password": "The current password is incorrect.",
-    "password_change_failed": "The password could not be changed."
+    "password_change_failed": "The password could not be changed.",
+    "integrator_disabled": "Your organization's access is disabled. Contact the office."
   },
   "dashboard": {
     "title": "Trips",
