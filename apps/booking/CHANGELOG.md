@@ -2,6 +2,13 @@
 
 All notable changes to `apps/booking`. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [SemVer](https://semver.org/).
 
+## [0.1.1] - 2026-10-09
+
+### Fixed
+- Signing in answered "Forbidden" on Azure: the CSRF check compared the page's Origin with the
+  server's internal address behind the App Service front end. It now compares it with the host
+  the browser called, as Next does for its Server Actions.
+
 ## [0.1.0] - 2026-10-08
 First release: the reference build before the final design. Not deployed yet.
 
