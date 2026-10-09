@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Versión** | 1.0 |
+| **Versión** | 1.1 |
 | **Fecha** | 2026-10-08 |
 | **Herramienta** | [stitch.withgoogle.com](https://stitch.withgoogle.com) (gratuito, con límite mensual) |
 | **Basado en** | [creative-brief.md](creative-brief.md) v1.0 |
@@ -21,7 +21,7 @@
 > 🇪🇸 El contexto y la página principal en un teléfono, con 5 viajes del escenario.
 
 ```text
-Mobile web app screen, portrait 390x844, for "Raphael Booking Portal", where dialysis centers book non-emergency medical transport for patients and follow each trip live. Vibe: calm, trustworthy, precise, quietly warm healthcare logistics. Brand: the attached pin logo, ocean blue #005070 to #50a0c0. Not a ride-hailing app, not an emergency app. All UI text in English.
+Mobile web app screen, portrait 390x844, for "Raphael Booking Portal", where dialysis centers book non-emergency medical transport for patients and follow each trip live. Vibe: calm, trustworthy, precise, quietly warm healthcare logistics. Brand: the attached pin logo, ocean blue #005070 to #50a0c0. The color of the "Raphael" wordmark is undecided: do not make it red. Not a ride-hailing app, not an emergency app. All UI text in English.
 
 Screen "Trips":
 - Top bar: logo + "Raphael" / "Booking Portal", right "EN", bell with "3", avatar "AL".
@@ -126,3 +126,4 @@ Guarda capturas, la exportación y el **DESIGN.md exportado** en `design/proposa
 | Versión | Fecha | Cambios |
 |---|---|---|
 | 1.0 | 2026-10-08 | Primera versión |
+| 1.1 | 2026-10-08 | S1: el color del nombre «Raphael» no está decidido |
