@@ -40,9 +40,7 @@ jobs:
           echo 'nodeLinker: hoisted' >> pnpm-workspace.yaml
           pnpm install --frozen-lockfile
           echo "node-linker: $(pnpm config get nodeLinker)"
-          links=$(find node_modules apps/booking/node_modules -maxdepth 3 -type l 2>/dev/null | wc -l)
-          echo "symlinks in node_modules: $links"
-          test "$links" -eq 0 || { echo "::error::node_modules is still pnpm's symlinked layout."; exit 1; }
+          # Hoisted still links .bin and the workspace's own packages; what matters is the output.
 
       - name: Build
         run: pnpm --filter booking build
@@ -53,6 +51,9 @@ jobs:
           cp -r .next/static .next/standalone/apps/booking/.next/static
           cp -r public .next/standalone/apps/booking/public
           test -z "$(find .next/standalone -name '.env*')" || { echo "::error::An .env file reached the artifact."; exit 1; }
+          links=$(find .next/standalone -type l | wc -l)
+          echo "symlinks in the standalone output: $links"
+          test "$links" -eq 0 || { find .next/standalone -type l | head -20; echo "::error::The standalone output has symlinks, which a zip deploy does not keep."; exit 1; }
           version=$(node -p "require('./package.json').version")
           test "v$version" = "${{ inputs.ref }}" || { echo "::error::package.json says $version, the tag says ${{ inputs.ref }}."; exit 1; }
           cd .next/standalone && zip -qr "$GITHUB_WORKSPACE/booking-$version-linux-x64.zip" .
