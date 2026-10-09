@@ -33,8 +33,15 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install
-        run: pnpm install --frozen-lockfile --config.node-linker=hoisted
+      # pnpm 10+ reads its settings from pnpm-workspace.yaml, not from --config flags: the flag was
+      # silently ignored and the first artifact kept the symlinked layout. CI only, never committed.
+      - name: Install (flat node_modules)
+        run: |
+          printf '
+nodeLinker: hoisted
+' >> pnpm-workspace.yaml
+          pnpm install --frozen-lockfile
+          test ! -d node_modules/.pnpm || { echo "::error::node_modules is still pnpm's symlinked layout."; exit 1; }
 
       - name: Build
         run: pnpm --filter booking build
@@ -48,6 +55,20 @@ jobs:
           version=$(node -p "require('./package.json').version")
           test "v$version" = "${{ inputs.ref }}" || { echo "::error::package.json says $version, the tag says ${{ inputs.ref }}."; exit 1; }
           cd .next/standalone && zip -qr "$GITHUB_WORKSPACE/booking-$version-linux-x64.zip" .
+
+      # What ships is the zip, so the zip is what gets started: unpacked somewhere else, with no
+      # access to the workspace, it must serve the login page.
+      - name: Start the artifact
+        run: |
+          mkdir /tmp/smoke && cd /tmp/smoke && unzip -q "$GITHUB_WORKSPACE"/booking-*-linux-x64.zip
+          RAPHAEL_API_ENV=prod SESSION_SECRET=$(openssl rand -hex 32) PORT=3000 HOSTNAME=127.0.0.1             node apps/booking/server.js > /tmp/smoke.log 2>&1 &
+          code=000
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/login || true)
+            [ "$code" = 200 ] && break; sleep 1
+          done
+          cat /tmp/smoke.log
+          test "$code" = 200 || { echo "::error::The artifact did not serve /login (last status $code)."; exit 1; }
 
       - uses: actions/upload-artifact@v4
         with:
