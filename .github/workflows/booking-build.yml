@@ -39,7 +39,10 @@ jobs:
         run: |
           echo 'nodeLinker: hoisted' >> pnpm-workspace.yaml
           pnpm install --frozen-lockfile
-          test ! -d node_modules/.pnpm || { echo "::error::node_modules is still pnpm's symlinked layout."; exit 1; }
+          echo "node-linker: $(pnpm config get nodeLinker)"
+          links=$(find node_modules apps/booking/node_modules -maxdepth 3 -type l 2>/dev/null | wc -l)
+          echo "symlinks in node_modules: $links"
+          test "$links" -eq 0 || { echo "::error::node_modules is still pnpm's symlinked layout."; exit 1; }
 
       - name: Build
         run: pnpm --filter booking build
