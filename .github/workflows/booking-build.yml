@@ -1,0 +1,56 @@
+# Builds the Booking Portal for Azure App Service (Linux) from a release tag.
+#
+# Why here and not on a workstation: the standalone server ships native binaries (sharp), and a
+# Windows build carries the Windows ones. Why hoisted: pnpm's default layout is made of symlinks,
+# which a zip deploy does not keep; a flat node_modules has none.
+#
+# It only builds. The artifact is attached to the tag's GitHub Release and deployed from there,
+# so what runs in production is exactly what the Release holds. No secret is used or baked in:
+# the server reads its configuration at start-up (apps/booking/.env.example).
+name: Build Booking Portal (Linux)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Release tag to build, e.g. v0.1.0"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: pnpm install --frozen-lockfile --config.node-linker=hoisted
+
+      - name: Build
+        run: pnpm --filter booking build
+
+      - name: Assemble the standalone server
+        run: |
+          cd apps/booking
+          cp -r .next/static .next/standalone/apps/booking/.next/static
+          cp -r public .next/standalone/apps/booking/public
+          test -z "$(find .next/standalone -name '.env*')" || { echo "::error::An .env file reached the artifact."; exit 1; }
+          version=$(node -p "require('./package.json').version")
+          test "v$version" = "${{ inputs.ref }}" || { echo "::error::package.json says $version, the tag says ${{ inputs.ref }}."; exit 1; }
+          cd .next/standalone && zip -qr "$GITHUB_WORKSPACE/booking-$version-linux-x64.zip" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: booking-linux-x64
+          path: booking-*-linux-x64.zip
+          if-no-files-found: error
