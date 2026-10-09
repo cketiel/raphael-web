@@ -122,8 +122,9 @@ export default function LoginPage() {
                 </div>
               </Field>
 
+              {/* As far from the password field as that field is from the user field (label included). */}
               <button type="submit" disabled={busy}
-                className="flex h-[52px] w-full items-center justify-center gap-[9px] rounded-lg bg-[var(--ds-primary)] text-[15px] font-bold tracking-[.08em] text-[var(--ds-on-primary)] disabled:cursor-progress disabled:opacity-90 lg:h-12 lg:text-sm">
+                className="mt-[26px] flex h-[52px] w-full items-center justify-center gap-[9px] rounded-lg bg-[var(--ds-primary)] text-[15px] font-bold tracking-[.08em] text-[var(--ds-on-primary)] disabled:cursor-progress disabled:opacity-90 lg:h-12 lg:text-sm">
                 {busy
                   ? <><PhCircleNotch size={19} aria-hidden className="animate-spin" />{t("login.submitting")}</>
                   : <><PhSignIn size={19} aria-hidden />{t("login.submit")}</>}
