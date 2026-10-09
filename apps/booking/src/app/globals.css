@@ -77,6 +77,82 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * The final design's tokens (design/DESIGN.md: Daylight and Harbor night). Screens move to them one
+ * at a time, as each is rebuilt; until then the tokens above stay for the rest. The login is first.
+ * The theme follows the system unless the person chose one: <html data-theme> (cookie rb_theme).
+ */
+:root {
+  --ds-primary: #0b6f96;
+  --ds-on-primary: #ffffff;
+  --ds-primary-container: #e7f1f6;
+  --ds-background: #eef2f5;
+  --ds-surface: #ffffff;
+  --ds-on-surface: #10303f;
+  --ds-on-surface-variant: #41616f;
+  --ds-outline: #b6c7d1;
+  --ds-outline-variant: #dae2e8;
+  --ds-selected: #eaf1f6;
+  --ds-error: #b3271b;
+  --ds-error-container: #fbeceb;
+  --ds-error-ring: rgb(192 57 43 / 0.22);
+  --ds-pop-shadow: 0 18px 44px rgb(5 25 35 / 0.26);
+  /* The brand panel stays dark in both themes, a step deeper at night (Login export). */
+  --ds-brand-gradient: linear-gradient(165deg, #0a4a66 0%, #073a52 52%, #05293a 100%);
+  --ds-brand-halo: radial-gradient(circle, rgb(110 195 224 / 0.34) 0%, rgb(110 195 224 / 0.12) 42%, transparent 68%);
+  --ds-brand-tile: rgb(255 255 255 / 0.1);
+  --ds-brand-tile-ring: rgb(154 213 236 / 0.3);
+  --ds-on-brand: #ffffff;
+  --ds-on-brand-variant: #cfe4ef;
+  --ds-on-brand-faint: #9fc3d4;
+  --ds-brand-icon: #9bdcf2;
+  --ds-color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ds-primary: #6ec3e0;
+    --ds-on-primary: #06222e;
+    --ds-primary-container: #133543;
+    --ds-background: #0a1a23;
+    --ds-surface: #112632;
+    --ds-on-surface: #e9f1f5;
+    --ds-on-surface-variant: #a8c0cc;
+    --ds-outline: #3a6277;
+    --ds-outline-variant: #22404f;
+    --ds-selected: #16303e;
+    --ds-error: #ff9a8d;
+    --ds-error-container: #331a18;
+    --ds-error-ring: rgb(242 122 108 / 0.34);
+    --ds-brand-gradient: linear-gradient(165deg, #083c53 0%, #062c3f 52%, #03151e 100%);
+    --ds-brand-halo: radial-gradient(circle, rgb(110 195 224 / 0.3) 0%, rgb(110 195 224 / 0.1) 42%, transparent 68%);
+    --ds-brand-tile: rgb(255 255 255 / 0.08);
+    --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
+    --ds-color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ds-primary: #6ec3e0;
+  --ds-on-primary: #06222e;
+  --ds-primary-container: #133543;
+  --ds-background: #0a1a23;
+  --ds-surface: #112632;
+  --ds-on-surface: #e9f1f5;
+  --ds-on-surface-variant: #a8c0cc;
+  --ds-outline: #3a6277;
+  --ds-outline-variant: #22404f;
+  --ds-selected: #16303e;
+  --ds-error: #ff9a8d;
+  --ds-error-container: #331a18;
+  --ds-error-ring: rgb(242 122 108 / 0.34);
+  --ds-brand-gradient: linear-gradient(165deg, #083c53 0%, #062c3f 52%, #03151e 100%);
+  --ds-brand-halo: radial-gradient(circle, rgb(110 195 224 / 0.3) 0%, rgb(110 195 224 / 0.1) 42%, transparent 68%);
+  --ds-brand-tile: rgb(255 255 255 / 0.08);
+  --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
+  --ds-color-scheme: dark;
+}
+
 html {
   /* 16 px base, as Bootstrap: form controls read at the size of body text, never smaller. */
   font-size: 100%;

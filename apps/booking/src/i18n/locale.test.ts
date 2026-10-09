@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import es from "../../messages/es.json";
 import { buildProductionCsv, CSV_HEADERS, type CsvLocale } from "@/features/booking/productionReportCsv";
-import { languageCookieName, resolveLocale } from "./locale";
+import { fromAcceptLanguage, languageCookieName, resolveLocale } from "./locale";
 
 /** Every key path of a message tree, arrays counted as one leaf. */
 function keys(tree: unknown, prefix = ""): string[] {
@@ -52,5 +52,19 @@ describe("CSV in Spanish", () => {
     expect(cells[0]).toBe('"20/10/2026"');
     expect(cells[23]).toBe('"Sí"');
     expect(cells[24]).toBe('"No"');
+  });
+});
+
+describe("fromAcceptLanguage", () => {
+  it("takes the browser's first language the portal has, by preference", () => {
+    expect(fromAcceptLanguage("es-US,es;q=0.9,en;q=0.8")).toBe("es");
+    expect(fromAcceptLanguage("fr-FR,fr;q=0.9,en;q=0.7,es;q=0.6")).toBe("en");
+    expect(fromAcceptLanguage("en;q=0.5,es;q=0.9")).toBe("es");
+  });
+
+  it("is null when the browser says nothing the portal speaks", () => {
+    expect(fromAcceptLanguage(null)).toBeNull();
+    expect(fromAcceptLanguage("fr,de;q=0.8")).toBeNull();
+    expect(fromAcceptLanguage("es;q=0")).toBeNull();
   });
 });

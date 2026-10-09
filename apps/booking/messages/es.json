@@ -12,6 +12,10 @@
     "en": "English",
     "es": "Español"
   },
+  "theme": {
+    "dark": "Cambiar al tema oscuro",
+    "light": "Cambiar al tema claro"
+  },
   "nav": {
     "environment": "Entorno {name} — no es producción",
     "user": "Usuario: {name}",
@@ -32,7 +36,7 @@
     "user": "Usuario",
     "password": "Contraseña",
     "submit": "ENTRAR",
-    "submitting": "Autenticando...",
+    "submitting": "ENTRANDO…",
     "failed": "No se puede iniciar sesión ahora mismo.",
     "heroTitle": "Todos los viajes de tu centro, en un solo lugar.",
     "heroText": "Reserva transporte médico no urgente, síguelo en vivo y ten a mano a tus providers.",
@@ -40,7 +44,10 @@
     "featureLive": "Avisos en vivo según avanzan los viajes",
     "featureCatalog": "Tus providers contratados",
     "showPassword": "Mostrar contraseña",
-    "hidePassword": "Ocultar contraseña"
+    "hidePassword": "Ocultar contraseña",
+    "featureEta": "ETA en vivo de cada viaje",
+    "featureRoute": "Sigue la ruta y el vehículo en tiempo real",
+    "checking": "Comprobando tus credenciales…"
   },
   "errors": {
     "missing_credentials": "Escribe tu usuario y tu contraseña.",
@@ -59,7 +66,8 @@
     "password_same_as_current": "La contraseña nueva tiene que ser distinta de la actual.",
     "password_mismatch": "La contraseña nueva y su confirmación no coinciden.",
     "wrong_current_password": "La contraseña actual no es correcta.",
-    "password_change_failed": "No se ha podido cambiar la contraseña."
+    "password_change_failed": "No se ha podido cambiar la contraseña.",
+    "integrator_disabled": "El acceso de tu organización está desactivado. Contacta con la oficina."
   },
   "dashboard": {
     "title": "Viajes",

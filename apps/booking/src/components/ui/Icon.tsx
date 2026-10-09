@@ -1,7 +1,9 @@
 /**
- * Every icon the portal uses, and the only file that imports the icon library (Bootstrap Icons
- * 1.11, the set of the original Booking Web, as SVG components: only these travel to the browser).
- * When the final design brings another set, this is the one file that changes.
+ * Every icon the portal uses, and the only file that imports the icon libraries. Both ship as SVG
+ * components, so only the icons used travel to the browser.
+ * - Phosphor: the set of the final design (design/DESIGN.md). Screens move to it one at a time,
+ *   as each is rebuilt; the login is the first. Its names carry the `Ph` prefix.
+ * - Bootstrap Icons 1.11, the set of the original Booking Web: every screen not rebuilt yet.
  *
  * Icons are decorative: give them aria-hidden, and let the text next to them, or the button's
  * aria-label, be what a screen reader announces. The kit's components already do.
@@ -59,3 +61,23 @@ export {
   XCircleFill as IconCancelled,
   XLg as IconClose,
 } from "react-bootstrap-icons";
+
+export {
+  BellRinging as PhBellRinging,
+  Buildings as PhBuildings,
+  CalendarPlus as PhCalendarPlus,
+  CaretDown as PhCaretDown,
+  Check as PhCheck,
+  CircleNotch as PhCircleNotch,
+  ClockCountdown as PhClockCountdown,
+  Eye as PhEye,
+  EyeSlash as PhEyeSlash,
+  GlobeHemisphereWest as PhGlobe,
+  Key as PhKey,
+  MoonStars as PhMoonStars,
+  Path as PhPath,
+  SignIn as PhSignIn,
+  Sun as PhSun,
+  UserCircle as PhUserCircle,
+  WarningCircle as PhWarningCircle,
+} from "@phosphor-icons/react";
