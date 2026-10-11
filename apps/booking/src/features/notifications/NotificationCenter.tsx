@@ -5,7 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState, type ComponentType } from "react";
 import { Button } from "@/components/ui/Button";
 import {
-  IconCancelled, IconCheck, IconCheckAll, IconChevronLeft, IconChevronRight, IconCompleted, IconInbox, IconOnTheWay, IconReactivated, IconScheduled,
+  IconCancelled, IconCheck, IconDisable, IconCheckAll, IconChevronLeft, IconChevronRight, IconCompleted, IconInbox, IconOnTheWay, IconReactivated, IconScheduled,
 } from "@/components/ui/Icon";
 import { Badge, Card, EmptyState, Notice, PageHeader, type Tone } from "@/components/ui/Surface";
 import { Tabs } from "@/components/ui/Tabs";
@@ -26,6 +26,8 @@ const TABS = [
   { key: "completed", event: "DRIVER_COMPLETED_TRIP", icon: IconCompleted },
   { key: "cancelled", event: "TRIP_CANCELLED", icon: IconCancelled },
   { key: "reactivated", event: "TRIP_REACTIVATED", icon: IconReactivated },
+  // A trip its Provider turned down: until the clinic gives it to someone else, nobody will do it.
+  { key: "rejected", event: "TRIP_REJECTED", icon: IconDisable },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -37,6 +39,7 @@ const EVENT_LOOK: Record<string, { icon: IconComponent; tone: Tone; tile: string
   DRIVER_COMPLETED_TRIP: { icon: IconCompleted, tone: "success", tile: "bg-success-soft text-success" },
   TRIP_CANCELLED: { icon: IconCancelled, tone: "danger", tile: "bg-danger-soft text-danger" },
   TRIP_REACTIVATED: { icon: IconReactivated, tone: "violet", tile: "bg-violet-100 text-violet-700" },
+  TRIP_REJECTED: { icon: IconDisable, tone: "danger", tile: "bg-[var(--st-rejected-bg)] text-[var(--st-rejected-ink)]" },
 };
 
 const DEFAULT_LOOK = { icon: IconInbox, tone: "neutral" as Tone, tile: "bg-slate-100 text-slate-600" };

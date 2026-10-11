@@ -3,13 +3,14 @@
 import { useTranslations } from "next-intl";
 import type { LiveNotification } from "@/features/realtime/RealtimeProvider";
 
-/** The five events a clinic is told about (NotificationRuleCatalog, recipient Integration), in the order a trip lives them. */
+/** The events a clinic is told about (NotificationRuleCatalog, recipient Integration), in the order a trip lives them. */
 export const CLINIC_EVENTS = [
   "TRIP_SCHEDULED",
   "DRIVER_STARTED_TRIP",
   "DRIVER_COMPLETED_TRIP",
   "TRIP_CANCELLED",
   "TRIP_REACTIVATED",
+  "TRIP_REJECTED",
 ] as const;
 
 const KNOWN = new Set<string>(CLINIC_EVENTS);
@@ -30,7 +31,11 @@ export function useDescribe() {
     const m = n.metadata ?? {};
     return {
       title: t(`events.${n.businessEventCode}.title`),
-      body: t(`events.${n.businessEventCode}.body`, { tripId: m.TripId ?? "", date: m.TripDate ?? "", time: m.TripTime ?? "" }),
+      body: t(`events.${n.businessEventCode}.body`, {
+        tripId: m.TripId ?? "", date: m.TripDate ?? "", time: m.TripTime ?? "",
+        // TRIP_REJECTED: who rejected it and why.
+        provider: m.ProviderName ?? "—", reason: m.RejectionReason ?? "—",
+      }),
     };
   };
 }

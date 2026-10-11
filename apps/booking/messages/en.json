@@ -332,6 +332,10 @@
       "DRIVER_COMPLETED_TRIP": {
         "title": "Trip completed",
         "body": "Trip #{tripId} was completed: the patient reached the destination."
+      },
+      "TRIP_REJECTED": {
+        "title": "Trip rejected",
+        "body": "Trip #{tripId} on {date} at {time} was rejected by {provider}: {reason}. Give it to another provider or to Raphael."
       }
     },
     "bellLabel": "Notifications, {count} unread",
@@ -352,7 +356,8 @@
       "started": "On the way",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "reactivated": "Reactivated"
+      "reactivated": "Reactivated",
+      "rejected": "Rejected"
     },
     "emptyTitle": "No notices here"
   },
