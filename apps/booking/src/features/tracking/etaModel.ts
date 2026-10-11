@@ -81,3 +81,16 @@ export function bufferMinutes(dropoffEta: string | null, appointment: string | n
   const appt = clockMinutes(appointment);
   return eta === null || appt === null ? null : appt - eta;
 }
+
+/**
+ * How long the patient will be on board, before the trip starts. Routed: drop-off ETA minus pickup
+ * ETA, the patient's real time in the vehicle even with other stops between, and it agrees with
+ * the two times on the card. Otherwise, or when the route's times make no sense, the road's own
+ * drive time with traffic at the requested hour.
+ */
+export function rideMinutes(pickupEta: string | null, dropoffEta: string | null, driveMinutes: number | null): number | null {
+  const from = clockMinutes(pickupEta);
+  const to = clockMinutes(dropoffEta);
+  if (from !== null && to !== null && to > from) return to - from;
+  return driveMinutes;
+}

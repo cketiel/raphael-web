@@ -407,14 +407,6 @@
     "route": "Route",
     "buffer": "Buffer",
     "bufferMin": "{sign}{n} MIN",
-    "requestedPickup": "Requested pickup",
-    "pickupEta": "Pickup ETA",
-    "quietCanceled": "Trip canceled",
-    "quietCanceledFoot": "The vehicle is no longer assigned. Booking does not reactivate trips: create a new one if needed.",
-    "quietFinished": "Trip finished",
-    "quietNotRouted": "Not routed yet",
-    "quietNotRoutedFoot": "{provider} has not assigned a vehicle yet. You will be notified when it is routed.",
-    "quietNotStarted": "Routed · not started",
     "mapPickup": "Pickup {time}",
     "mapPickupEta": "Pickup ETA {time}",
     "mapPickupReq": "Pickup {time} req",
@@ -434,7 +426,21 @@
     "progressWaiting": "Not started",
     "progressToPickup": "Heading to pickup",
     "progressOnBoard": "On board",
-    "progressToGo": "{miles} mi to go"
+    "progressToGo": "{miles} mi to go",
+    "pendingTitle": {
+      "notStarted": "Not started yet",
+      "notRouted": "Not routed yet",
+      "late": "Not started · running late",
+      "waiting": "Not started · no vehicle yet",
+      "canceled": "Trip canceled"
+    },
+    "pendingFoot": {
+      "notStarted": "Live tracking starts when the driver starts the trip.",
+      "notRouted": "{provider} has not assigned a vehicle yet. The times are estimates until the trip is routed.",
+      "late": "{provider} has flagged this trip as running late. Live tracking starts when the driver starts the trip.",
+      "waiting": "No vehicle is on its way yet. {provider} has been alerted.",
+      "canceled": "The vehicle is no longer assigned. Booking does not reactivate trips: create a new one if needed."
+    }
   },
   "account": {
     "menu": "Account menu for {name}",
@@ -649,6 +655,10 @@
     "arrived": "ARRIVED",
     "completed": "Trip completed",
     "completedFoot": "The patient was dropped off",
-    "droppedOff": "Dropped off"
+    "droppedOff": "Dropped off",
+    "h": "H",
+    "canceled": "CANCELED",
+    "estRide": "Est. ride",
+    "dropoff": "Drop-off"
   }
 }

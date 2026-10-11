@@ -407,14 +407,6 @@
     "route": "Ruta",
     "buffer": "Margen",
     "bufferMin": "{sign}{n} MIN",
-    "requestedPickup": "Recogida pedida",
-    "pickupEta": "ETA de recogida",
-    "quietCanceled": "Viaje cancelado",
-    "quietCanceledFoot": "El vehículo ya no está asignado. Booking no reactiva viajes: crea uno nuevo si hace falta.",
-    "quietFinished": "Viaje terminado",
-    "quietNotRouted": "Sin rutear todavía",
-    "quietNotRoutedFoot": "{provider} aún no ha asignado vehículo. Recibirás un aviso cuando se rutee.",
-    "quietNotStarted": "Ruteado · sin empezar",
     "mapPickup": "Recogida {time}",
     "mapPickupEta": "ETA recogida {time}",
     "mapPickupReq": "Recogida {time} pedida",
@@ -434,7 +426,21 @@
     "progressWaiting": "Sin empezar",
     "progressToPickup": "Hacia la recogida",
     "progressOnBoard": "Paciente a bordo",
-    "progressToGo": "Faltan {miles} mi"
+    "progressToGo": "Faltan {miles} mi",
+    "pendingTitle": {
+      "notStarted": "Sin empezar",
+      "notRouted": "Sin rutear todavía",
+      "late": "Sin empezar · con retraso",
+      "waiting": "Sin empezar · sin vehículo",
+      "canceled": "Viaje cancelado"
+    },
+    "pendingFoot": {
+      "notStarted": "El seguimiento en vivo empieza cuando el conductor inicia el viaje.",
+      "notRouted": "{provider} aún no ha asignado vehículo. Los tiempos son estimados hasta que el viaje se rutee.",
+      "late": "{provider} ha marcado este viaje con retraso. El seguimiento en vivo empieza cuando el conductor inicia el viaje.",
+      "waiting": "Todavía no hay ningún vehículo en camino. {provider} ya está avisado.",
+      "canceled": "El vehículo ya no está asignado. Booking no reactiva viajes: crea uno nuevo si hace falta."
+    }
   },
   "account": {
     "menu": "Menú de la cuenta de {name}",
@@ -649,6 +655,10 @@
     "arrived": "LLEGÓ",
     "completed": "Viaje completado",
     "completedFoot": "El paciente fue entregado",
-    "droppedOff": "Entregado"
+    "droppedOff": "Entregado",
+    "h": "H",
+    "canceled": "CANCELADO",
+    "estRide": "Viaje estimado",
+    "dropoff": "Destino"
   }
 }

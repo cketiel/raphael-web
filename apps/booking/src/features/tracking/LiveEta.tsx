@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { PhCircleNotch, PhVan, PhWarningCircle } from "@/components/ui/Icon";
+import { PhCircleNotch, PhInfo, PhVan, PhWarningCircle } from "@/components/ui/Icon";
 
 /**
  * Live ETA (design: Live ETA.dc.html): how long, how far and at what time the vehicle reaches the
@@ -210,5 +210,111 @@ function Dial({ size, ring, arc, text, cap, capSize = 8, v, g, arcDash, accent, 
         </div>
       </div>
     </Flash>
+  );
+}
+
+/**
+ * A trip that has not started yet, on the live card's shape and read left to right as the whole
+ * ride: the pickup under the van, the estimated ride time and miles in the middle and the drop-off
+ * ETA on the dial. Nothing is live, so the van is an outline, the threads are dashed, the arc is
+ * empty and nothing pulses or flashes.
+ */
+export interface PendingEtaValues {
+  tone: "pending" | "late" | "canceled";
+  title: string;
+  /** The status colour, on the dot before the title. */
+  dot: string;
+  /** "Pickup 08:40", or "Requested 08:30" before routing. */
+  pickup: string;
+  /** Estimated minutes the patient spends on board; null when unknown. */
+  minutes: number | null;
+  /** "8.3"; null when unknown. */
+  miles: string | null;
+  /** "09:04"; null before routing. */
+  dropoffEta: string | null;
+  foot: string;
+}
+
+export function PendingEta({ v, size, compact = false }: { v: PendingEtaValues; size: "lg" | "md"; compact?: boolean }) {
+  const t = useTranslations("liveEta");
+  const g = GROUND.dark;
+  const s = SIZE[size];
+  const late = v.tone === "late";
+  const canceled = v.tone === "canceled";
+  const ride = canceled || v.minutes === null ? null : v.minutes < 60
+    ? { n: String(v.minutes), unit: t("min") }
+    : { n: `${Math.floor(v.minutes / 60)}:${String(v.minutes % 60).padStart(2, "0")}`, unit: t("h") };
+  const bigText = canceled ? t("canceled") : ride?.n ?? "—";
+  const milesText = canceled || v.miles === null ? "—" : `${v.miles} ${t("mi")}`;
+  const etaText = v.dropoffEta ?? "—";
+  const dialV: LiveEtaValues = { state: late ? "late" : "nodata", phase: "Dropoff", minutes: null, miles: null, eta: v.dropoffEta, ageSeconds: null, progress: 0 };
+  const dashed = `repeating-linear-gradient(90deg, ${g.rail} 0 7px, transparent 7px 16px)`;
+  const van = (d: number, icon: number) => (
+    <span className="flex shrink-0 items-center justify-center rounded-full" style={{ width: d, height: d, boxShadow: `inset 0 0 0 1.5px ${g.rail}` }}>
+      <PhVan size={icon} weight="fill" style={{ color: g.mute }} aria-hidden />
+    </span>
+  );
+  const thread = (h: number, min: number) => <span className="flex-1 rounded-sm" style={{ minWidth: min, height: h, background: dashed, backgroundSize: `16px ${h}px` }} />;
+  const arrow = <span className="mr-0.5 size-0 shrink-0 border-y-[5px] border-l-[7px] border-y-transparent" style={{ borderLeftColor: g.rail }} />;
+
+  if (compact) {
+    return (
+      <div className="flex w-full items-center">
+        {van(36, 18)}
+        {thread(2, 10)}
+        <div className="shrink-0 px-2 text-center">
+          <span className="flex items-baseline justify-center gap-[5px]">
+            <span className={`${MONO} whitespace-nowrap font-semibold leading-none ${canceled ? "text-[15px]" : "text-[21px]"}`} style={{ color: canceled ? g.mute : g.ink }}>{bigText}</span>
+            {ride && <span className={`${MONO} text-[10px] font-semibold tracking-[0.12em]`} style={{ color: g.mute }}>{ride.unit}</span>}
+          </span>
+          <div className={`${MONO} mt-0.5 whitespace-nowrap text-[9.5px] font-medium tracking-[0.12em]`} style={{ color: g.mute }}>{milesText}</div>
+        </div>
+        {thread(2, 10)}
+        {arrow}
+        <Dial size={44} ring={3} arc={5} text={12} cap="" v={dialV} g={g} arcDash={`0 ${CIRC.toFixed(1)}`} accent={g.late} live={false} etaText={etaText} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full flex-col" style={{ gap: s.gap }}>
+      <div className={`${MONO} flex items-center gap-2 font-semibold uppercase tracking-[0.12em]`} style={{ fontSize: s.phase, color: late ? g.lateInk : g.mute }}>
+        <span className="size-2 shrink-0 rounded-[2px]" style={{ background: v.dot }} />
+        {v.title}
+      </div>
+
+      <div className="flex w-full items-center" style={{ paddingBottom: s.foot + 8 }}>
+        <span className="relative shrink-0">
+          {van(s.disc, s.van)}
+          <span className={`${MONO} absolute left-0 top-full mt-1.5 whitespace-nowrap font-semibold uppercase tracking-[0.08em]`} style={{ fontSize: s.foot, color: g.mute }}>{v.pickup}</span>
+        </span>
+        {thread(s.rail, s.railMin)}
+        <div className="shrink-0 text-center" style={{ padding: `0 ${s.pad}px` }}>
+          {!canceled && size === "lg" && <div className={`${MONO} mb-1 uppercase tracking-[0.12em]`} style={{ fontSize: s.cap, color: g.mute }}>{t("estRide")}</div>}
+          <span className="flex items-baseline justify-center gap-1.5">
+            <span className={`${MONO} whitespace-nowrap font-semibold leading-none tracking-[-0.01em]`}
+              style={{ fontSize: canceled ? s.arriving : s.num, color: canceled ? g.mute : g.ink }}>{bigText}</span>
+            {ride && <span className={`${MONO} font-semibold tracking-[0.12em]`} style={{ fontSize: s.unit, color: g.mute }}>{ride.unit}</span>}
+          </span>
+          <div className={`${MONO} mt-1 whitespace-nowrap font-medium tracking-[0.14em]`} style={{ fontSize: s.sub, color: g.mute }}>{milesText}</div>
+        </div>
+        {thread(s.rail, s.railMin)}
+        {arrow}
+        <div className="flex shrink-0 flex-col items-center gap-1.5">
+          <Dial size={s.dial} ring={s.dialRing} arc={s.arc} text={s.dialText} cap={size === "lg" ? t("dropoff") : ""} capSize={s.cap}
+            v={dialV} g={g} arcDash={`0 ${CIRC.toFixed(1)}`} accent={g.late} live={false} etaText={etaText} ticks />
+          {late && (
+            <span className={`${MONO} inline-flex h-5 items-center gap-[5px] rounded-[5px] px-2 text-[10px] font-semibold tracking-[0.06em]`} style={{ background: g.lateBg, color: g.lateInk }}>
+              <span className="size-1.5 rounded-[2px]" style={{ background: g.late }} />{t("lateShort")}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-start gap-[7px] text-[12.5px] leading-normal" style={{ color: late ? g.lateInk : g.mute }}>
+        {late ? <PhWarningCircle size={15} className="mt-px shrink-0" aria-hidden /> : <PhInfo size={15} className="mt-px shrink-0" aria-hidden />}
+        <span>{v.foot}</span>
+      </div>
+    </div>
   );
 }

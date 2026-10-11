@@ -15,8 +15,8 @@ import { CancelDialog, ToastBar, type Toast } from "@/features/booking/TripDialo
 import { LiveSheet, NoData, useIsPhone } from "@/features/booking/TripViews";
 import { StatusChip, statusEdge, statusKey } from "@/features/booking/TripStatus";
 import { useRealtime, type TripVehiclePosition } from "@/features/realtime/RealtimeProvider";
-import { LiveEta, type LiveEtaValues } from "./LiveEta";
-import { bufferMinutes, clockMinutes, hhmm, liveEtaValues, MPH_PER_MPS } from "./etaModel";
+import { LiveEta, PendingEta, type LiveEtaValues, type PendingEtaValues } from "./LiveEta";
+import { bufferMinutes, clockMinutes, hhmm, liveEtaValues, MPH_PER_MPS, rideMinutes } from "./etaModel";
 import { TripProgressBar, type ProgressStage } from "./TripProgressBar";
 import { TrackingMap } from "./TrackingMap";
 
@@ -27,8 +27,9 @@ const DONE_STATUSES = ["Finished", "Billed", "Payed"];
 /**
  * One trip, followed live (design: Trip Tracking.dc.html). A page of its own, /trips/40233, so it
  * can be linked and opened in another tab; Back returns to the list as it was left.
- * - Left: the live card (Live ETA large, appointment and buffer) or a quiet card when the trip is
- *   not under way, then the route with the four times of each stop.
+ * - Left: the live card (Live ETA large, appointment and buffer) or, when the trip is not under
+ *   way, the same card with the whole ride estimated and nothing live; then the route with the four
+ *   times of each stop.
  * - Right: the map with the road, the two stops and the vehicle gliding between fixes.
  * - Phone: the map full size and the cards in a bottom sheet that is dragged up.
  */
@@ -45,6 +46,8 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
   const [failed, setFailed] = useState(false);
   const [position, setPosition] = useState<TripVehiclePosition | null>(null);
   const [polyline, setPolyline] = useState<string | null>(null);
+  /** The road's own drive time and miles, from the same cached leg as the polyline. */
+  const [driveEstimate, setDriveEstimate] = useState<{ minutes: number; miles: number | null } | null>(null);
   const [asking, setAsking] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
@@ -104,7 +107,13 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
       }],
     };
     api<Schemas["RouteLegsResponseDto"]>("routing/legs", { method: "POST", body: JSON.stringify(body) })
-      .then((r) => { const leg = r.legs?.[0]; if (!cancelled && leg?.status === "Ok") setPolyline(leg.encodedPolyline ?? null); })
+      .then((r) => {
+        const leg = r.legs?.[0];
+        if (cancelled || leg?.status !== "Ok") return;
+        setPolyline(leg.encodedPolyline ?? null);
+        const seconds = leg.durationInTrafficSeconds ?? leg.durationSeconds;
+        setDriveEstimate(seconds ? { minutes: Math.round(seconds / 60), miles: leg.distanceMiles ?? null } : null);
+      })
       .catch(() => undefined);
     return () => { cancelled = true; };
     // legKey holds every input that changes the answer.
@@ -225,53 +234,35 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
   const doneCard = tracking && done && !canceled && (
     <div className="relative shrink-0 rounded-xl p-[18px] text-[#f2f8fb] opacity-80 saturate-[.35] [background:radial-gradient(circle_at_88%_6%,rgb(129_99_230/0.42),transparent_58%),linear-gradient(170deg,#073d55,#04202d)]">
       <LiveEta size={phone ? "md" : "lg"} v={{ state: "done", phase: "Dropoff", minutes: 0, miles: "0", eta: hhmm(tracking.droppedOffAt), ageSeconds: null, progress: 1 }} />
-      <div className="relative mt-4 flex flex-wrap items-end gap-[18px] border-t border-[rgb(207_228_239/0.22)] pt-3.5">
-        <div>
-          <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("appointment")}</div>
-          <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none`}>{hhmm(tracking.appointmentTime) ?? "—"}</div>
-        </div>
-        <div className="ml-auto text-right">
-          <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("buffer")}</div>
-          <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none ${doneBuffer !== null && doneBuffer < 0 ? "text-[#f7bd81]" : "text-[#8fe0b5]"}`}>
-            {doneBuffer === null ? "—" : t("bufferMin", { sign: doneBuffer >= 0 ? "+" : "\u2212", n: Math.abs(doneBuffer) })}
-          </div>
-        </div>
-      </div>
+      <CardFooter appointment={hhmm(tracking.appointmentTime)} buffer={doneBuffer} />
     </div>
   );
-  const quiet = tracking && !isLive && !doneCard ? quietCard() : null;
-  function quietCard() {
-    const tr = tracking!;
-    let title: string, aL: string, aV: string | null, bL: string, bV: string | null, foot: string;
-    if (canceled) {
-      title = t("quietCanceled"); aL = t("requested"); aV = hhmm(tr.requestedPickupTime); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
-      foot = t("quietCanceledFoot");
-    } else if (!routed) {
-      title = t("quietNotRouted"); aL = t("requestedPickup"); aV = hhmm(tr.requestedPickupTime); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
-      foot = t("quietNotRoutedFoot", { provider });
-    } else {
-      title = t("quietNotStarted"); aL = t("pickupEta"); aV = hhmm(tr.pickupEta); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
-      foot = t("onlyWhileInProgress");
-    }
-    return (
-      <div className="shrink-0 rounded-xl border border-[var(--ds-outline-variant)] bg-[var(--ds-subtle)] p-[18px]">
-        <div className={`${MONO} flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ds-on-surface-variant)]`}>
-          <span className="size-2 rounded-[2px]" style={{ background: statusEdge(statusKey(status, canceled)) }} />{title}
-        </div>
-        <div className="mt-3.5 flex flex-wrap items-end gap-[18px]">
-          <div>
-            <div className={`${MONO} text-[10.5px] uppercase tracking-[0.1em] text-[var(--ds-on-surface-variant)]`}>{aL}</div>
-            <div className={`${MONO} mt-[5px] text-[28px] font-semibold leading-none`}>{aV ?? "—"}</div>
-          </div>
-          <div className="pb-0.5">
-            <div className={`${MONO} text-[10.5px] uppercase tracking-[0.1em] text-[var(--ds-on-surface-variant)]`}>{bL}</div>
-            <div className={`${MONO} mt-[5px] text-[19px] font-semibold leading-none`}>{bV ?? "—"}</div>
-          </div>
-        </div>
-        <div className="mt-3.5 text-[12.5px] leading-normal text-[var(--ds-on-surface-variant)]">{foot}</div>
-      </div>
-    );
-  }
+  // Not started yet (or canceled): the same card, read as the whole ride, with nothing live on it.
+  const pending: PendingEtaValues | null = tracking && !isLive && (!done || canceled) ? (() => {
+    const key = statusKey(status, canceled);
+    // The status speaks first: a late or unattended trip says so even before it is routed.
+    const kind = canceled ? "canceled" : key === "late" ? "late" : key === "waiting" ? "waiting" : !routed ? "notRouted" : "notStarted";
+    const miles = tracking.distance ?? driveEstimate?.miles ?? null;
+    return {
+      tone: canceled ? "canceled" : key === "late" ? "late" : "pending",
+      title: t(`pendingTitle.${kind}`),
+      dot: statusEdge(key),
+      pickup: canceled || !routed
+        ? `${t("requested")} ${hhmm(tracking.requestedPickupTime) ?? "—"}`
+        : `${t("pickup")} ${hhmm(tracking.pickupEta) ?? "—"}`,
+      minutes: rideMinutes(tracking.pickupEta ?? null, tracking.dropoffEta ?? null, driveEstimate?.minutes ?? null),
+      miles: miles === null ? null : miles.toFixed(1),
+      dropoffEta: canceled ? null : hhmm(tracking.dropoffEta),
+      foot: t(`pendingFoot.${kind}`, { provider }),
+    };
+  })() : null;
+  const pendingCard = (open = true) => pending && (
+    <div className={`relative shrink-0 rounded-xl text-[#f2f8fb] [background:radial-gradient(circle_at_88%_6%,rgb(129_99_230/0.42),transparent_58%),linear-gradient(170deg,#073d55,#04202d)] ${canceled ? "opacity-80 saturate-[.35]" : ""}`}
+      style={{ padding: phone && !open ? 11 : 18 }}>
+      <PendingEta v={pending} size={phone ? "md" : "lg"} compact={phone && !open} />
+      {(!phone || open) && <CardFooter appointment={hhmm(tracking?.appointmentTime)} buffer={canceled ? null : buffer} />}
+    </div>
+  );
 
   const current = isLive && position ? (onBoard ? "dropoffEta" : "pickupEta") : null;
   const route = tracking && (
@@ -359,7 +350,7 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
               <>
                 {liveCard(open)}
                 {doneCard}
-                {quiet}
+                {pendingCard(open)}
                 {open && route}
               </>
             )}
@@ -370,7 +361,7 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
           <div className="flex w-[378px] shrink-0 flex-col gap-3.5 overflow-y-auto overflow-x-hidden pr-3 xl:w-[412px]">
             {liveCard()}
             {doneCard}
-            {quiet}
+            {pendingCard()}
             {route}
           </div>
           <div className="min-w-0 flex-1">{map}</div>
@@ -434,7 +425,6 @@ const LiveCard = memo(function LiveCard({ inputs, compact, size, showFooter, app
   appointment: string | null;
   buffer: number | null;
 }) {
-  const t = useTranslations("tracking");
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -445,20 +435,26 @@ const LiveCard = memo(function LiveCard({ inputs, compact, size, showFooter, app
     <div className="relative shrink-0 rounded-xl text-[#f2f8fb] [background:radial-gradient(circle_at_88%_6%,rgb(129_99_230/0.42),transparent_58%),linear-gradient(170deg,#073d55,#04202d)]"
       style={{ padding: compact ? 11 : 18 }}>
       <LiveEta v={v} size={size} compact={compact} />
-      {showFooter && (
-        <div className="relative mt-4 flex flex-wrap items-end gap-[18px] border-t border-[rgb(207_228_239/0.22)] pt-3.5">
-          <div>
-            <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("appointment")}</div>
-            <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none`}>{appointment ?? "—"}</div>
-          </div>
-          <div className="ml-auto text-right">
-            <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("buffer")}</div>
-            <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none ${buffer !== null && buffer < 0 ? "text-[#f7bd81]" : "text-[#8fe0b5]"}`}>
-              {buffer === null ? "—" : t("bufferMin", { sign: buffer >= 0 ? "+" : "−", n: Math.abs(buffer) })}
-            </div>
-          </div>
-        </div>
-      )}
+      {showFooter && <CardFooter appointment={appointment} buffer={buffer} />}
     </div>
   );
 });
+
+/** The dark card's foot: the appointment and the slack before it (green early, orange late). */
+function CardFooter({ appointment, buffer }: { appointment: string | null; buffer: number | null }) {
+  const t = useTranslations("tracking");
+  return (
+    <div className="relative mt-4 flex flex-wrap items-end gap-[18px] border-t border-[rgb(207_228_239/0.22)] pt-3.5">
+      <div>
+        <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("appointment")}</div>
+        <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none`}>{appointment ?? "—"}</div>
+      </div>
+      <div className="ml-auto text-right">
+        <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("buffer")}</div>
+        <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none ${buffer === null ? "" : buffer < 0 ? "text-[#f7bd81]" : "text-[#8fe0b5]"}`}>
+          {buffer === null ? "—" : t("bufferMin", { sign: buffer >= 0 ? "+" : "−", n: Math.abs(buffer) })}
+        </div>
+      </div>
+    </div>
+  );
+}

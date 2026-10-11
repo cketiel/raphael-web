@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bufferMinutes, liveEtaValues, minutesUntil, type LiveInputs } from "./etaModel";
+import { bufferMinutes, liveEtaValues, minutesUntil, rideMinutes, type LiveInputs } from "./etaModel";
 
 const at = (h: number, m: number, s = 0) => new Date(2026, 9, 20, h, m, s);
 const base = (over: Partial<LiveInputs> = {}): LiveInputs => ({
@@ -42,5 +42,20 @@ describe("Live ETA values", () => {
     expect(bufferMinutes("09:14:00", "09:30:00")).toBe(16);
     expect(bufferMinutes("09:38:00", "09:30:00")).toBe(-8);
     expect(bufferMinutes(null, "09:30:00")).toBeNull();
+  });
+});
+
+describe("Ride time before the trip starts", () => {
+  it("is the route's drop-off ETA minus its pickup ETA, stops between included", () => {
+    expect(rideMinutes("08:40:00", "09:04:00", 18)).toBe(24);
+  });
+
+  it("falls back to the road's drive time when the trip is not routed", () => {
+    expect(rideMinutes(null, null, 18)).toBe(18);
+    expect(rideMinutes(null, null, null)).toBeNull();
+  });
+
+  it("does not trust a drop-off ETA that is not after the pickup", () => {
+    expect(rideMinutes("09:10:00", "09:04:00", 18)).toBe(18);
   });
 });
