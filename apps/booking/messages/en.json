@@ -428,7 +428,13 @@
     "roadmap": "Map",
     "satellite": "Satellite",
     "showLabels": "Show Google's labels",
-    "hideLabels": "Hide Google's labels"
+    "hideLabels": "Hide Google's labels",
+    "progressDone": "Completed",
+    "progressCanceled": "Canceled",
+    "progressWaiting": "Not started",
+    "progressToPickup": "Heading to pickup",
+    "progressOnBoard": "On board",
+    "progressToGo": "{miles} mi to go"
   },
   "account": {
     "menu": "Account menu for {name}",

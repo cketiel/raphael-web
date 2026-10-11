@@ -428,7 +428,13 @@
     "roadmap": "Mapa",
     "satellite": "Satélite",
     "showLabels": "Mostrar las etiquetas de Google",
-    "hideLabels": "Ocultar las etiquetas de Google"
+    "hideLabels": "Ocultar las etiquetas de Google",
+    "progressDone": "Completado",
+    "progressCanceled": "Cancelado",
+    "progressWaiting": "Sin empezar",
+    "progressToPickup": "Hacia la recogida",
+    "progressOnBoard": "Paciente a bordo",
+    "progressToGo": "Faltan {miles} mi"
   },
   "account": {
     "menu": "Menú de la cuenta de {name}",

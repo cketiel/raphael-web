@@ -114,6 +114,11 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
         {/* Sidebar, 1280 px and up */}
         <aside className={`sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col overflow-y-auto bg-[linear-gradient(180deg,#0a4a66_0%,#073a52_55%,#05293a_100%)] ${collapsed ? "" : "xl:flex"}`}>
           <div className="pointer-events-none absolute left-[130px] top-[-40px] h-[200px] w-[260px] -translate-x-1/2 bg-[radial-gradient(circle,rgb(110_195_224/0.3),transparent_68%)]" />
+          {/* Fold the menu to the rail, for more room: top corner, where such a control is looked for. */}
+          <button type="button" onClick={() => setNav(true)} aria-label={t("collapse")} title={t("collapse")}
+            className="absolute right-3 top-3 z-10 flex size-10 items-center justify-center rounded-[9px] text-[var(--ds-on-brand-variant)] shadow-[inset_0_0_0_1px_rgb(154_213_236/0.26)] hover:bg-white/[0.1] hover:text-white">
+            <PhSidebarSimple size={20} aria-hidden />
+          </button>
           <Link href="/" className="relative flex flex-col items-center gap-2.5 px-[22px] pb-5 pt-[26px]">
             <Image src="/brand/raphael-pin.png" alt="" width={43} height={54} priority unoptimized className="h-[54px] w-[43px]" />
             <span className="pl-[0.26em] text-[17px] font-semibold tracking-[0.26em] text-white">RAPHAEL</span>
@@ -138,10 +143,6 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
             })}
           </nav>
           <div className="relative mt-auto flex flex-col gap-3 px-4 pb-5 pt-[18px]">
-            <button type="button" onClick={() => setNav(true)}
-              className="flex h-9 items-center gap-2 rounded-lg px-3 text-xs font-medium text-[var(--ds-on-brand-variant)] hover:bg-white/[0.08] hover:text-white">
-              <PhSidebarSimple size={17} aria-hidden />{t("collapse")}
-            </button>
             <div className="flex h-9 items-center gap-2 rounded-lg bg-white/[0.08] px-3 text-xs font-medium text-[var(--ds-on-brand-variant)]">
               <span aria-hidden="true" className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
               {t(`live.${status}`)}
@@ -153,6 +154,11 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
         {/* Rail, 1024 to 1279 px */}
         <aside className={`sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col items-center gap-2 bg-[linear-gradient(180deg,#0a4a66,#073a52_55%,#05293a)] pb-3.5 pt-4 lg:flex ${collapsed ? "" : "xl:hidden"}`}>
           <Link href="/" aria-label="Raphael"><Image src="/brand/raphael-pin.png" alt="" width={34} height={43} unoptimized className="h-[43px] w-[34px]" /></Link>
+          {/* Unfold, only where the full sidebar fits: below 1280 px the rail is the only form. */}
+          <button type="button" onClick={() => setNav(false)} aria-label={t("expand")} title={t("expand")}
+            className="mt-2 hidden size-10 items-center justify-center rounded-[9px] text-[var(--ds-on-brand-variant)] shadow-[inset_0_0_0_1px_rgb(154_213_236/0.26)] hover:bg-white/[0.1] hover:text-white xl:flex">
+            <PhSidebarSimple size={20} weight="fill" aria-hidden />
+          </button>
           <div className="mb-1.5 mt-2.5 h-px w-9 bg-[rgb(154_213_236/0.34)]" />
           <nav aria-label={t("sections")} className="flex flex-col items-center gap-2">
             {sections.map((s) => {
@@ -171,11 +177,6 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
             })}
           </nav>
           <div className="mt-auto flex flex-col items-center gap-2.5">
-            {/* Only where the full sidebar fits: below 1280 px the rail is the only form. */}
-            <button type="button" onClick={() => setNav(false)} aria-label={t("expand")} title={t("expand")}
-              className="hidden size-11 items-center justify-center rounded-[11px] text-[var(--ds-on-brand-variant)] hover:bg-white/[0.08] hover:text-white xl:flex">
-              <PhSidebarSimple size={20} weight="fill" aria-hidden />
-            </button>
             <span aria-hidden="true" title={t(`live.${status}`)} className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
             <span className="flex size-11 items-center justify-center rounded-full bg-[linear-gradient(140deg,#5ab6dd,#0a5c7e)] text-[13px] font-bold text-white" aria-hidden="true">{initials(username)}</span>
           </div>

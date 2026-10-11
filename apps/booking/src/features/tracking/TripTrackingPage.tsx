@@ -16,7 +16,8 @@ import { LiveSheet, NoData, useIsPhone } from "@/features/booking/TripViews";
 import { StatusChip, statusEdge, statusKey } from "@/features/booking/TripStatus";
 import { useRealtime, type TripVehiclePosition } from "@/features/realtime/RealtimeProvider";
 import { LiveEta, type LiveEtaValues } from "./LiveEta";
-import { bufferMinutes, hhmm, liveEtaValues, MPH_PER_MPS } from "./etaModel";
+import { bufferMinutes, clockMinutes, hhmm, liveEtaValues, MPH_PER_MPS } from "./etaModel";
+import { TripProgressBar, type ProgressStage } from "./TripProgressBar";
 import { TrackingMap } from "./TrackingMap";
 
 type Tracking = Schemas["TripTrackingDto"];
@@ -145,13 +146,21 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
   const provider = tracking?.providerName ?? tDash("providerDefault");
   const meta = [tracking?.spaceTypeName, tracking?.distance ? `${tracking.distance.toFixed(1)} mi` : null, provider].filter(Boolean).join(" · ");
   const phoneNumber = tracking?.pickupPhone ? formatUsPhone(tracking.pickupPhone.replace(/\D/g, "").slice(-10)) : null;
+  // The trip's progress, pickup → drop-off, for the bar between the title and the actions.
+  const legMiles = tracking?.distance ?? null;
+  const toGo = position?.remainingMiles ?? null;
+  const stage: ProgressStage = canceled ? "canceled" : done ? "done"
+    : !isLive ? "waiting" : onBoard ? "onBoard" : "toPickup";
+  const progress = stage === "onBoard" && toGo !== null && legMiles ? 1 - toGo / legMiles : 0;
+  const etaDrop = position?.dropoffEta ?? tracking?.dropoffEta ?? null;
+  const late = (clockMinutes(etaDrop) ?? 0) > (clockMinutes(tracking?.appointmentTime) ?? Infinity);
   const header = (
     <div className="flex items-center gap-2.5 border-b border-[var(--ds-outline-variant)] bg-[var(--ds-surface)] px-4 py-3.5 sm:gap-3.5 sm:px-[26px] sm:py-4">
       <button type="button" onClick={back} aria-label={t("back")} title={t("back")}
         className="flex size-11 shrink-0 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] hover:bg-[var(--ds-selected)]">
         <PhArrowLeft size={19} aria-hidden />
       </button>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 lg:max-w-[40%] lg:flex-none">
         <div className="flex flex-wrap items-center gap-2.5">
           <h1 className="truncate text-base font-semibold tracking-[-0.01em] sm:text-[24px] sm:tracking-[-0.02em]">
             {t("title", { id: number })}{tracking?.customerName ? ` · ${tracking.customerName}` : ""}
@@ -161,6 +170,14 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
         {tracking && <div className={`${MONO} mt-1 truncate text-[10.5px] uppercase text-[var(--ds-on-surface-variant)] sm:text-[12.5px]`}>{meta}</div>}
         {tracking && <div className="mt-2.5 sm:hidden"><StatusChip status={status} isCancelled={canceled} /></div>}
       </div>
+      {tracking && (
+        <div className="hidden min-w-[220px] flex-1 px-2 lg:block xl:px-6">
+          <TripProgressBar stage={stage} progress={progress} late={late && stage === "onBoard"}
+            milesToGo={toGo !== null ? toGo.toFixed(1) : null}
+            pickupLabel={`${t("pickup")} ${hhmm(tracking.pickedUpAt) ?? hhmm(tracking.requestedPickupTime) ?? ""}`.trim()}
+            dropoffLabel={`${t("dropoff")} ${hhmm(tracking.droppedOffAt) ?? hhmm(etaDrop) ?? ""}`.trim()} />
+        </div>
+      )}
       {tracking && (
         <div className="flex shrink-0 gap-2.5">
           {phoneNumber

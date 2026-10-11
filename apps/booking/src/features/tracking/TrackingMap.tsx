@@ -120,17 +120,29 @@ function RouteLine({ encoded, theme, vehicle }: { encoded: string | null; theme:
   return null;
 }
 
-/** Frames the trip's two stops once, and again whenever "show the whole trip" is pressed. */
+/**
+ * Frames the trip's two stops once, and again whenever "show the whole trip" is pressed. It waits
+ * until the map's box has a size: framing a box of 0 px zooms to the maximum on one point.
+ */
 function Framer({ points, version }: { points: LatLng[]; version: number }) {
   const map = useMap(MAP_ID);
   const framed = useRef(-1);
   useEffect(() => {
     if (!map || points.length === 0 || framed.current === version) return;
-    framed.current = version;
-    if (points.length === 1) { map.setCenter(points[0]); map.setZoom(14); return; }
-    const bounds = new google.maps.LatLngBounds();
-    points.forEach((p) => bounds.extend(p));
-    map.fitBounds(bounds, 80);
+    const fit = () => {
+      framed.current = version;
+      if (points.length === 1) { map.setCenter(points[0]); map.setZoom(14); return; }
+      const bounds = new google.maps.LatLngBounds();
+      points.forEach((p) => bounds.extend(p));
+      map.fitBounds(bounds, 80);
+    };
+    const box = map.getDiv();
+    if (box.clientWidth > 0 && box.clientHeight > 0) { fit(); return; }
+    const watch = new ResizeObserver(() => {
+      if (box.clientWidth > 0 && box.clientHeight > 0) { watch.disconnect(); fit(); }
+    });
+    watch.observe(box);
+    return () => watch.disconnect();
   }, [map, points, version]);
   return null;
 }

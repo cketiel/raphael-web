@@ -164,7 +164,6 @@
     --ds-brand-tile: rgb(255 255 255 / 0.08);
     --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
     --ds-subtle: #0e2029;
-  --ds-switch-on: #1d4154;
     --ds-switch-on: #1d4154;
     --ds-track: #0c2330;
     --ds-rule: #5ab6dd;
@@ -220,6 +219,7 @@
   --ds-brand-tile: rgb(255 255 255 / 0.08);
   --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
   --ds-subtle: #0e2029;
+  --ds-switch-on: #1d4154;
   --ds-track: #0c2330;
   --ds-rule: #5ab6dd;
   --ds-summary: #1b3340;
