@@ -8968,6 +8968,7 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
+                    providerIds?: string;
                     startDate?: string;
                     endDate?: string;
                     fundingSourceIds?: string;
@@ -13525,6 +13526,9 @@ export interface components {
             dropoffPhone?: string | null;
             authorization?: string | null;
             fundingSource?: string | null;
+            /** Format: int32 */
+            providerId?: number | null;
+            provider?: string | null;
             /** Format: double */
             distance?: number | null;
             run?: string | null;

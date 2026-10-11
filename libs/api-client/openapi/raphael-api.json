@@ -10064,6 +10064,13 @@
         ],
         "parameters": [
           {
+            "name": "providerIds",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "startDate",
             "in": "query",
             "schema": {
@@ -18230,6 +18237,15 @@
             "nullable": true
           },
           "fundingSource": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "provider": {
             "type": "string",
             "nullable": true
           },

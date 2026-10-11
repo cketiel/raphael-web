@@ -187,7 +187,14 @@
     "export": "Exportar",
     "exportTrips": "Viajes (CSV)",
     "exportTripsNothing": "No hay viajes en estas fechas para exportar.",
-    "colDate": "Fecha"
+    "colDate": "Fecha",
+    "provider": "Provider",
+    "providerFilter": "Filtrar por Provider",
+    "allProviders": "Todos",
+    "providerRaphael": "Raphael",
+    "noProviderTrips": "No hay viajes con {provider}",
+    "noProviderTripsText": "En estas fechas hay {total, plural, one {# viaje} other {# viajes}} con otros Providers.",
+    "allProvidersShow": "Ver todos los Providers"
   },
   "status": {
     "Assigned": "Asignado",

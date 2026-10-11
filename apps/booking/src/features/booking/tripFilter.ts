@@ -46,3 +46,15 @@ export function tripMatches(trip: TripRead, term: string, statusLabel: (s: strin
     return wordDigits.length >= 3 && wordDigits === word.replace(/[\s().+-]/g, "") && digits.includes(wordDigits);
   });
 }
+
+/** "all", or one Provider's id. Raphael, which carries out the trips with no Provider, is 0. */
+export type ProviderFilter = "all" | number;
+export const RAPHAEL_PROVIDER = 0;
+
+/**
+ * The trips (or report rows) of one Provider. Like the search, it runs over what is already
+ * loaded: choosing another Provider asks the server for nothing.
+ */
+export function byProvider<T extends { providerId?: number | null }>(rows: T[], provider: ProviderFilter): T[] {
+  return provider === "all" ? rows : rows.filter((r) => (r.providerId ?? RAPHAEL_PROVIDER) === provider);
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tripMatches } from "./tripFilter";
+import { byProvider, RAPHAEL_PROVIDER, tripMatches } from "./tripFilter";
 import type { TripRead } from "./types";
 
 const trip = {
@@ -49,5 +49,21 @@ describe("tripMatches", () => {
   it("finds the status in the user's language and the provider", () => {
     expect(tripMatches(trip, "programado", label)).toBe(true);
     expect(tripMatches(trip, "choice medical", label)).toBe(true);
+  });
+});
+
+describe("byProvider", () => {
+  const rows = [{ providerId: null }, { providerId: 12 }, { providerId: 7 }, {}];
+
+  it("keeps everything with All", () => {
+    expect(byProvider(rows, "all")).toHaveLength(4);
+  });
+
+  it("reads a trip with no Provider as Raphael's", () => {
+    expect(byProvider(rows, RAPHAEL_PROVIDER)).toEqual([{ providerId: null }, {}]);
+  });
+
+  it("keeps only the chosen Provider's trips", () => {
+    expect(byProvider(rows, 12)).toEqual([{ providerId: 12 }]);
   });
 });

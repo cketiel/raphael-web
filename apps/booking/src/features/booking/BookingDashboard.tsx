@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/Icon";
 import { Menu } from "@/components/ui/Menu";
 import { useOrganization } from "@/features/admin/adminApi";
+import { useAssignableProviders } from "@/features/catalog/catalogApi";
 import { useErrorText } from "@/i18n/useErrorText";
 import { api } from "@/lib/bff";
 import { useRealtime } from "@/features/realtime/RealtimeProvider";
@@ -17,7 +18,7 @@ import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./pro
 import { localToday, summarize } from "./rules";
 import { byDayAndTime, toLine, type TripLine } from "./tripLines";
 import { buildTripsCsv, downloadTripsCsv, tripsCsvFileName } from "./tripsCsv";
-import { tripMatches } from "./tripFilter";
+import { byProvider, RAPHAEL_PROVIDER, tripMatches, type ProviderFilter } from "./tripFilter";
 import { tripsCache, type LoadedTrips } from "./tripsCache";
 import { LiveEtaTicker } from "@/features/tracking/LiveEtaTicker";
 import { useLiveTrips } from "@/features/tracking/useLiveTrips";
@@ -47,12 +48,13 @@ const LIST_STATE_KEY = "rb_trips_list";
 const UNDER_WAY = ["Started", "Arrived", "InProgress"];
 
 /** What the list was showing when the user opened a trip's tracking page, or null. Read once, then forgotten. */
-function readListState(): { start: string; end: string; filter: string; selected: string[] } | null {
+function readListState(): { start: string; end: string; filter: string; provider: ProviderFilter; selected: string[] } | null {
   try {
     const raw = sessionStorage.getItem(LIST_STATE_KEY);
     sessionStorage.removeItem(LIST_STATE_KEY);
     const v = raw ? JSON.parse(raw) : null;
-    return v && /^\d{4}-\d{2}-\d{2}$/.test(v.start) && /^\d{4}-\d{2}-\d{2}$/.test(v.end) ? v : null;
+    if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v.start) || !/^\d{4}-\d{2}-\d{2}$/.test(v.end)) return null;
+    return { ...v, provider: Number.isInteger(v.provider) ? v.provider : "all" };
   } catch {
     return null;
   }
@@ -91,6 +93,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
   const [start, setStart] = useState(() => focus?.date ?? restored?.start ?? localToday());
   const [end, setEnd] = useState(() => focus?.date ?? restored?.end ?? localToday());
   const [filter, setFilter] = useState(() => restored?.filter ?? "");
+  const [provider, setProvider] = useState<ProviderFilter>(() => restored?.provider ?? "all");
   const [highlightId, setHighlightId] = useState<number | null>(focus?.tripId ?? null);
   const highlightRefs = useRef(new Map<string, HTMLElement>());
   // The list this tab already holds for this range, if any: shown at once, never asked again for
@@ -166,7 +169,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
   /** Kept for this tab only: the way back from the tracking page. */
   function saveListState() {
     try {
-      sessionStorage.setItem(LIST_STATE_KEY, JSON.stringify({ start, end, filter, selected: [...selected] }));
+      sessionStorage.setItem(LIST_STATE_KEY, JSON.stringify({ start, end, filter, provider, selected: [...selected] }));
     } catch { /* storage blocked: the list simply starts on today */ }
   }
 
@@ -261,11 +264,28 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
     }
   }
 
+  // The Provider filter: All, then Raphael (the trips with no Provider), then the ones this clinic
+  // has contracted. Only a clinic has that list; a broker sees every trip.
+  const assignable = useAssignableProviders(isIntegrator);
+  const providerOptions = assignable.data ?? [];
+  // A Provider kept from before that is no longer contracted falls back to All once the list is known.
+  const shownProvider: ProviderFilter = !isIntegrator ? "all"
+    : provider === "all" || provider === RAPHAEL_PROVIDER || !assignable.isSuccess || providerOptions.some((p) => p.providerId === provider)
+      ? provider : "all";
+  const providerName = shownProvider === RAPHAEL_PROVIDER ? t("providerRaphael")
+    : providerOptions.find((p) => p.providerId === shownProvider)?.name ?? "";
+  // Everything on the screen follows the Provider: list, counters, side panels and both exports.
+  const providerTrips = byProvider(loaded?.trips ?? [], shownProvider);
+  const providerReport = byProvider(loaded?.report ?? [], shownProvider);
+
   const allLines = (loaded?.trips ?? []).map(toLine).sort(byDayAndTime);
+  const providerLines = shownProvider === "all" ? allLines
+    : allLines.filter((l) => (l.trip.providerId ?? RAPHAEL_PROVIDER) === shownProvider);
   // The trips under way follow their vehicles live: phase, miles to go and the route's ETAs.
+  // All of them, whatever the Provider: changing it must not drop and re-join the live channels.
   const underWayIds = allLines.filter((l) => !l.canceled && UNDER_WAY.includes(l.trip.status ?? "")).map((l) => l.trip.id);
   const livePositions = useLiveTrips(underWayIds);
-  const lines = allLines.filter((l) => tripMatches(l.trip, filter, statusLabel));
+  const lines = providerLines.filter((l) => tripMatches(l.trip, filter, statusLabel));
   const highlightMissing = highlightId !== null && loaded !== null && !allLines.some((l) => l.trip.id === highlightId);
   const multiDay = !!loaded && loaded.start !== loaded.end;
 
@@ -282,7 +302,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
 
   const selectable = lines.filter((l) => !l.canceled);
   const allChecked = selectable.length > 0 && selectable.every((l) => selected.has(l.trip.tripId ?? ""));
-  const summary = loaded ? summarize(loaded.trips, loaded.report) : null;
+  const summary = loaded ? summarize(providerTrips, providerReport) : null;
 
   const actions: TripActions = {
     selected,
@@ -318,7 +338,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
 
   const day = (d: string) => format.dateTime(new Date(`${d}T12:00:00`), { weekday: "short", day: "2-digit", month: "short", year: "numeric" }).replace(/[,.]/g, "");
   const rangeLabel = loaded ? (loaded.start === loaded.end ? day(loaded.start) : `${day(loaded.start)} → ${day(loaded.end)}`) : "";
-  const countLabel = filter
+  const countLabel = filter || shownProvider !== "all"
     ? t("recordsFiltered", { shown: lines.length, total: allLines.length })
     : t("records", { count: allLines.length });
 
@@ -327,13 +347,13 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
     : null;
 
   /**
-   * The trips of the range loaded, all of them and whatever the search box says, as a SafeRide2 file
-   * the Desktop can import (tripsCsv.ts). Built in this browser: the patients' data goes nowhere else.
+   * The trips of the range loaded, of the chosen Provider whatever the search box says, as a SafeRide2
+   * file the Desktop can import (tripsCsv.ts). Built in this browser: the patients' data goes nowhere else.
    */
   function exportTrips() {
     if (!loaded) return;
     const patients = new Map((customers.data ?? []).map((c) => [c.id ?? -1, { riderId: c.riderId, dob: c.dob }]));
-    downloadTripsCsv(buildTripsCsv(loaded.trips, patients, organization.data?.name ?? ""), tripsCsvFileName(loaded.start, loaded.end));
+    downloadTripsCsv(buildTripsCsv(providerTrips, patients, organization.data?.name ?? ""), tripsCsvFileName(loaded.start, loaded.end));
   }
 
   const newBooking = () => {
@@ -354,11 +374,20 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
     state = <ListState kind="empty" view={view} title={t("emptyDay", { date: rangeLabel })} text={t("emptyText")}
       action={<DsButton kind="tonal" onClick={newBooking}>{t("newBooking")}</DsButton>} />;
   } else if (loaded && filter && lines.length === 0) {
-    state = <ListState kind="empty" view={view} title={t("noMatches", { term: filter })} text={t("noMatchesText", { total: allLines.length })}
+    state = <ListState kind="empty" view={view} title={t("noMatches", { term: filter })} text={t("noMatchesText", { total: providerLines.length })}
       action={<DsButton kind="tonal" onClick={() => setFilter("")}>{t("clearSearch")}</DsButton>} />;
+  } else if (loaded && lines.length === 0) {
+    state = <ListState kind="empty" view={view} title={t("noProviderTrips", { provider: providerName })} text={t("noProviderTripsText", { total: allLines.length })}
+      action={<DsButton kind="tonal" onClick={() => chooseProvider("all")}>{t("allProvidersShow")}</DsButton>} />;
   }
 
-  const inProgress = allLines.find((l) => l.key === "inprogress") ?? null;
+  /** A selection must never include trips the filter hides: "Cancel selected" would cancel them unseen. */
+  function chooseProvider(next: ProviderFilter) {
+    setProvider(next);
+    setSelected(new Set());
+  }
+
+  const inProgress = providerLines.find((l) => l.key === "inprogress") ?? null;
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-[var(--ds-surface)]">
@@ -379,13 +408,13 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
             items={[
               {
                 key: "trips", label: t("exportTrips"), icon: PhRows,
-                disabled: allLines.length === 0, hint: allLines.length === 0 ? t("exportTripsNothing") : undefined,
+                disabled: providerTrips.length === 0, hint: providerTrips.length === 0 ? t("exportTripsNothing") : undefined,
                 onSelect: exportTrips,
               },
               {
                 key: "report", label: t("exportReport"), icon: PhFileCsv,
-                disabled: (loaded?.report.length ?? 0) === 0, hint: (loaded?.report.length ?? 0) === 0 ? t("exportNothing") : undefined,
-                onSelect: () => downloadProductionCsv(loaded!.report, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] })),
+                disabled: providerReport.length === 0, hint: providerReport.length === 0 ? t("exportNothing") : undefined,
+                onSelect: () => downloadProductionCsv(providerReport, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] })),
               },
             ]} />
           <DsButton kind="tonal" icon={<PhPlus size={16} weight="bold" aria-hidden />} className="flex-1 sm:flex-none" onClick={newBooking}>
@@ -421,6 +450,18 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
             );
           })}
         </div>
+        {isIntegrator && (
+          <label className="flex items-center gap-2">
+            <span className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[var(--ds-on-surface-variant)]`}>{t("provider")}</span>
+            <select value={String(shownProvider)} aria-label={t("providerFilter")}
+              onChange={(e) => chooseProvider(e.target.value === "all" ? "all" : Number(e.target.value))}
+              className="h-11 max-w-[240px] rounded-lg border border-[var(--ds-outline)] bg-[var(--ds-surface)] px-3 text-sm text-[var(--ds-on-surface)]">
+              <option value="all">{t("allProviders")}</option>
+              <option value={RAPHAEL_PROVIDER}>{t("providerRaphael")}</option>
+              {providerOptions.map((p) => <option key={p.providerId} value={p.providerId}>{p.name}</option>)}
+            </select>
+          </label>
+        )}
         {/* Find a trip among the loaded ones. Only in this browser: what is typed never leaves it. */}
         <div className="flex h-11 min-w-[240px] flex-1 items-center gap-[9px] rounded-lg border border-[var(--ds-outline)] bg-[var(--ds-surface)] px-3">
           <PhMagnifyingGlass size={17} aria-hidden className="text-[var(--ds-on-surface-variant)]" />
@@ -479,7 +520,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
           )}
           aside={<>
             <InProgressPanel line={inProgress} position={inProgress ? livePositions.get(inProgress.trip.id) ?? null : null} onTrack={(l) => { saveListState(); router.push(`/trips/${l.trip.id}`); }} />
-            <NeedsAttention lines={allLines} onPick={(l) => { setFilter(""); setHighlightId(l.trip.id); }} />
+            <NeedsAttention lines={providerLines} onPick={(l) => { setFilter(""); setHighlightId(l.trip.id); }} />
           </>} />))}
 
       {asking && (

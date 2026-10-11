@@ -58,8 +58,8 @@ export function useProviderDetail(id: number | null) {
 }
 
 /** The Providers a trip can be given to: contracted, active, with an account in Raphael. */
-export function useAssignableProviders() {
-  return useQuery({ queryKey: ["catalog", "assignable"], queryFn: () => api<AssignableProvider[]>(`${BASE}/providers/assignable`), staleTime: 5 * 60_000 });
+export function useAssignableProviders(enabled = true) {
+  return useQuery({ queryKey: ["catalog", "assignable"], queryFn: () => api<AssignableProvider[]>(`${BASE}/providers/assignable`), staleTime: 5 * 60_000, enabled });
 }
 
 /** Contract, remove and edit. Each one refreshes the list, the file and the assignable Providers. */
