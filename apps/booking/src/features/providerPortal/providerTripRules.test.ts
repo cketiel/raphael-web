@@ -1,25 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { providerCan, toTimeSpan } from "./providerTripRules";
+import { isExportable, providerCan, toTimeSpan } from "./providerTripRules";
 
-const trip = (over = {}) => ({ status: "Accepted", isCancelled: false, providerOutcome: null, date: "2026-10-11T00:00:00", ...over });
+const trip = (over = {}) => ({ status: "Assigned", isCancelled: false, date: "2026-10-11T00:00:00", ...over });
 
-describe("What an external Provider may report", () => {
-  it("rejects and reports a trip of today that has not started", () => {
-    expect(providerCan(trip(), "2026-10-11")).toEqual({ reject: true, report: true });
+describe("What an external Provider may do", () => {
+  it("accepts or rejects a trip given to it, and reports nothing before accepting it", () => {
+    expect(providerCan(trip(), "2026-10-11")).toEqual({ accept: true, reject: true, report: false });
   });
 
-  it("does not report a trip of a day still to come, but may reject it", () => {
-    expect(providerCan(trip({ date: "2026-10-12T00:00:00" }), "2026-10-11")).toEqual({ reject: true, report: false });
+  it("reports an accepted trip once its day has come, and may still reject it", () => {
+    expect(providerCan(trip({ status: "Accepted" }), "2026-10-11")).toEqual({ accept: false, reject: true, report: true });
+    expect(providerCan(trip({ status: "Accepted", date: "2026-10-12T00:00:00" }), "2026-10-11")).toEqual({ accept: false, reject: true, report: false });
   });
 
-  it("does nothing more once a result is in, or the trip is cancelled or finished", () => {
-    expect(providerCan(trip({ providerOutcome: "Rejected" }), "2026-10-11")).toEqual({ reject: false, report: false });
-    expect(providerCan(trip({ isCancelled: true }), "2026-10-11")).toEqual({ reject: false, report: false });
-    expect(providerCan(trip({ status: "Finished" }), "2026-10-11")).toEqual({ reject: false, report: false });
+  it("does nothing more with a rejected, cancelled or finished trip", () => {
+    for (const over of [{ status: "Rejected" }, { isCancelled: true }, { status: "Finished" }]) {
+      expect(providerCan(trip(over), "2026-10-11")).toEqual({ accept: false, reject: false, report: false });
+    }
   });
 
-  it("no longer rejects a trip under way, though it can still report it", () => {
-    expect(providerCan(trip({ status: "InProgress" }), "2026-10-11")).toEqual({ reject: false, report: true });
+  it("exports only what it committed to", () => {
+    expect(isExportable({ status: "Assigned" })).toBe(false);
+    expect(isExportable({ status: "Rejected" })).toBe(false);
+    expect(isExportable({ status: "Accepted" })).toBe(true);
+    expect(isExportable({ status: "Finished" })).toBe(true);
   });
 
   it("sends times as the backend reads them", () => {

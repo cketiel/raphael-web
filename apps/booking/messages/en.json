@@ -195,7 +195,7 @@
     "noProviderTrips": "No trips with {provider}",
     "noProviderTripsText": "There are {total, plural, one {# trip} other {# trips}} in these dates with other Providers.",
     "allProvidersShow": "Show all Providers",
-    "colClinic": "Clinic",
+    "colClinic": "Integrator",
     "completeTrip": "Complete trip",
     "noShowTrip": "Patient no-show",
     "rejectTrip": "Reject trip",
@@ -208,7 +208,13 @@
       "noShow": "Trip #{id} marked as a no-show.",
       "complete": "Trip #{id} completed."
     },
-    "attentionRejected": "Rejected by {provider}: {reason}. Give it to another Provider or to Raphael."
+    "attentionRejected": "Rejected by {provider}: {reason}. Give it to another Provider or to Raphael.",
+    "acceptTrip": "Accept trip",
+    "acceptSelected": "Accept selected",
+    "acceptedToast": "{count, plural, one {# trip accepted} other {# trips accepted}}.",
+    "exportNotAccepted": "No accepted trips to export. Accept them first.",
+    "mustReassign": "This trip was rejected by its provider: choose another provider or Raphael.",
+    "acceptedExternalOnlyCancel": "The provider accepted this trip and works it in its own system: it can only be cancelled."
   },
   "status": {
     "Assigned": "Assigned",
@@ -223,7 +229,8 @@
     "Canceled": "Canceled",
     "Cancelled": "Canceled",
     "Billed": "Billed",
-    "Payed": "Paid"
+    "Payed": "Paid",
+    "Rejected": "Rejected"
   },
   "trip": {
     "title": "Trip Registration",
@@ -295,7 +302,8 @@
     "addressConfirmed": "Address confirmed on the map",
     "addressPlaceholder": "Start typing an address or a place…",
     "mapHint": "Drag a pin to adjust the exact pickup or drop-off point.",
-    "attachmentHint": "Word or PDF, optional."
+    "attachmentHint": "Word or PDF, optional.",
+    "providerLocked": "Accepted by its provider, or already routed: the provider can no longer be changed."
   },
   "notifications": {
     "title": "Notifications",

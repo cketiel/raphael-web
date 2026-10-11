@@ -11742,6 +11742,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/BookingPortal/provider/trips/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": number[];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": number;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -15027,6 +15066,7 @@ export interface components {
             integratorName?: string | null;
             providerOutcome?: string | null;
             providerOutcomeReason?: string | null;
+            providerIsExternal?: boolean;
         };
         /**
          * What the Booking Portal's tracking view shows for one trip: where, when it is expected, and

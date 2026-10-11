@@ -195,7 +195,7 @@
     "noProviderTrips": "No hay viajes con {provider}",
     "noProviderTripsText": "En estas fechas hay {total, plural, one {# viaje} other {# viajes}} con otros Providers.",
     "allProvidersShow": "Ver todos los Providers",
-    "colClinic": "Clínica",
+    "colClinic": "Integrator",
     "completeTrip": "Completar viaje",
     "noShowTrip": "Paciente no se presentó",
     "rejectTrip": "Rechazar viaje",
@@ -208,7 +208,13 @@
       "noShow": "Viaje #{id} marcado como no-show.",
       "complete": "Viaje #{id} completado."
     },
-    "attentionRejected": "Rechazado por {provider}: {reason}. Dáselo a otro Provider o a Raphael."
+    "attentionRejected": "Rechazado por {provider}: {reason}. Dáselo a otro Provider o a Raphael.",
+    "acceptTrip": "Aceptar viaje",
+    "acceptSelected": "Aceptar seleccionados",
+    "acceptedToast": "{count, plural, one {# viaje aceptado} other {# viajes aceptados}}.",
+    "exportNotAccepted": "No hay viajes aceptados que exportar. Acéptalos primero.",
+    "mustReassign": "Este viaje lo rechazó su Provider: elige otro Provider o Raphael.",
+    "acceptedExternalOnlyCancel": "El Provider aceptó este viaje y lo trabaja en su propio sistema: solo se puede cancelar."
   },
   "status": {
     "Assigned": "Asignado",
@@ -223,7 +229,8 @@
     "Canceled": "Cancelado",
     "Cancelled": "Cancelado",
     "Billed": "Facturado",
-    "Payed": "Pagado"
+    "Payed": "Pagado",
+    "Rejected": "Rechazado"
   },
   "trip": {
     "title": "Registro de viaje",
@@ -295,7 +302,8 @@
     "addressConfirmed": "Dirección confirmada en el mapa",
     "addressPlaceholder": "Empieza a escribir una dirección o un lugar…",
     "mapHint": "Arrastra un pin para ajustar el punto exacto de recogida o entrega.",
-    "attachmentHint": "Word o PDF, opcional."
+    "attachmentHint": "Word o PDF, opcional.",
+    "providerLocked": "Ya aceptado por su Provider, o ruteado: el Provider ya no se puede cambiar."
   },
   "notifications": {
     "title": "Notificaciones",

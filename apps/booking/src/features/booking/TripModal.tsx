@@ -133,6 +133,7 @@ interface LegResult {
 export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose, onSaved }: TripModalProps) {
   const feedback = useFeedback();
   const t = useTranslations("trip");
+  const tDash = useTranslations("dashboard");
   const tc = useTranslations("common");
   const errorText = useErrorText();
   /** "N/A" is the form's own marker for "Google gave no town"; it is shown in the user's language. */
@@ -148,6 +149,10 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
   // Only a clinic chooses among its contracted Providers; a broker user does not get the list.
   const isClinic = funding?.kind === "integrator" || funding?.kind === "integrator-unlinked";
   const assignable = useAssignableProviders();
+  // The Provider of a trip is chosen while it is Assigned, and must be changed when it was Rejected.
+  // Once a Provider accepted it, or it was routed, it stays (PROVIDER_ACCESS_MODEL.md §3.7).
+  const rejected = trip?.status === "Rejected";
+  const providerChangeable = !trip || trip.status === "Assigned" || rejected;
   const providerOptions = [
     ...(assignable.data ?? []).map((p) => ({ id: String(p.providerId), name: p.name ?? "" })),
     // The office may have given the trip to a Provider this clinic has not contracted: it stays an option.
@@ -277,6 +282,11 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
     }
     if (funding?.kind === "broker" && !funding.all.some((f) => f.name === form.fundingSource)) {
       await feedback.alert(t("chooseFundingSource"));
+      return;
+    }
+    // A rejected trip must go to someone else (PROVIDER_ACCESS_MODEL.md §3.7); the backend checks it too.
+    if (rejected && providerId === (trip?.providerId != null ? String(trip.providerId) : "")) {
+      await feedback.alert(tDash("mustReassign"));
       return;
     }
 
@@ -443,8 +453,9 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
               </Field>
               {isClinic && (
                 <Field label={t("provider")} htmlFor="trip-provider" className="col-span-2 sm:col-span-4"
-                  hint={!assignable.isLoading && providerOptions.length === 0 ? t("providerNoneContracted") : undefined}>
-                  <Select id="trip-provider" value={providerId} onChange={(e) => setProviderId(e.target.value)}>
+                  hint={rejected ? tDash("mustReassign") : !providerChangeable ? t("providerLocked") : !assignable.isLoading && providerOptions.length === 0 ? t("providerNoneContracted") : undefined}>
+                  <Select id="trip-provider" value={providerId} onChange={(e) => setProviderId(e.target.value)} disabled={!providerChangeable}
+                    aria-invalid={rejected && providerId === (trip?.providerId != null ? String(trip.providerId) : "")}>
                     <option value="">{t("providerDefault")}</option>
                     {providerOptions.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                   </Select>

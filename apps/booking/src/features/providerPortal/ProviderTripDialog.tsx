@@ -12,7 +12,8 @@ import type { TripLine } from "@/features/booking/tripLines";
 import { providerTrips } from "./providerPortalApi";
 import { toTimeSpan } from "./providerTripRules";
 
-export type ProviderTripAction = "reject" | "noShow" | "complete";
+/** "accept" needs no dialog: it is one click, on one trip or on the ones selected. */
+export type ProviderTripAction = "accept" | "reject" | "noShow" | "complete";
 
 const ICON = { reject: IconClose, noShow: IconUser, complete: IconCheckCircle };
 
@@ -24,7 +25,7 @@ const ICON = { reject: IconClose, noShow: IconUser, complete: IconCheckCircle };
  * - Complete: the real pickup and drop-off times, which the production report bills with.
  */
 export function ProviderTripDialog({ action, line, onClose, onDone }: {
-  action: ProviderTripAction; line: TripLine; onClose: () => void; onDone: () => void;
+  action: Exclude<ProviderTripAction, "accept">; line: TripLine; onClose: () => void; onDone: () => void;
 }) {
   const t = useTranslations("providerPortal");
   const tc = useTranslations("common");

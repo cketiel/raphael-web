@@ -140,6 +140,7 @@
   --st-inprogress: #6d4ad6; --st-inprogress-bg: #efebfc; --st-inprogress-ink: #5839b8;
   --st-finished: #6b7280; --st-finished-bg: #f1f2f4; --st-finished-ink: #5a606b;
   --st-canceled: #c0392b; --st-canceled-bg: #fbeceb; --st-canceled-ink: #a8322a;
+  --st-rejected: #b8327a; --st-rejected-bg: #fbeaf3; --st-rejected-ink: #9a2763;
   --st-ring-alpha: 20%;
   --ds-color-scheme: light;
 }
@@ -195,6 +196,7 @@
     --st-inprogress: #a98cf7; --st-inprogress-bg: #211a3b; --st-inprogress-ink: #c6b4fa;
     --st-finished: #93a3ad; --st-finished-bg: #1b242a; --st-finished-ink: #b8c5cd;
     --st-canceled: #f27a6c; --st-canceled-bg: #331a18; --st-canceled-ink: #f7a89f;
+  --st-rejected: #ec7fb8; --st-rejected-bg: #33162a; --st-rejected-ink: #f5b3d6;
     --st-ring-alpha: 34%;
     --ds-color-scheme: dark;
   }
@@ -250,6 +252,7 @@
   --st-inprogress: #a98cf7; --st-inprogress-bg: #211a3b; --st-inprogress-ink: #c6b4fa;
   --st-finished: #93a3ad; --st-finished-bg: #1b242a; --st-finished-ink: #b8c5cd;
   --st-canceled: #f27a6c; --st-canceled-bg: #331a18; --st-canceled-ink: #f7a89f;
+  --st-rejected: #ec7fb8; --st-rejected-bg: #33162a; --st-rejected-ink: #f5b3d6;
   --st-ring-alpha: 34%;
   --ds-color-scheme: dark;
 }

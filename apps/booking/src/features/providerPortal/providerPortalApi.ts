@@ -55,6 +55,8 @@ export function useIntegratorEdit(id: number) {
 
 /** The three things this Provider reports about a trip of its own. The backend checks each one again. */
 export const providerTrips = {
+  /** Answers how many were accepted: the ones no longer Assigned are skipped. */
+  accept: (ids: number[]) => api<number>(`${BASE}/trips/accept`, { method: "POST", body: JSON.stringify(ids) }),
   reject: (id: number, reason: string) => api(`${BASE}/trips/${id}/reject`, { method: "POST", body: JSON.stringify({ reason }) }),
   noShow: (id: number, reason: string) => api(`${BASE}/trips/${id}/no-show`, { method: "POST", body: JSON.stringify({ reason }) }),
   complete: (id: number, body: TripCompletion) => api(`${BASE}/trips/${id}/complete`, { method: "POST", body: JSON.stringify(body) }),

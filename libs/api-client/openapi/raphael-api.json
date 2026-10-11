@@ -13219,6 +13219,39 @@
           }
         }
       }
+    },
+    "/api/BookingPortal/provider/trips/accept": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -21323,6 +21356,9 @@
           "providerOutcomeReason": {
             "type": "string",
             "nullable": true
+          },
+          "providerIsExternal": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

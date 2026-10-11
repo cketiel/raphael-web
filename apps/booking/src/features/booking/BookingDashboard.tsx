@@ -20,7 +20,8 @@ import { byDayAndTime, toLine, type TripLine } from "./tripLines";
 import { buildTripsCsv, downloadTripsCsv, tripsCsvFileName } from "./tripsCsv";
 import { byIntegrator, byProvider, RAPHAEL_PROVIDER, tripMatches, type ProviderFilter } from "./tripFilter";
 import { ProviderTripDialog, type ProviderTripAction } from "@/features/providerPortal/ProviderTripDialog";
-import { useMyClinics } from "@/features/providerPortal/providerPortalApi";
+import { providerTrips as providerTripApi, useMyClinics } from "@/features/providerPortal/providerPortalApi";
+import { isExportable, providerCan } from "@/features/providerPortal/providerTripRules";
 import { tripsCache, type LoadedTrips } from "./tripsCache";
 import { LiveEtaTicker } from "@/features/tracking/LiveEtaTicker";
 import { useLiveTrips } from "@/features/tracking/useLiveTrips";
@@ -297,6 +298,8 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
   // Everything on the screen follows the filter: list, counters, side panels and both exports.
   const providerTrips = byParty(loaded?.trips ?? []);
   const providerReport = byParty(loaded?.report ?? []);
+  // An external Provider exports only the trips it accepted, or later: never one it has not committed to.
+  const exportableTrips = isProvider ? providerTrips.filter(isExportable) : providerTrips;
 
   const allLines = (loaded?.trips ?? []).map(toLine).sort(byDayAndTime);
   const shownIds = new Set(providerTrips.map((x) => x.id));
@@ -320,14 +323,15 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [highlightId, loaded, view]);
 
-  const selectable = lines.filter((l) => !l.canceled);
+  // A clinic selects to cancel; an external Provider selects to accept, so only what it can accept.
+  const selectable = isProvider ? lines.filter((l) => providerCan(l.trip, localToday()).accept) : lines.filter((l) => !l.canceled);
   const allChecked = selectable.length > 0 && selectable.every((l) => selected.has(l.trip.tripId ?? ""));
   const summary = loaded ? summarize(providerTrips, providerReport) : null;
 
   const actions: TripActions = {
     selected,
     readOnly: isProvider,
-    report: isProvider ? (l, action) => setReporting({ line: l, action }) : undefined,
+    report: isProvider ? (l, action) => (action === "accept" ? void accept([l]) : setReporting({ line: l, action })) : undefined,
     today: localToday(),
     live: livePositions,
     highlightId,
@@ -373,10 +377,22 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
    * The trips of the range loaded, of the chosen Provider whatever the search box says, as a SafeRide2
    * file the Desktop can import (tripsCsv.ts). Built in this browser: the patients' data goes nowhere else.
    */
+  /** An external Provider commits to these trips: Assigned to Accepted. The list comes again, once. */
+  async function accept(toAccept: TripLine[]) {
+    try {
+      const count = await providerTripApi.accept(toAccept.map((l) => l.trip.id));
+      setToast({ tone: "success", text: t("acceptedToast", { count }) });
+      setSelected(new Set());
+      await loadTrips(start, end, true);
+    } catch (e) {
+      setToast({ tone: "error", text: errorText(e, t("cancelUnavailable")) });
+    }
+  }
+
   function exportTrips() {
     if (!loaded) return;
     const patients = new Map((customers.data ?? []).map((c) => [c.id ?? -1, { riderId: c.riderId, dob: c.dob }]));
-    downloadTripsCsv(buildTripsCsv(providerTrips, patients, organization.data?.name ?? ""), tripsCsvFileName(loaded.start, loaded.end));
+    downloadTripsCsv(buildTripsCsv(exportableTrips, patients, organization.data?.name ?? ""), tripsCsvFileName(loaded.start, loaded.end));
   }
 
   const newBooking = () => {
@@ -431,7 +447,8 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
             items={[
               {
                 key: "trips", label: t("exportTrips"), icon: PhRows,
-                disabled: providerTrips.length === 0, hint: providerTrips.length === 0 ? t("exportTripsNothing") : undefined,
+                disabled: exportableTrips.length === 0,
+                hint: exportableTrips.length > 0 ? undefined : isProvider && providerTrips.length > 0 ? t("exportNotAccepted") : t("exportTripsNothing"),
                 onSelect: exportTrips,
               },
               {
@@ -521,14 +538,22 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
             <Stat label={t("bandCanceled")} value={summary.canceledTrips} tone="text-[var(--ds-error)]" />
             <Stat label={t("bandBilledValue")} value={summary.totalBilledValue} tone="text-[var(--ds-money)]" />
           </div>
-          {!isProvider && <div className="ml-auto flex items-center gap-2.5">
+          <div className="ml-auto flex items-center gap-2.5">
             <span className={`${MONO} text-[12.5px] uppercase`}>{t("selectedShort", { count: selected.size })}</span>
-            <button type="button" disabled={selected.size === 0}
-              onClick={() => setAsking(allLines.filter((l) => selected.has(l.trip.tripId ?? "")))}
-              className="h-11 rounded-lg border border-[var(--ds-error)] px-[15px] text-[13.5px] font-semibold text-[var(--ds-error)] disabled:opacity-40">
-              {t("cancelSelectedShort")}
-            </button>
-          </div>}
+            {isProvider ? (
+              <button type="button" disabled={selected.size === 0}
+                onClick={() => void accept(allLines.filter((l) => selected.has(l.trip.tripId ?? "")))}
+                className="h-11 rounded-lg border border-[var(--ds-primary)] px-[15px] text-[13.5px] font-semibold text-[var(--ds-primary)] disabled:opacity-40">
+                {t("acceptSelected")}
+              </button>
+            ) : (
+              <button type="button" disabled={selected.size === 0}
+                onClick={() => setAsking(allLines.filter((l) => selected.has(l.trip.tripId ?? "")))}
+                className="h-11 rounded-lg border border-[var(--ds-error)] px-[15px] text-[13.5px] font-semibold text-[var(--ds-error)] disabled:opacity-40">
+                {t("cancelSelectedShort")}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -552,7 +577,7 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
       )}
       {toast && <ToastBar toast={toast} onClose={() => setToast(null)} />}
       {reporting && (
-        <ProviderTripDialog action={reporting.action} line={reporting.line} onClose={() => setReporting(null)}
+        <ProviderTripDialog action={reporting.action as Exclude<ProviderTripAction, "accept">} line={reporting.line} onClose={() => setReporting(null)}
           onDone={() => {
             setToast({ tone: "success", text: t(`reported.${reporting.action}`, { id: reporting.line.number }) });
             setReporting(null);

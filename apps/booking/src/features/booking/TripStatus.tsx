@@ -2,9 +2,12 @@
 
 import { useTranslations } from "next-intl";
 
-/** The nine status families of the final design (Design System §2). Each has a --st-<key> colour set. */
+/**
+ * The status families of the final design (Design System §2), plus Rejected (2026-10-11): a trip its
+ * Provider turned down, which the clinic must give to someone else. Each has a --st-<key> colour set.
+ */
 export type StatusKey =
-  | "scheduled" | "assigned" | "accepted" | "waiting" | "late" | "arrived" | "inprogress" | "finished" | "canceled";
+  | "scheduled" | "assigned" | "accepted" | "waiting" | "late" | "arrived" | "inprogress" | "finished" | "canceled" | "rejected";
 
 /**
  * The backend's status, folded into a design family. Statuses the design does not draw take the
@@ -15,6 +18,7 @@ export function statusKey(status: string | null | undefined, isCancelled?: boole
   switch ((status ?? "").toLowerCase()) {
     case "assigned": return "assigned";
     case "accepted": return "accepted";
+    case "rejected": return "rejected";
     case "waiting": return "waiting";
     case "late": return "late";
     case "arrived": return "arrived";
