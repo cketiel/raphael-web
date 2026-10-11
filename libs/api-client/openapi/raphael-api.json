@@ -3007,6 +3007,525 @@
         }
       }
     },
+    "/api/BookingPortal/provider/clinics": {
+      "get": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "summary": "The clinics that contracted the caller's Provider: the Trips list's Integrator filter.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderClinicDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderClinicDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderClinicDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/accept": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "summary": "Accepts these Assigned trips of the caller's Provider. Answers how many were accepted.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/{id}/reject": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripRejectDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripRejectDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripRejectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/{id}/complete": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripCompleteDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripCompleteDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripCompleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/{id}/no-show": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripNoShowDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripNoShowDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripNoShowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/catalog/integrators/search": {
+      "get": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "Term",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "GroupId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "nullable": true
+            }
+          },
+          {
+            "name": "Mine",
+            "in": "query",
+            "description": "Only the clinics that contracted the caller's Provider.",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorPageDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorPageDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorPageDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/catalog/integrators/{id}": {
+      "get": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "description": "A name and zip that belong to another catalog entry answer 409 (global handler).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderPortalIntegratorEditDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderPortalIntegratorEditDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderPortalIntegratorEditDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Bot/activate-willcall": {
       "post": {
         "tags": [
@@ -12978,280 +13497,6 @@
           }
         }
       }
-    },
-    "/api/BookingPortal/provider/clinics": {
-      "get": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ProviderClinicDto"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/trips/{id}/reject": {
-      "post": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProviderTripRejectDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/trips/{id}/complete": {
-      "post": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProviderTripCompleteDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/trips/{id}/no-show": {
-      "post": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProviderTripNoShowDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/catalog/integrators/search": {
-      "get": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "Term",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "GroupId",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "Mine",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderPortalIntegratorPageDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/catalog/integrators/{id}": {
-      "get": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProviderPortalIntegratorEditDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/BookingPortal/provider/trips/accept": {
-      "post": {
-        "tags": [
-          "BookingPortalProvider"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -18860,6 +19105,7 @@
           },
           "integratorId": {
             "type": "integer",
+            "description": "The clinic that booked the trip; null for the office's own. An external Provider filters by it.",
             "format": "int32",
             "nullable": true
           },
@@ -19103,6 +19349,21 @@
         },
         "additionalProperties": false
       },
+      "ProviderClinicDto": {
+        "type": "object",
+        "properties": {
+          "integratorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A clinic that contracted the caller's Provider: what the Integrator filter lists."
+      },
       "ProviderDto": {
         "required": [
           "name"
@@ -19190,6 +19451,293 @@
           }
         },
         "additionalProperties": false
+      },
+      "ProviderOutcome": {
+        "enum": [
+          1,
+          2,
+          3
+        ],
+        "type": "integer",
+        "description": "What a Provider that works outside Raphael reported about a trip given to it\r\n(PROVIDER_ACCESS_MODEL.md §3.5). Not a Raphael.Shared.Entities.TripStatus: that one is shared with the\r\nDesktop, the Driver, the Rider and the integration API, and a rejection does not move it.",
+        "format": "int32",
+        "nullable": true
+      },
+      "ProviderPortalIntegratorDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupNameEs": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isMyClinic": {
+            "type": "boolean",
+            "description": "This clinic contracted the caller's Provider."
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "facilityType": {
+            "type": "string",
+            "nullable": true
+          },
+          "beds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "chainName": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderPortalIntegratorEditDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The contact details an external Provider may correct on any Integrator of the catalog."
+      },
+      "ProviderPortalIntegratorPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProviderPortalIntegratorRowDto"
+            },
+            "nullable": true
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mineCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogFacetValueDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderPortalIntegratorRowDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
+            "type": "string",
+            "nullable": true
+          },
+          "groupNameEs": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isMyClinic": {
+            "type": "boolean",
+            "description": "This clinic contracted the caller's Provider."
+          }
+        },
+        "additionalProperties": false,
+        "description": "One Integrator of the catalog, as an external Provider sees it."
+      },
+      "ProviderTripCompleteDto": {
+        "type": "object",
+        "properties": {
+          "pickupArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "pickedUpAt": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "dropoffArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "droppedOffAt": {
+            "type": "string",
+            "format": "date-span"
+          }
+        },
+        "additionalProperties": false,
+        "description": "The trip was done. Picked up and dropped off are required: they are what the production\r\nreport prints and what the trip is billed with. Wall-clock times of the trip's own day."
+      },
+      "ProviderTripNoShowDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The patient was not there."
+      },
+      "ProviderTripRejectDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The Provider will not do this trip. The reason is required: the clinic reads it."
       },
       "ProviderWorkMode": {
         "title": "How a Provider carries out the trips given to it (PROVIDER_ACCESS_MODEL.md §3.2).",
@@ -20545,6 +21093,46 @@
           },
           "provider": {
             "$ref": "#/components/schemas/Provider"
+          },
+          "providerOutcome": {
+            "$ref": "#/components/schemas/ProviderOutcome"
+          },
+          "providerOutcomeReason": {
+            "maxLength": 500,
+            "type": "string",
+            "description": "Why it was rejected, or the no-show's note.",
+            "nullable": true
+          },
+          "providerOutcomeAtUtc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "providerOutcomeByUserId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "providerPickupArrivedAt": {
+            "type": "string",
+            "description": "Wall-clock times of the trip's day, as the Provider reported them (TIME_POLICY).",
+            "format": "date-span",
+            "nullable": true
+          },
+          "providerPickedUpAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "providerDropoffArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "providerDroppedOffAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
           }
         },
         "additionalProperties": false,
@@ -21342,6 +21930,7 @@
           },
           "integratorId": {
             "type": "integer",
+            "description": "The clinic that booked it: an external Provider's list mixes several.",
             "format": "int32",
             "nullable": true
           },
@@ -21351,6 +21940,7 @@
           },
           "providerOutcome": {
             "type": "string",
+            "description": "\"Rejected\", \"Completed\" or \"NoShow\" from an external Provider; null otherwise.",
             "nullable": true
           },
           "providerOutcomeReason": {
@@ -21358,7 +21948,8 @@
             "nullable": true
           },
           "providerIsExternal": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Its Provider works outside Raphael: once it accepts, the clinic can only cancel."
           }
         },
         "additionalProperties": false
@@ -21501,6 +22092,7 @@
           },
           "providerOutcome": {
             "type": "string",
+            "description": "\"Rejected\", \"Completed\" or \"NoShow\" from an external Provider; null otherwise.",
             "nullable": true
           },
           "providerOutcomeReason": {
@@ -22571,277 +23163,6 @@
         },
         "additionalProperties": false,
         "description": "Only the time travels, because it is the only thing the dispatcher gets to decide:\r\nthe flag itself, the status and the history row are the server's business.\r\n            \r\n<br>\r\n⚠️ Wall-clock time where the trip is operated, not the hour of the machine that sent\r\nit. Null means \"let the server use the operation's own clock\" — for an activation,\r\nnow where the trip runs; for the reverse, the 23:59 the office reads as waiting on\r\nthe patient. See `_meta/TIME_POLICY.md` §2B.\r\n"
-      },
-      "ProviderClinicDto": {
-        "type": "object",
-        "properties": {
-          "integratorId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderTripRejectDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderTripNoShowDto": {
-        "type": "object",
-        "properties": {
-          "reason": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderTripCompleteDto": {
-        "type": "object",
-        "properties": {
-          "pickupArrivedAt": {
-            "type": "string",
-            "format": "date-span",
-            "nullable": true
-          },
-          "pickedUpAt": {
-            "type": "string",
-            "format": "date-span"
-          },
-          "dropoffArrivedAt": {
-            "type": "string",
-            "format": "date-span",
-            "nullable": true
-          },
-          "droppedOffAt": {
-            "type": "string",
-            "format": "date-span"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderPortalIntegratorRowDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "groupId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "groupNameEn": {
-            "type": "string"
-          },
-          "groupNameEs": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "county": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "website": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "isMyClinic": {
-            "type": "boolean"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderPortalIntegratorDetailDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "name": {
-            "type": "string"
-          },
-          "groupId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "groupNameEn": {
-            "type": "string"
-          },
-          "groupNameEs": {
-            "type": "string"
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "county": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "website": {
-            "type": "string",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "isMyClinic": {
-            "type": "boolean"
-          },
-          "address": {
-            "type": "string",
-            "nullable": true
-          },
-          "zip": {
-            "type": "string",
-            "nullable": true
-          },
-          "contactName": {
-            "type": "string",
-            "nullable": true
-          },
-          "facilityType": {
-            "type": "string",
-            "nullable": true
-          },
-          "beds": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "chainName": {
-            "type": "string",
-            "nullable": true
-          },
-          "latitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "longitude": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderPortalIntegratorPageDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ProviderPortalIntegratorRowDto"
-            }
-          },
-          "totalCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageNumber": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "mineCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CatalogFacetValueDto"
-            }
-          }
-        },
-        "additionalProperties": false
-      },
-      "ProviderPortalIntegratorEditDto": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "address": {
-            "type": "string",
-            "nullable": true
-          },
-          "city": {
-            "type": "string",
-            "nullable": true
-          },
-          "state": {
-            "type": "string",
-            "nullable": true
-          },
-          "zip": {
-            "type": "string",
-            "nullable": true
-          },
-          "phone": {
-            "type": "string",
-            "nullable": true
-          },
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
-          "website": {
-            "type": "string",
-            "nullable": true
-          },
-          "contactName": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
       }
     },
     "securitySchemes": {

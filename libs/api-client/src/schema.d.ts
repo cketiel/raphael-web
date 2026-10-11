@@ -2021,6 +2021,390 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/BookingPortal/provider/clinics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The clinics that contracted the caller's Provider: the Trips list's Integrator filter. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderClinicDto"][];
+                        "application/json": components["schemas"]["ProviderClinicDto"][];
+                        "text/json": components["schemas"]["ProviderClinicDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/trips/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accepts these Assigned trips of the caller's Provider. Answers how many were accepted. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": number[];
+                    "text/json": number[];
+                    "application/*+json": number[];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": number;
+                        "application/json": number;
+                        "text/json": number;
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/trips/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProviderTripRejectDto"];
+                    "text/json": components["schemas"]["ProviderTripRejectDto"];
+                    "application/*+json": components["schemas"]["ProviderTripRejectDto"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/trips/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProviderTripCompleteDto"];
+                    "text/json": components["schemas"]["ProviderTripCompleteDto"];
+                    "application/*+json": components["schemas"]["ProviderTripCompleteDto"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/trips/{id}/no-show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProviderTripNoShowDto"];
+                    "text/json": components["schemas"]["ProviderTripNoShowDto"];
+                    "application/*+json": components["schemas"]["ProviderTripNoShowDto"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/catalog/integrators/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    Term?: string;
+                    GroupId?: number | null;
+                    /** @description Only the clinics that contracted the caller's Provider. */
+                    Mine?: boolean | null;
+                    PageNumber?: number;
+                    PageSize?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderPortalIntegratorPageDto"];
+                        "application/json": components["schemas"]["ProviderPortalIntegratorPageDto"];
+                        "text/json": components["schemas"]["ProviderPortalIntegratorPageDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/provider/catalog/integrators/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                        "application/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                        "text/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** @description A name and zip that belong to another catalog entry answer 409 (global handler). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProviderPortalIntegratorEditDto"];
+                    "text/json": components["schemas"]["ProviderPortalIntegratorEditDto"];
+                    "application/*+json": components["schemas"]["ProviderPortalIntegratorEditDto"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                        "application/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                        "text/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Bot/activate-willcall": {
         parameters: {
             query?: never;
@@ -11487,300 +11871,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/BookingPortal/provider/clinics": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProviderClinicDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/trips/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProviderTripRejectDto"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/trips/{id}/complete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProviderTripCompleteDto"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/trips/{id}/no-show": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProviderTripNoShowDto"];
-                };
-            };
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/catalog/integrators/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Term?: string;
-                    GroupId?: number;
-                    Mine?: boolean;
-                    PageNumber?: number;
-                    PageSize?: number;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProviderPortalIntegratorPageDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/catalog/integrators/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["ProviderPortalIntegratorEditDto"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ProviderPortalIntegratorDetailDto"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/BookingPortal/provider/trips/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": number[];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": number;
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -14014,7 +14104,10 @@ export interface components {
             providerId?: number | null;
             /** @description The Provider's name; null when Raphael carries out the trip. */
             provider?: string | null;
-            /** Format: int32 */
+            /**
+             * Format: int32
+             * @description The clinic that booked the trip; null for the office's own. An external Provider filters by it.
+             */
             integratorId?: number | null;
             /** Format: double */
             distance?: number | null;
@@ -14102,6 +14195,12 @@ export interface components {
             ownerProviderId?: number | null;
             workMode?: components["schemas"]["ProviderWorkMode"];
         };
+        /** @description A clinic that contracted the caller's Provider: what the Integrator filter lists. */
+        ProviderClinicDto: {
+            /** Format: int32 */
+            integratorId?: number;
+            name?: string | null;
+        };
         ProviderDto: {
             /** Format: int32 */
             id?: number;
@@ -14135,6 +14234,108 @@ export interface components {
              */
             ownerProviderId?: number | null;
             ownerProviderName?: string | null;
+        };
+        /**
+         * Format: int32
+         * @description What a Provider that works outside Raphael reported about a trip given to it
+         *     (PROVIDER_ACCESS_MODEL.md §3.5). Not a Raphael.Shared.Entities.TripStatus: that one is shared with the
+         *     Desktop, the Driver, the Rider and the integration API, and a rejection does not move it.
+         * @enum {integer|null}
+         */
+        ProviderOutcome: 1 | 2 | 3 | null;
+        ProviderPortalIntegratorDetailDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            groupId?: number;
+            groupNameEn?: string | null;
+            groupNameEs?: string | null;
+            city?: string | null;
+            county?: string | null;
+            state?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            isActive?: boolean;
+            /** @description This clinic contracted the caller's Provider. */
+            isMyClinic?: boolean;
+            address?: string | null;
+            zip?: string | null;
+            contactName?: string | null;
+            facilityType?: string | null;
+            /** Format: int32 */
+            beds?: number | null;
+            chainName?: string | null;
+            /** Format: double */
+            latitude?: number | null;
+            /** Format: double */
+            longitude?: number | null;
+        };
+        /** @description The contact details an external Provider may correct on any Integrator of the catalog. */
+        ProviderPortalIntegratorEditDto: {
+            name?: string | null;
+            address?: string | null;
+            city?: string | null;
+            state?: string | null;
+            zip?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            contactName?: string | null;
+        };
+        ProviderPortalIntegratorPageDto: {
+            items?: components["schemas"]["ProviderPortalIntegratorRowDto"][] | null;
+            /** Format: int32 */
+            totalCount?: number;
+            /** Format: int32 */
+            pageNumber?: number;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int32 */
+            mineCount?: number;
+            groups?: components["schemas"]["CatalogFacetValueDto"][] | null;
+        };
+        /** @description One Integrator of the catalog, as an external Provider sees it. */
+        ProviderPortalIntegratorRowDto: {
+            /** Format: int32 */
+            id?: number;
+            name?: string | null;
+            /** Format: int32 */
+            groupId?: number;
+            groupNameEn?: string | null;
+            groupNameEs?: string | null;
+            city?: string | null;
+            county?: string | null;
+            state?: string | null;
+            phone?: string | null;
+            email?: string | null;
+            website?: string | null;
+            isActive?: boolean;
+            /** @description This clinic contracted the caller's Provider. */
+            isMyClinic?: boolean;
+        };
+        /**
+         * @description The trip was done. Picked up and dropped off are required: they are what the production
+         *     report prints and what the trip is billed with. Wall-clock times of the trip's own day.
+         */
+        ProviderTripCompleteDto: {
+            /** Format: date-span */
+            pickupArrivedAt?: string | null;
+            /** Format: date-span */
+            pickedUpAt?: string;
+            /** Format: date-span */
+            dropoffArrivedAt?: string | null;
+            /** Format: date-span */
+            droppedOffAt?: string;
+        };
+        /** @description The patient was not there. */
+        ProviderTripNoShowDto: {
+            reason?: string | null;
+        };
+        /** @description The Provider will not do this trip. The reason is required: the clinic reads it. */
+        ProviderTripRejectDto: {
+            reason?: string | null;
         };
         /**
          * How a Provider carries out the trips given to it (PROVIDER_ACCESS_MODEL.md §3.2).
@@ -14739,6 +14940,24 @@ export interface components {
              */
             providerId?: number | null;
             provider?: components["schemas"]["Provider"];
+            providerOutcome?: components["schemas"]["ProviderOutcome"];
+            /** @description Why it was rejected, or the no-show's note. */
+            providerOutcomeReason?: string | null;
+            /** Format: date-time */
+            providerOutcomeAtUtc?: string | null;
+            /** Format: int32 */
+            providerOutcomeByUserId?: number | null;
+            /**
+             * Format: date-span
+             * @description Wall-clock times of the trip's day, as the Provider reported them (TIME_POLICY).
+             */
+            providerPickupArrivedAt?: string | null;
+            /** Format: date-span */
+            providerPickedUpAt?: string | null;
+            /** Format: date-span */
+            providerDropoffArrivedAt?: string | null;
+            /** Format: date-span */
+            providerDroppedOffAt?: string | null;
         };
         TripCreateDto: {
             day: string;
@@ -15061,11 +15280,16 @@ export interface components {
              */
             providerId?: number | null;
             providerName?: string | null;
-            /** Format: int32 */
+            /**
+             * Format: int32
+             * @description The clinic that booked it: an external Provider's list mixes several.
+             */
             integratorId?: number | null;
             integratorName?: string | null;
+            /** @description "Rejected", "Completed" or "NoShow" from an external Provider; null otherwise. */
             providerOutcome?: string | null;
             providerOutcomeReason?: string | null;
+            /** @description Its Provider works outside Raphael: once it accepts, the clinic can only cancel. */
             providerIsExternal?: boolean;
         };
         /**
@@ -15144,6 +15368,7 @@ export interface components {
             providerName?: string | null;
             /** @description The kind of vehicle on the route ("Wheelchair", "Stretcher"), or null before routing. */
             vehicleType?: string | null;
+            /** @description "Rejected", "Completed" or "NoShow" from an external Provider; null otherwise. */
             providerOutcome?: string | null;
             providerOutcomeReason?: string | null;
         };
@@ -15491,95 +15716,6 @@ export interface components {
         WillCallUpdateDto: {
             /** Format: date-span */
             fromTime?: string | null;
-        };
-        ProviderClinicDto: {
-            /** Format: int32 */
-            integratorId?: number;
-            name?: string;
-        };
-        ProviderTripRejectDto: {
-            reason?: string;
-        };
-        ProviderTripNoShowDto: {
-            reason?: string;
-        };
-        ProviderTripCompleteDto: {
-            /** Format: date-span */
-            pickupArrivedAt?: string | null;
-            /** Format: date-span */
-            pickedUpAt?: string;
-            /** Format: date-span */
-            dropoffArrivedAt?: string | null;
-            /** Format: date-span */
-            droppedOffAt?: string;
-        };
-        ProviderPortalIntegratorRowDto: {
-            /** Format: int32 */
-            id?: number;
-            name?: string;
-            /** Format: int32 */
-            groupId?: number;
-            groupNameEn?: string;
-            groupNameEs?: string;
-            city?: string | null;
-            county?: string | null;
-            state?: string | null;
-            phone?: string | null;
-            email?: string | null;
-            website?: string | null;
-            isActive?: boolean;
-            isMyClinic?: boolean;
-        };
-        ProviderPortalIntegratorDetailDto: {
-            /** Format: int32 */
-            id?: number;
-            name?: string;
-            /** Format: int32 */
-            groupId?: number;
-            groupNameEn?: string;
-            groupNameEs?: string;
-            city?: string | null;
-            county?: string | null;
-            state?: string | null;
-            phone?: string | null;
-            email?: string | null;
-            website?: string | null;
-            isActive?: boolean;
-            isMyClinic?: boolean;
-            address?: string | null;
-            zip?: string | null;
-            contactName?: string | null;
-            facilityType?: string | null;
-            /** Format: int32 */
-            beds?: number | null;
-            chainName?: string | null;
-            /** Format: double */
-            latitude?: number | null;
-            /** Format: double */
-            longitude?: number | null;
-        };
-        ProviderPortalIntegratorPageDto: {
-            items?: components["schemas"]["ProviderPortalIntegratorRowDto"][];
-            /** Format: int32 */
-            totalCount?: number;
-            /** Format: int32 */
-            pageNumber?: number;
-            /** Format: int32 */
-            pageSize?: number;
-            /** Format: int32 */
-            mineCount?: number;
-            groups?: components["schemas"]["CatalogFacetValueDto"][];
-        };
-        ProviderPortalIntegratorEditDto: {
-            name?: string;
-            address?: string | null;
-            city?: string | null;
-            state?: string | null;
-            zip?: string | null;
-            phone?: string | null;
-            email?: string | null;
-            website?: string | null;
-            contactName?: string | null;
         };
     };
     responses: never;
