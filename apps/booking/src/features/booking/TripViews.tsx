@@ -4,12 +4,14 @@ import type { Schemas } from "@raphael/api-client";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore, type PointerEvent, type ReactNode } from "react";
 import {
-  PhCalendarX, PhCircleNotch, PhClockCountdown, PhCrosshair, PhDotsThree, PhPencilSimple, PhWifiSlash, PhX,
+  PhCalendarX, PhCheck, PhCircleNotch, PhClockCountdown, PhCrosshair, PhDotsThree, PhHandPalm, PhPencilSimple, PhUserMinus, PhWifiSlash, PhX,
 } from "@/components/ui/Icon";
 import { Menu } from "@/components/ui/Menu";
 import { api } from "@/lib/bff";
 import { useRealtime, type TripVehiclePosition } from "@/features/realtime/RealtimeProvider";
 import { LiveEtaTicker } from "@/features/tracking/LiveEtaTicker";
+import type { ProviderTripAction } from "@/features/providerPortal/ProviderTripDialog";
+import { providerCan } from "@/features/providerPortal/providerTripRules";
 import type { TripLine } from "./tripLines";
 import { StatusChip, statusEdge, statusRing } from "./TripStatus";
 
@@ -36,8 +38,14 @@ export interface TripActions {
   track: (line: TripLine) => void;
   edit: (line: TripLine) => void;
   cancel: (line: TripLine) => void;
-  /** An external Provider's user: it follows the trips, it never edits, cancels or selects them. */
+  /**
+   * An external Provider's user: it never edits, cancels or selects a trip. Instead it reports one
+   * of three results through `report` (reject, no-show, complete), on the days `today` allows.
+   */
   readOnly?: boolean;
+  report?: (line: TripLine, action: ProviderTripAction) => void;
+  /** "YYYY-MM-DD" in the reader's calendar: a trip of a later day cannot be completed yet. */
+  today?: string;
   rowRef: (layout: string, id: number) => (el: HTMLElement | null) => void;
 }
 
@@ -129,6 +137,14 @@ function Actions({ line, a, vertical, small }: { line: TripLine; a: TripActions;
         <IconButton small={small} label={t("editTrip")} disabled={off} onClick={() => a.edit(line)}><PhPencilSimple size={18} className="text-[var(--ds-on-surface-variant)]" aria-hidden /></IconButton>
         <IconButton small={small} label={t("cancelTrip")} disabled={off} onClick={() => a.cancel(line)}><PhX size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
       </>}
+      {a.readOnly && a.report && (() => {
+        const can = providerCan(line.trip, a.today ?? "");
+        return <>
+          <IconButton small={small} label={t("completeTrip")} disabled={!can.report} onClick={() => a.report!(line, "complete")}><PhCheck size={18} className="text-[var(--ds-success)]" aria-hidden /></IconButton>
+          <IconButton small={small} label={t("noShowTrip")} disabled={!can.report} onClick={() => a.report!(line, "noShow")}><PhUserMinus size={18} className="text-[var(--ds-late-mark)]" aria-hidden /></IconButton>
+          <IconButton small={small} label={t("rejectTrip")} disabled={!can.reject} onClick={() => a.report!(line, "reject")}><PhHandPalm size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
+        </>;
+      })()}
     </div>
   );
 }
@@ -142,6 +158,21 @@ function PhoneActions({ line, a }: { line: TripLine; a: TripActions }) {
         className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-[var(--ds-outline)] text-[13.5px] font-semibold text-[var(--ds-primary)] disabled:opacity-45">
         <PhCrosshair size={18} aria-hidden />{t("track")}
       </button>
+      {a.readOnly && a.report && (() => {
+        const can = providerCan(line.trip, a.today ?? "");
+        const items = [
+          ...(can.report ? [
+            { key: "complete", label: t("completeTrip"), icon: PhCheck, onSelect: () => a.report!(line, "complete") },
+            { key: "noShow", label: t("noShowTrip"), icon: PhUserMinus, onSelect: () => a.report!(line, "noShow") },
+          ] : []),
+          ...(can.reject ? [{ key: "reject", label: t("rejectTrip"), icon: PhHandPalm, danger: true, onSelect: () => a.report!(line, "reject") }] : []),
+        ];
+        return items.length > 0 && (
+          <Menu look="ds" width={220} label={t("more")}
+            buttonClassName="flex size-11 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] text-[var(--ds-on-surface-variant)]"
+            trigger={<PhDotsThree size={18} aria-hidden />} items={items} />
+        );
+      })()}
       {!line.canceled && !a.readOnly && (
         <Menu look="ds" width={200} label={t("more")}
           buttonClassName="flex size-11 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] text-[var(--ds-on-surface-variant)]"
@@ -191,7 +222,7 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
       <div className={`sticky top-0 z-10 hidden h-[38px] shrink-0 items-center border-b-[1.5px] border-[var(--ds-rule)] bg-[var(--ds-surface)] px-[26px] lg:grid ${multiDay ? GRID_DAYS : GRID} ${head}`}>
         <div><Checkbox checked={allChecked} label={t("selectAll")} onChange={onToggleAll} disabled={lines.length === 0 || a.readOnly} /></div>
         {multiDay && <div>{t("colDate")}</div>}
-        <div>{t("colTime")}</div><div>{t("colPatient")}</div><div>{t("colRoute")}</div><div>{t("colStatus")}</div><div>{t("colProvider")}</div>
+        <div>{t("colTime")}</div><div>{t("colPatient")}</div><div>{t("colRoute")}</div><div>{t("colStatus")}</div><div>{a.readOnly ? t("colClinic") : t("colProvider")}</div>
         <div className="text-right">{t("colActions")}</div>
       </div>
       <div>
@@ -216,9 +247,10 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
                 <div className="min-w-0 pr-4"><Route line={line} /></div>
                 <div className="flex min-w-0 flex-col items-start gap-0.5">
                   <StatusChip status={line.trip.status} isCancelled={line.canceled} dense />
+                  <RejectedChip line={line} dense />
                   {a.live.has(line.trip.id) && <LiveEtaTicker trip={line.trip} position={a.live.get(line.trip.id) ?? null} size="inline" dense />}
                 </div>
-                <div className="line-clamp-2 pr-3 text-[13px] leading-[1.35] text-[var(--ds-on-surface-variant)]">{line.provider ?? t("providerDefault")}</div>
+                <div className="line-clamp-2 pr-3 text-[13px] leading-[1.35] text-[var(--ds-on-surface-variant)]">{a.readOnly ? line.trip.integratorName ?? "—" : line.provider ?? t("providerDefault")}</div>
                 <Actions line={line} a={a} small />
               </div>
               {/* Phones and tablets: the card */}
@@ -241,7 +273,7 @@ function PhoneCard({ line, a, sel, hl, multiDay }: { line: TripLine; a: TripActi
       <div className="flex items-start gap-3">
         <div className="pt-0.5"><Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled || a.readOnly} /></div>
         <TimeCell line={line} showDay={multiDay} big />
-        <div className="ml-auto"><StatusChip status={line.trip.status} isCancelled={line.canceled} /></div>
+        <div className="ml-auto flex flex-col items-end gap-1"><StatusChip status={line.trip.status} isCancelled={line.canceled} /><RejectedChip line={line} /></div>
       </div>
       {a.live.has(line.trip.id) && <div className="mt-2"><LiveEtaTicker trip={line.trip} position={a.live.get(line.trip.id) ?? null} size="inline" /></div>}
       <div className="mt-2.5 text-sm font-semibold">{line.patient}</div>
@@ -309,6 +341,7 @@ export function TimelineView({ lines, a, multiDay, nowIndex, nowTime, aside, pee
                     <div className="mt-1 flex flex-wrap items-center gap-2.5 sm:mt-0">
                       <span className="text-sm font-semibold">{line.patient}</span>
                       <StatusChip status={line.trip.status} isCancelled={line.canceled} />
+                      <RejectedChip line={line} />
                       {a.live.has(line.trip.id) && <LiveEtaTicker trip={line.trip} position={a.live.get(line.trip.id) ?? null} size="inline" />}
                       {(sel || line.past) && (
                         <span className={`${MONO} ml-auto text-[11px] uppercase ${sel ? "text-[var(--ds-primary)]" : "text-[var(--ds-on-surface-variant)]"}`}>
@@ -415,13 +448,15 @@ export function InProgressPanel({ line, position, onTrack }: {
 /** Late and arrived trips: what the clinic may need to act on now. A click brings the trip into view. */
 export function NeedsAttention({ lines, onPick }: { lines: TripLine[]; onPick: (line: TripLine) => void }) {
   const t = useTranslations("dashboard");
-  const items = lines.filter((l) => l.key === "late" || l.key === "arrived");
+  // A trip its Provider rejected goes first: until the clinic gives it to someone, nobody will do it.
+  const rejected = (l: TripLine) => l.trip.providerOutcome === "Rejected" && !l.canceled;
+  const items = [...lines.filter(rejected), ...lines.filter((l) => !rejected(l) && (l.key === "late" || l.key === "arrived"))];
   return (
     <div className="rounded-xl border border-[var(--ds-outline-variant)] bg-[var(--ds-surface)] p-4">
       <div className={`${MONO} text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--ds-on-surface-variant)]`}>{t("needsAttention")}</div>
       {items.length === 0 && <p className="mt-3 text-[13px] text-[var(--ds-on-surface-variant)]">{t("nothingNeedsAttention")}</p>}
       {items.map((l, i) => {
-        const late = l.key === "late";
+        const late = l.key === "late" || rejected(l);
         return (
           <button key={l.trip.id} type="button" onClick={() => onPick(l)}
             className={`flex w-full items-start gap-2.5 rounded-[9px] p-[11px] text-left ${i === 0 ? "mt-3" : "mt-[9px]"} ${late ? "bg-[var(--ds-warn-bg)]" : "bg-[var(--ds-cool-bg)]"}`}>
@@ -429,9 +464,11 @@ export function NeedsAttention({ lines, onPick }: { lines: TripLine[]; onPick: (
             <span>
               <span className="block text-[13.5px] font-semibold">#{l.number} · {l.patient}</span>
               <span className="mt-[3px] block text-xs text-[var(--ds-on-surface-variant)]">
-                {late
-                  ? t("attentionLate", { time: l.time ?? "—", place: l.from.place ?? l.from.address })
-                  : t("attentionArrived", { space: l.space ?? "—", place: l.to.place ?? l.to.address })}
+                {rejected(l)
+                  ? t("attentionRejected", { provider: l.provider ?? "—", reason: l.trip.providerOutcomeReason ?? "—" })
+                  : late
+                    ? t("attentionLate", { time: l.time ?? "—", place: l.from.place ?? l.from.address })
+                    : t("attentionArrived", { space: l.space ?? "—", place: l.to.place ?? l.to.address })}
               </span>
             </span>
           </button>
@@ -556,5 +593,18 @@ export function LiveSheet({ children, bottom = 84 }: {
         </div>
       </section>
     </>
+  );
+}
+
+/** A trip its external Provider turned down: the clinic decides what happens next. The reason on hover. */
+function RejectedChip({ line, dense = false }: { line: TripLine; dense?: boolean }) {
+  const t = useTranslations("dashboard");
+  if (line.trip.providerOutcome !== "Rejected") return null;
+  return (
+    <span title={line.trip.providerOutcomeReason ?? undefined}
+      className={`inline-flex items-center whitespace-nowrap rounded-[5px] ${MONO} font-semibold uppercase tracking-[0.05em] ${dense ? "h-5 gap-1.5 px-2 text-[10.5px]" : "h-[26px] gap-[7px] px-2.5 text-[11.5px]"}`}
+      style={{ background: "var(--st-late-bg)", color: "var(--st-late-ink)", boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--st-late) var(--st-ring-alpha), transparent)" }}>
+      <PhHandPalm size={dense ? 11 : 13} aria-hidden />{t("rejected")}
+    </span>
   );
 }

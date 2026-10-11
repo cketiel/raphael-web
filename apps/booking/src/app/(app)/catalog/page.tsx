@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { CatalogBrowser } from "@/features/catalog/CatalogBrowser";
+import { IntegratorCatalog } from "@/features/providerPortal/IntegratorCatalog";
 import { getSession, portalKind } from "@/server/session";
 
 /**
@@ -8,8 +9,9 @@ import { getSession, portalKind } from "@/server/session";
  */
 export default async function CatalogPage() {
   const session = await getSession();
-  // The catalog is a clinic's: an external Provider's user gets a 404, as the backend answers it.
-  if (session.user && portalKind(session.user) === "provider") notFound();
+  // An external Provider browses the other side: the Integrators, whose contact details it may correct.
+  if (session.user && portalKind(session.user) === "provider") return <IntegratorCatalog />;
+  if (!session.user) notFound();
   // A clinic's admin: role 1 with an integrator (CATALOG_MODEL.md, "Administrador de una clínica").
   const isClinicAdmin = session.user?.role === "1" && session.user?.integratorId != null;
 

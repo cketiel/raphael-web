@@ -2790,6 +2790,223 @@
         }
       }
     },
+    "/api/BookingPortal/catalog/providers/{id}/users": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "summary": "The users of a contracted external Provider. Clinic admin only.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalProviderUserDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalProviderUserDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalProviderUserDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "summary": "A new user, role User, for a contracted external Provider. It sees that Provider's trips\r\nfrom every clinic, once it has changed the password at its first sign-in.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserCreateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserCreateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/{id}/users/{userId}/active": {
+      "put": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "description": "Switching a user off ends every open session of it.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserActiveDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserActiveDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserActiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Bot/activate-willcall": {
       "post": {
         "tags": [
@@ -12762,21 +12979,10 @@
         }
       }
     },
-    "/api/BookingPortal/catalog/providers/{id}/users": {
+    "/api/BookingPortal/provider/clinics": {
       "get": {
         "tags": [
-          "BookingPortalCatalog"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
+          "BookingPortalProvider"
         ],
         "responses": {
           "200": {
@@ -12786,45 +12992,8 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PortalProviderUserDto"
+                    "$ref": "#/components/schemas/ProviderClinicDto"
                   }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "BookingPortalCatalog"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PortalProviderUserCreateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PortalProviderUserDto"
                 }
               }
             }
@@ -12832,23 +13001,14 @@
         }
       }
     },
-    "/api/BookingPortal/catalog/providers/{id}/users/{userId}/active": {
-      "put": {
+    "/api/BookingPortal/provider/trips/{id}/reject": {
+      "post": {
         "tags": [
-          "BookingPortalCatalog"
+          "BookingPortalProvider"
         ],
         "parameters": [
           {
             "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "userId",
             "in": "path",
             "required": true,
             "schema": {
@@ -12861,7 +13021,187 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PortalProviderUserActiveDto"
+                "$ref": "#/components/schemas/ProviderTripRejectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/{id}/complete": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripCompleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/trips/{id}/no-show": {
+      "post": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTripNoShowDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/catalog/integrators/search": {
+      "get": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "Term",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "GroupId",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "Mine",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorPageDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/provider/catalog/integrators/{id}": {
+      "get": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "BookingPortalProvider"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderPortalIntegratorEditDto"
               }
             }
           }
@@ -12872,7 +13212,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                  "$ref": "#/components/schemas/ProviderPortalIntegratorDetailDto"
                 }
               }
             }
@@ -12967,7 +13307,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "A Provider a trip can be given to: contracted, active and with an account."
+        "description": "A Provider a trip can be given to: contracted, active, with an account and at least one active user."
       },
       "AuthTokenPairDto": {
         "title": "What `POST /api/Auth/refresh` answers with: a new access token and the refresh\r\ntoken that replaces the one just spent.",
@@ -17452,10 +17792,12 @@
             "nullable": true
           },
           "isExternalProvider": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "A user of a Provider that works outside Raphael: it only enters the Booking portal."
           },
           "mustChangePassword": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "The account may do nothing until its owner changes the password."
           },
           "isSuccess": {
             "type": "boolean"
@@ -18121,22 +18463,27 @@
           },
           "accountId": {
             "type": "integer",
+            "description": "The Provider's account in Raphael, when it has one: what `Trip.ProviderId` stores.",
             "format": "int32",
             "nullable": true
           },
           "workMode": {
             "type": "string",
+            "description": "\"Raphael\" (works in the Desktop) or \"External\" (another system); null without an account.",
             "nullable": true
           },
           "activeUserCount": {
             "type": "integer",
+            "description": "Active users of the account. Without one, no trip can be given to the Provider.",
             "format": "int32"
           },
           "assignable": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Contracted by the caller's clinic, with an account and at least one active user."
           },
           "canManageUsers": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "The caller may create and switch off this Provider's users: a clinic admin, on a contracted Provider that does not work in Raphael."
           }
         },
         "additionalProperties": false,
@@ -18299,6 +18646,76 @@
         "additionalProperties": false,
         "description": "One page of a portal catalog search, with what the filters can offer."
       },
+      "PortalProviderUserActiveDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortalProviderUserCreateDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A new user for an external Provider. Always role User; it changes the password at its first sign-in."
+      },
+      "PortalProviderUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "mustChangePassword": {
+            "type": "boolean",
+            "description": "Still on the password the clinic gave it: it can do nothing until its owner changes it."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A user of an external Provider, as the clinic that contracted it sees it."
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -18406,6 +18823,11 @@
           "provider": {
             "type": "string",
             "description": "The Provider's name; null when Raphael carries out the trip.",
+            "nullable": true
+          },
+          "integratorId": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           },
           "distance": {
@@ -18641,6 +19063,9 @@
             "description": "The company this row belongs to. `null` means the general broker, the same reading\r\nas `User.ProviderId`. See `Integrator.OwnerProviderId`.",
             "format": "int32",
             "nullable": true
+          },
+          "workMode": {
+            "$ref": "#/components/schemas/ProviderWorkMode"
           }
         },
         "additionalProperties": false
@@ -18732,6 +19157,16 @@
           }
         },
         "additionalProperties": false
+      },
+      "ProviderWorkMode": {
+        "title": "How a Provider carries out the trips given to it (PROVIDER_ACCESS_MODEL.md §3.2).",
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "description": "One account model for both: trips, history and clinic relations hang off the same\r\nRaphael.Shared.Entities.Provider.Id in either mode, so moving a Provider from an outside system to\r\nRaphael is changing this value and giving it Desktop users. Nothing is migrated.",
+        "format": "int32"
       },
       "PushTokenRequest": {
         "type": "object",
@@ -20871,6 +21306,23 @@
           "providerName": {
             "type": "string",
             "nullable": true
+          },
+          "integratorId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "integratorName": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerOutcome": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerOutcomeReason": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -21009,6 +21461,14 @@
           "vehicleType": {
             "type": "string",
             "description": "The kind of vehicle on the route (\"Wheelchair\", \"Stretcher\"), or null before routing.",
+            "nullable": true
+          },
+          "providerOutcome": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerOutcomeReason": {
+            "type": "string",
             "nullable": true
           }
         },
@@ -21502,6 +21962,10 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "mustChangePassword": {
+            "type": "boolean",
+            "description": "The password was set by somebody else (a clinic creating an external Provider's user):\r\nuntil its owner changes it, the account can do nothing but change it."
           },
           "roleId": {
             "type": "integer",
@@ -22072,64 +22536,273 @@
         "additionalProperties": false,
         "description": "Only the time travels, because it is the only thing the dispatcher gets to decide:\r\nthe flag itself, the status and the history row are the server's business.\r\n            \r\n<br>\r\n⚠️ Wall-clock time where the trip is operated, not the hour of the machine that sent\r\nit. Null means \"let the server use the operation's own clock\" — for an activation,\r\nnow where the trip runs; for the reverse, the 23:59 the office reads as waiting on\r\nthe patient. See `_meta/TIME_POLICY.md` §2B.\r\n"
       },
-      "PortalProviderUserDto": {
+      "ProviderClinicDto": {
+        "type": "object",
+        "properties": {
+          "integratorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderTripRejectDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderTripNoShowDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderTripCompleteDto": {
+        "type": "object",
+        "properties": {
+          "pickupArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "pickedUpAt": {
+            "type": "string",
+            "format": "date-span"
+          },
+          "dropoffArrivedAt": {
+            "type": "string",
+            "format": "date-span",
+            "nullable": true
+          },
+          "droppedOffAt": {
+            "type": "string",
+            "format": "date-span"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderPortalIntegratorRowDto": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "format": "int32"
           },
-          "fullName": {
+          "name": {
             "type": "string"
           },
-          "username": {
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
             "type": "string"
+          },
+          "groupNameEs": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string",
             "nullable": true
           },
-          "phoneNumber": {
+          "website": {
             "type": "string",
             "nullable": true
           },
           "isActive": {
             "type": "boolean"
           },
-          "mustChangePassword": {
+          "isMyClinic": {
             "type": "boolean"
           }
         },
         "additionalProperties": false
       },
-      "PortalProviderUserCreateDto": {
+      "ProviderPortalIntegratorDetailDto": {
         "type": "object",
         "properties": {
-          "fullName": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
             "type": "string"
           },
-          "username": {
+          "groupId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groupNameEn": {
             "type": "string"
           },
-          "password": {
+          "groupNameEs": {
             "type": "string"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "county": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
           },
           "email": {
             "type": "string",
             "nullable": true
           },
-          "phoneNumber": {
+          "website": {
             "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isMyClinic": {
+            "type": "boolean"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "facilityType": {
+            "type": "string",
+            "nullable": true
+          },
+          "beds": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "chainName": {
+            "type": "string",
+            "nullable": true
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
             "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "PortalProviderUserActiveDto": {
+      "ProviderPortalIntegratorPageDto": {
         "type": "object",
         "properties": {
-          "isActive": {
-            "type": "boolean"
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProviderPortalIntegratorRowDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mineCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogFacetValueDto"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProviderPortalIntegratorEditDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "nullable": true
+          },
+          "zip": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

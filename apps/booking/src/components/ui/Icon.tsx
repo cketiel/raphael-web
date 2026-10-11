@@ -103,6 +103,8 @@ export {
   Sun as PhSun,
   TextAa as PhTextAa,
   UserCircle as PhUserCircle,
+  UserMinus as PhUserMinus,
+  HandPalm as PhHandPalm,
   Van as PhVan,
   Warning as PhWarning,
   WarningCircle as PhWarningCircle,

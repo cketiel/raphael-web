@@ -79,7 +79,8 @@ export function AppShell({ username, isClinicAdmin, isProvider = false, navColla
   const orgLoading = isClinicAdmin && organization.isLoading;
   const roleLabel = isClinicAdmin ? t("roleAdmin") : t("roleUser");
 
-  const sections = isProvider ? SECTIONS.filter((s) => s.key === "trips") : SECTIONS.filter((s) => !s.adminOnly || isClinicAdmin);
+  // An external Provider: Trips and Catalog (of Integrators), no Notifications or Admin.
+  const sections = isProvider ? SECTIONS.filter((s) => s.key === "trips" || s.key === "catalog") : SECTIONS.filter((s) => !s.adminOnly || isClinicAdmin);
   // A trip's tracking page (/trips/40233) belongs to Trips.
   const isActive = (href: string) => (href === "/" ? pathname === "/" || pathname.startsWith("/trips/") : pathname.startsWith(href));
   const badge = (key: Section["key"]) => (key === "notifications" && unread > 0 ? (unread > 99 ? "99+" : String(unread)) : null);

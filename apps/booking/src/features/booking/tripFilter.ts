@@ -58,3 +58,8 @@ export const RAPHAEL_PROVIDER = 0;
 export function byProvider<T extends { providerId?: number | null }>(rows: T[], provider: ProviderFilter): T[] {
   return provider === "all" ? rows : rows.filter((r) => (r.providerId ?? RAPHAEL_PROVIDER) === provider);
 }
+
+/** The trips (or report rows) of one clinic, for an external Provider's list. "all" keeps everything. */
+export function byIntegrator<T extends { integratorId?: number | null }>(rows: T[], integrator: ProviderFilter): T[] {
+  return integrator === "all" ? rows : rows.filter((r) => r.integratorId === integrator);
+}

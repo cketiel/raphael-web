@@ -26,6 +26,9 @@ export interface TripStatusChange {
   status: string;
   isCancelled: boolean;
   date: string;
+  /** An external Provider's report ("Rejected"…), which can change with the status unchanged. */
+  providerOutcome?: string | null;
+  providerOutcomeReason?: string | null;
 }
 
 /** Raphael.Shared TripVehiclePositionMessage. */

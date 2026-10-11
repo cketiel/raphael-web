@@ -18,7 +18,9 @@ import { downloadProductionCsv, type CsvLocale, type ProductionRow } from "./pro
 import { localToday, summarize } from "./rules";
 import { byDayAndTime, toLine, type TripLine } from "./tripLines";
 import { buildTripsCsv, downloadTripsCsv, tripsCsvFileName } from "./tripsCsv";
-import { byProvider, RAPHAEL_PROVIDER, tripMatches, type ProviderFilter } from "./tripFilter";
+import { byIntegrator, byProvider, RAPHAEL_PROVIDER, tripMatches, type ProviderFilter } from "./tripFilter";
+import { ProviderTripDialog, type ProviderTripAction } from "@/features/providerPortal/ProviderTripDialog";
+import { useMyClinics } from "@/features/providerPortal/providerPortalApi";
 import { tripsCache, type LoadedTrips } from "./tripsCache";
 import { LiveEtaTicker } from "@/features/tracking/LiveEtaTicker";
 import { useLiveTrips } from "@/features/tracking/useLiveTrips";
@@ -116,6 +118,8 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
   const [asking, setAsking] = useState<TripLine[] | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
+  /** The report an external Provider is filling in: reject, no-show or complete. */
+  const [reporting, setReporting] = useState<{ line: TripLine; action: ProviderTripAction } | null>(null);
   const [now, setNow] = useState<string | null>(null);
   const { onTripStatus } = useRealtime();
 
@@ -210,12 +214,19 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
 
   // Live status changes. A trip already on screen changes in place; one that is not, but falls in
   // the searched range (a new booking, a reactivation by the office), brings the list again in the background.
-  const onStatusChanged = useEffectEvent((change: { tripId: number; status: string; isCancelled: boolean; date: string }) => {
+  const onStatusChanged = useEffectEvent((change: {
+    tripId: number; status: string; isCancelled: boolean; date: string;
+    providerOutcome?: string | null; providerOutcomeReason?: string | null;
+  }) => {
     if (!loaded) return;
     if (loaded.trips.some((x) => x.id === change.tripId)) {
       setLoaded({
         ...loaded,
-        trips: loaded.trips.map((x) => (x.id === change.tripId ? { ...x, status: change.status, isCancelled: change.isCancelled } : x)),
+        // An external Provider's report comes with it (rejected, with the status unchanged).
+        trips: loaded.trips.map((x) => (x.id === change.tripId ? {
+          ...x, status: change.status, isCancelled: change.isCancelled,
+          providerOutcome: change.providerOutcome ?? null, providerOutcomeReason: change.providerOutcomeReason ?? null,
+        } : x)),
       });
       return;
     }
@@ -268,23 +279,28 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
     }
   }
 
-  // The Provider filter: All, then Raphael (the trips with no Provider), then the ones this clinic
-  // has contracted. Only a clinic has that list; a broker sees every trip.
+  // The party filter. A clinic filters by Provider: All, then Raphael (the trips with no
+  // Provider), then the ones it has contracted. An external Provider filters by clinic: All, then
+  // the clinics that contracted it. A broker sees every trip, with no filter.
   const assignable = useAssignableProviders(isIntegrator);
-  const providerOptions = assignable.data ?? [];
-  // A Provider kept from before that is no longer contracted falls back to All once the list is known.
-  const shownProvider: ProviderFilter = !isIntegrator ? "all"
-    : provider === "all" || provider === RAPHAEL_PROVIDER || !assignable.isSuccess || providerOptions.some((p) => p.providerId === provider)
-      ? provider : "all";
-  const providerName = shownProvider === RAPHAEL_PROVIDER ? t("providerRaphael")
-    : providerOptions.find((p) => p.providerId === shownProvider)?.name ?? "";
-  // Everything on the screen follows the Provider: list, counters, side panels and both exports.
-  const providerTrips = byProvider(loaded?.trips ?? [], shownProvider);
-  const providerReport = byProvider(loaded?.report ?? [], shownProvider);
+  const clinics = useMyClinics(isProvider);
+  const partyOptions: { id: number; name: string }[] = isProvider
+    ? (clinics.data ?? []).map((c) => ({ id: c.integratorId ?? 0, name: c.name ?? "" }))
+    : [{ id: RAPHAEL_PROVIDER, name: t("providerRaphael") }, ...(assignable.data ?? []).map((p) => ({ id: p.providerId ?? 0, name: p.name ?? "" }))];
+  const partyReady = isProvider ? clinics.isSuccess : assignable.isSuccess;
+  // One kept from before that is no longer on the list falls back to All once the list is known.
+  const shownProvider: ProviderFilter = !isIntegrator && !isProvider ? "all"
+    : provider === "all" || !partyReady || partyOptions.some((o) => o.id === provider) ? provider : "all";
+  const providerName = partyOptions.find((o) => o.id === shownProvider)?.name ?? "";
+  const byParty = <T extends { providerId?: number | null; integratorId?: number | null }>(rows: T[]) =>
+    isProvider ? byIntegrator(rows, shownProvider) : byProvider(rows, shownProvider);
+  // Everything on the screen follows the filter: list, counters, side panels and both exports.
+  const providerTrips = byParty(loaded?.trips ?? []);
+  const providerReport = byParty(loaded?.report ?? []);
 
   const allLines = (loaded?.trips ?? []).map(toLine).sort(byDayAndTime);
-  const providerLines = shownProvider === "all" ? allLines
-    : allLines.filter((l) => (l.trip.providerId ?? RAPHAEL_PROVIDER) === shownProvider);
+  const shownIds = new Set(providerTrips.map((x) => x.id));
+  const providerLines = shownProvider === "all" ? allLines : allLines.filter((l) => shownIds.has(l.trip.id));
   // The trips under way follow their vehicles live: phase, miles to go and the route's ETAs.
   // All of them, whatever the Provider: changing it must not drop and re-join the live channels.
   const underWayIds = allLines.filter((l) => !l.canceled && UNDER_WAY.includes(l.trip.status ?? "")).map((l) => l.trip.id);
@@ -311,6 +327,8 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
   const actions: TripActions = {
     selected,
     readOnly: isProvider,
+    report: isProvider ? (l, action) => setReporting({ line: l, action }) : undefined,
+    today: localToday(),
     live: livePositions,
     highlightId,
     toggle: (l) => setSelected((s) => {
@@ -457,15 +475,14 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
             );
           })}
         </div>
-        {isIntegrator && (
+        {(isIntegrator || isProvider) && (
           <label className="flex items-center gap-2">
-            <span className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[var(--ds-on-surface-variant)]`}>{t("provider")}</span>
-            <select value={String(shownProvider)} aria-label={t("providerFilter")}
+            <span className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[var(--ds-on-surface-variant)]`}>{isProvider ? t("clinic") : t("provider")}</span>
+            <select value={String(shownProvider)} aria-label={isProvider ? t("clinicFilter") : t("providerFilter")}
               onChange={(e) => chooseProvider(e.target.value === "all" ? "all" : Number(e.target.value))}
               className="h-11 max-w-[240px] rounded-lg border border-[var(--ds-outline)] bg-[var(--ds-surface)] px-3 text-sm text-[var(--ds-on-surface)]">
-              <option value="all">{t("allProviders")}</option>
-              <option value={RAPHAEL_PROVIDER}>{t("providerRaphael")}</option>
-              {providerOptions.map((p) => <option key={p.providerId} value={p.providerId}>{p.name}</option>)}
+              <option value="all">{isProvider ? t("allClinics") : t("allProviders")}</option>
+              {partyOptions.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
             </select>
           </label>
         )}
@@ -534,6 +551,15 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
         <CancelDialog lines={asking} busy={cancelling} onKeep={() => setAsking(null)} onConfirm={() => void confirmCancel(asking)} />
       )}
       {toast && <ToastBar toast={toast} onClose={() => setToast(null)} />}
+      {reporting && (
+        <ProviderTripDialog action={reporting.action} line={reporting.line} onClose={() => setReporting(null)}
+          onDone={() => {
+            setToast({ tone: "success", text: t(`reported.${reporting.action}`, { id: reporting.line.number }) });
+            setReporting(null);
+            // An external Provider has no live channel: its own report brings the list again, once.
+            void loadTrips(start, end, true);
+          }} />
+      )}
 
       {/* Maps JavaScript loads only when the form opens, never with the dashboard. */}
       {modal.open && <APIProvider apiKey={mapsKey} language={locale} region="US"><TripModal

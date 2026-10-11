@@ -21,6 +21,11 @@ const ALLOWED: ReadonlyArray<{ method: string; pattern: RegExp; brokerOnly?: boo
   { method: "PUT", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}$/ },
   { method: "POST", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/contract$/ },
   { method: "DELETE", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/contract$/ },
+  // An external Provider's own portal (PROVIDER_ACCESS_MODEL.md §3.5). The backend answers 404 to anyone else.
+  { method: "GET", pattern: /^BookingPortal\/provider\/clinics$/ },
+  { method: "POST", pattern: /^BookingPortal\/provider\/trips\/\d{1,10}\/(reject|complete|no-show)$/ },
+  { method: "GET", pattern: /^BookingPortal\/provider\/catalog\/integrators\/(search|\d{1,10})$/ },
+  { method: "PUT", pattern: /^BookingPortal\/provider\/catalog\/integrators\/\d{1,10}$/ },
   // An external Provider's users, managed by the clinic's admin (PROVIDER_ACCESS_MODEL.md §3.4).
   { method: "GET", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/users$/ },
   { method: "POST", pattern: /^BookingPortal\/catalog\/providers\/\d{1,10}\/users$/ },

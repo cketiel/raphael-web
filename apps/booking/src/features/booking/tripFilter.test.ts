@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byProvider, RAPHAEL_PROVIDER, tripMatches } from "./tripFilter";
+import { byIntegrator, byProvider, RAPHAEL_PROVIDER, tripMatches } from "./tripFilter";
 import type { TripRead } from "./types";
 
 const trip = {
@@ -65,5 +65,17 @@ describe("byProvider", () => {
 
   it("keeps only the chosen Provider's trips", () => {
     expect(byProvider(rows, 12)).toEqual([{ providerId: 12 }]);
+  });
+});
+
+describe("byIntegrator", () => {
+  const rows = [{ integratorId: 5 }, { integratorId: 9 }, { integratorId: null }];
+
+  it("keeps everything with All", () => {
+    expect(byIntegrator(rows, "all")).toHaveLength(3);
+  });
+
+  it("keeps only the chosen clinic's trips", () => {
+    expect(byIntegrator(rows, 5)).toEqual([{ integratorId: 5 }]);
   });
 });
