@@ -460,7 +460,10 @@
     "save": "Cambiar contraseña",
     "saving": "Guardando...",
     "changed": "Tu contraseña se ha cambiado.",
-    "failed": "No se puede cambiar la contraseña ahora mismo."
+    "failed": "No se puede cambiar la contraseña ahora mismo.",
+    "forcedIntro": "Tu contraseña la puso otra persona. Elige la tuya para continuar.",
+    "forcedDone": "Contraseña cambiada. Vuelve a entrar con tu nueva contraseña.",
+    "forcedSignIn": "Entrar"
   },
   "catalog": {
     "title": "Catálogo",
@@ -500,7 +503,6 @@
     "emsLicense": "Licencia EMS",
     "licenseExpires": "Caducidad de la licencia",
     "planSegment": "Segmento del plan",
-    "notOperatingYet": "Este proveedor todavía no opera en Raphael: está en tu lista, pero no se le pueden asignar viajes hasta que tenga cuenta.",
     "contract": "Contratar",
     "remove": "Quitar de contratados",
     "edit": "Editar datos de contacto",
@@ -517,7 +519,26 @@
     "colActions": "Acciones",
     "subtitle": "Busca providers y guarda los que trabajan con tu centro.",
     "emptyTitle": "Ningún provider coincide con estos filtros",
-    "emptyText": "Prueba con otro nombre, ciudad o grupo."
+    "emptyText": "Prueba con otro nombre, ciudad o grupo.",
+    "assignableYes": "A este Provider ya se le pueden asignar viajes.",
+    "assignableNoUsers": "Pendiente de alta: crea al menos un usuario para este Provider. Hasta entonces no se le pueden asignar viajes ni aparece en el filtro de Providers.",
+    "assignableNoOffice": "Este Provider trabaja en Raphael pero no tiene usuarios activos. Contacta con la oficina.",
+    "users": "Usuarios del Provider",
+    "usersNone": "Todavía no tiene usuarios.",
+    "userNew": "Nuevo usuario",
+    "userNewNotice": "El usuario verá los viajes que todas las clínicas asignan a este Provider. Al entrar por primera vez tendrá que cambiar la contraseña que pongas aquí.",
+    "userFullName": "Nombre completo",
+    "userUsername": "Usuario",
+    "userPassword": "Contraseña temporal",
+    "userPasswordHint": "Al menos {min} caracteres, con letras y números.",
+    "userCreate": "Crear usuario",
+    "userCreated": "Usuario {username} creado. Dale al Provider su usuario y su contraseña temporal: elegirá la suya al entrar.",
+    "userActive": "Activo",
+    "userInactive": "Inactivo",
+    "userPending": "Contraseña pendiente",
+    "userTurnOff": "Desactivar",
+    "userTurnOn": "Activar",
+    "userConfirmOff": "¿Desactivar a {name}? Sus sesiones abiertas terminan ahora."
   },
   "admin": {
     "title": "Administración",

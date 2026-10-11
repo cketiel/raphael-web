@@ -49,9 +49,11 @@ const SECTIONS: Section[] = [
 /** The user's choice of a folded sidebar, kept for a year in this browser. */
 export const NAV_COOKIE = "rb_nav";
 
-export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBanner, children }: {
+export function AppShell({ username, isClinicAdmin, isProvider = false, navCollapsed, environmentBanner, children }: {
   username: string;
   isClinicAdmin: boolean;
+  /** An external Provider's user: Trips only, and no live channel to show. */
+  isProvider?: boolean;
   /** The sidebar folded to the rail on wide screens too, by the user's choice. */
   navCollapsed: boolean;
   environmentBanner: ReactNode;
@@ -77,7 +79,7 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
   const orgLoading = isClinicAdmin && organization.isLoading;
   const roleLabel = isClinicAdmin ? t("roleAdmin") : t("roleUser");
 
-  const sections = SECTIONS.filter((s) => !s.adminOnly || isClinicAdmin);
+  const sections = isProvider ? SECTIONS.filter((s) => s.key === "trips") : SECTIONS.filter((s) => !s.adminOnly || isClinicAdmin);
   // A trip's tracking page (/trips/40233) belongs to Trips.
   const isActive = (href: string) => (href === "/" ? pathname === "/" || pathname.startsWith("/trips/") : pathname.startsWith(href));
   const badge = (key: Section["key"]) => (key === "notifications" && unread > 0 ? (unread > 99 ? "99+" : String(unread)) : null);
@@ -143,10 +145,12 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
             })}
           </nav>
           <div className="relative mt-auto flex flex-col gap-3 px-4 pb-5 pt-[18px]">
-            <div className="flex h-9 items-center gap-2 rounded-lg bg-white/[0.08] px-3 text-xs font-medium text-[var(--ds-on-brand-variant)]">
-              <span aria-hidden="true" className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
-              {t(`live.${status}`)}
-            </div>
+            {!isProvider && (
+              <div className="flex h-9 items-center gap-2 rounded-lg bg-white/[0.08] px-3 text-xs font-medium text-[var(--ds-on-brand-variant)]">
+                <span aria-hidden="true" className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
+                {t(`live.${status}`)}
+              </div>
+            )}
             {userMenu("sidebar")}
           </div>
         </aside>
@@ -177,7 +181,7 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
             })}
           </nav>
           <div className="mt-auto flex flex-col items-center gap-2.5">
-            <span aria-hidden="true" title={t(`live.${status}`)} className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
+            {!isProvider && <span aria-hidden="true" title={t(`live.${status}`)} className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />}
             <span className="flex size-11 items-center justify-center rounded-full bg-[linear-gradient(140deg,#5ab6dd,#0a5c7e)] text-[13px] font-bold text-white" aria-hidden="true">{initials(username)}</span>
           </div>
         </aside>
@@ -198,7 +202,7 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
               <div className="ml-auto flex items-center gap-1.5">
                 <div className="hidden sm:block"><ThemeToggle onBrand /></div>
                 <div className="hidden sm:block"><LanguageMenu onBrand /></div>
-                <NotificationBell onBrand />
+                {!isProvider && <NotificationBell onBrand />}
                 <div className="sm:hidden">
                   <UserMenu username={username} roleLabel={roleLabel} variant="brand" extra={phoneExtras} organization={{ name: orgName, canOpen: isClinicAdmin }} />
                 </div>
@@ -231,7 +235,7 @@ export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBan
               {onTrips && <ViewSwitch />}
               <ThemeToggle />
               <LanguageMenu />
-              <NotificationBell />
+              {!isProvider && <NotificationBell />}
               {userMenu("topbar")}
             </div>
           </header>

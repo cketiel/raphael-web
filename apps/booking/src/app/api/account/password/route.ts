@@ -42,7 +42,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ code: "service_unavailable", message: "The service is not available right now." }, { status: 502 });
   }
 
-  if (upstream.ok) return new NextResponse(null, { status: 204 });
+  if (upstream.ok) {
+    // A password somebody else set: the backend has ended every session of the account, this
+    // one too. The owner signs in again with the new password.
+    if (session.user.mustChangePassword) session.destroy();
+    return new NextResponse(null, { status: 204 });
+  }
 
   // The backend answers 400 with its own English text; the only one a user can act on is a wrong
   // current password, so that one gets its code and the rest a generic one.

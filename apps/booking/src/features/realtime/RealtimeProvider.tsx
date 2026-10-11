@@ -91,8 +91,9 @@ export function useRealtime() {
  * need CORS on the API, while the WebSocket itself does not. The token comes from our BFF on every
  * (re)connect and lives only in memory.
  */
-export function RealtimeProvider({ children }: { children: ReactNode }) {
-  const [status, setStatus] = useState<HubStatus>("connecting");
+/** `enabled` false opens no hub at all (an external Provider's user): the status stays "disconnected". */
+export function RealtimeProvider({ children, enabled = true }: { children: ReactNode; enabled?: boolean }) {
+  const [status, setStatus] = useState<HubStatus>(enabled ? "connecting" : "disconnected");
   const [notifications, setNotifications] = useState<LiveNotification[]>([]);
   const dispatchRef = useRef<HubConnection | null>(null);
   const statusListeners = useRef(new Set<(c: TripStatusChange) => void>());
@@ -100,6 +101,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const positionListeners = useRef(new Map<number, (p: TripVehiclePosition) => void>());
 
   useEffect(() => {
+    if (!enabled) return;
     let disposed = false;
     const connections: HubConnection[] = [];
 
@@ -163,7 +165,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         if (connection.state !== HubConnectionState.Disconnected) void connection.stop();
       }
     };
-  }, []);
+  }, [enabled]);
 
   const onTripTracking = useCallback((listener: (tripId: number) => void) => {
     trackingListeners.current.add(listener);

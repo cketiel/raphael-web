@@ -33,7 +33,11 @@ const DONE_STATUSES = ["Finished", "Billed", "Payed"];
  * - Right: the map with the road, the two stops and the vehicle gliding between fixes.
  * - Phone: the map full size and the cards in a bottom sheet that is dragged up.
  */
-export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey: string }) {
+export function TripTrackingPage({ tripId, mapsKey, readOnly = false }: {
+  tripId: number; mapsKey: string;
+  /** An external Provider's user: it follows the trip, it never cancels it. */
+  readOnly?: boolean;
+}) {
   const t = useTranslations("tracking");
   const tDash = useTranslations("dashboard");
   const locale = useLocale();
@@ -195,10 +199,10 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
               <PhPhone size={17} aria-hidden /><span className="hidden sm:inline">{phoneNumber}</span>
             </a>
             : <span className="hidden items-center text-[13px] sm:flex"><NoData>{t("noPhone")}</NoData></span>}
-          <button type="button" disabled={canceled || done || !tracking.externalTripId} onClick={() => setAsking(true)} aria-label={t("cancelTrip")}
+          {!readOnly && <button type="button" disabled={canceled || done || !tracking.externalTripId} onClick={() => setAsking(true)} aria-label={t("cancelTrip")}
             className="flex h-11 items-center justify-center gap-2 rounded-lg border border-[var(--ds-error)] px-3 text-[13.5px] font-semibold text-[var(--ds-error)] disabled:border-[var(--ds-outline)] disabled:text-[var(--ds-on-surface-variant)] disabled:opacity-45 sm:px-4">
             <PhXCircle size={19} className="sm:hidden" aria-hidden /><span className="hidden sm:inline">{t("cancelTrip")}</span>
-          </button>
+          </button>}
         </div>
       )}
     </div>

@@ -11,6 +11,7 @@ import { Notice } from "@/components/ui/Surface";
 import { useErrorText } from "@/i18n/useErrorText";
 import { Badges } from "./CatalogBrowser";
 import { useProviderActions, useProviderDetail, type ProviderDetail, type ProviderEdit } from "./catalogApi";
+import { ProviderUsersSection } from "./ProviderUsersSection";
 
 /**
  * One Provider's file. A clinic's admin contracts it or removes it, and corrects its contact
@@ -113,9 +114,14 @@ export function ProviderDetailModal({ id, onClose }: { id: number; isClinicAdmin
             <Row label={t("licenseExpires")} value={p.licenseExpiresOn && format.dateTime(new Date(p.licenseExpiresOn), { dateStyle: "medium" })} />
             <Row label={t("planSegment")} value={p.planSegment} />
           </Section>
-          {!p.operatesInRaphael && p.contracted && (
-            <Notice tone="warning" className="md:col-span-2">{t("notOperatingYet")}</Notice>
-          )}
+          {/* A Provider can be given trips, and appears in the Trips list's Provider filter, only
+              with an account and at least one active user (PROVIDER_ACCESS_MODEL.md §3.3). */}
+          {p.contracted && (p.assignable
+            ? <Notice tone="success" className="md:col-span-2">{t("assignableYes")}</Notice>
+            : p.workMode === "Raphael"
+              ? <Notice tone="warning" className="md:col-span-2">{t("assignableNoOffice")}</Notice>
+              : <Notice tone="warning" className="md:col-span-2">{t("assignableNoUsers")}</Notice>)}
+          {p.canManageUsers && <ProviderUsersSection id={id} />}
         </div>
       )}
 

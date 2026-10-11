@@ -8968,11 +8968,13 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    providerIds?: string;
                     startDate?: string;
                     endDate?: string;
                     fundingSourceIds?: string;
                     vehicleRouteIds?: string;
+                    driverIds?: string;
+                    vehicleIds?: string;
+                    providerIds?: string;
                     includeSignatures?: boolean;
                 };
                 header?: never;
@@ -11343,6 +11345,110 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/BookingPortal/catalog/providers/{id}/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PortalProviderUserDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PortalProviderUserCreateDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PortalProviderUserDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/BookingPortal/catalog/providers/{id}/users/{userId}/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PortalProviderUserActiveDto"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PortalProviderUserDto"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -13135,6 +13241,8 @@ export interface components {
             integratorId?: number | null;
             /** Format: int32 */
             providerId?: number | null;
+            isExternalProvider?: boolean;
+            mustChangePassword?: boolean;
             isSuccess?: boolean;
             /**
              * Format: date-time
@@ -13441,6 +13549,13 @@ export interface components {
             canEdit?: boolean;
             /** @description The caller may contract it or remove it: a clinic admin. */
             canContract?: boolean;
+            /** Format: int32 */
+            accountId?: number | null;
+            workMode?: string | null;
+            /** Format: int32 */
+            activeUserCount?: number;
+            assignable?: boolean;
+            canManageUsers?: boolean;
         };
         /** @description The contact details a clinic admin may change on a Provider it contracted. */
         PortalCatalogProviderEditDto: {
@@ -13526,8 +13641,12 @@ export interface components {
             dropoffPhone?: string | null;
             authorization?: string | null;
             fundingSource?: string | null;
-            /** Format: int32 */
+            /**
+             * Format: int32
+             * @description The Provider carrying out the trip; null when Raphael does (no subcontract).
+             */
             providerId?: number | null;
+            /** @description The Provider's name; null when Raphael carries out the trip. */
             provider?: string | null;
             /** Format: double */
             distance?: number | null;
@@ -14981,6 +15100,26 @@ export interface components {
         WillCallUpdateDto: {
             /** Format: date-span */
             fromTime?: string | null;
+        };
+        PortalProviderUserDto: {
+            /** Format: int32 */
+            id?: number;
+            fullName?: string;
+            username?: string;
+            email?: string | null;
+            phoneNumber?: string | null;
+            isActive?: boolean;
+            mustChangePassword?: boolean;
+        };
+        PortalProviderUserCreateDto: {
+            fullName?: string;
+            username?: string;
+            password?: string;
+            email?: string | null;
+            phoneNumber?: string | null;
+        };
+        PortalProviderUserActiveDto: {
+            isActive?: boolean;
         };
     };
     responses: never;

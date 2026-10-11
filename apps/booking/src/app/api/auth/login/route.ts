@@ -12,6 +12,7 @@ const credentials = z.object({
 
 // Roles BookingPortalController accepts ([Authorize(Roles = "6,1,3")]). Anyone else could sign
 // in to the backend but would get nothing but 403s here, so they are turned away at the door.
+// An external Provider's user is let in whatever its role: the backend decides it belongs here.
 const BOOKING_ROLES = new Set(["1", "3", "6"]);
 
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
@@ -36,7 +37,8 @@ export async function POST(request: NextRequest) {
   if (status !== 200 || !body?.token || !body.refreshToken) {
     return NextResponse.json({ code: "invalid_credentials", message: "Invalid username or password." }, { status: 401 });
   }
-  if (!BOOKING_ROLES.has(body.role ?? "")) {
+  const isProvider = !!body.isExternalProvider;
+  if (!isProvider && !BOOKING_ROLES.has(body.role ?? "")) {
     return NextResponse.json({ code: "no_portal_access", message: "This account does not have access to the Booking Portal." }, { status: 403 });
   }
 
@@ -49,6 +51,8 @@ export async function POST(request: NextRequest) {
     username: body.username ?? parsed.data.username,
     role: body.role ?? "",
     integratorId: body.integratorId ?? null,
+    kind: isProvider ? "provider" : body.integratorId != null ? "clinic" : "office",
+    mustChangePassword: !!body.mustChangePassword,
   };
   await session.save();
 

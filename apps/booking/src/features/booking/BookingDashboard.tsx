@@ -34,6 +34,8 @@ const MONO = "font-[family-name:var(--font-plex-mono)]";
 
 interface BookingDashboardProps {
   isIntegrator: boolean;
+  /** An external Provider's user: the trips the clinics give it, to follow and export. It never books or cancels. */
+  isProvider?: boolean;
   isClinicAdmin: boolean;
   mapsKey: string;
   mapId: string;
@@ -73,7 +75,7 @@ function clockNow() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, focus }: BookingDashboardProps) {
+export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdmin, mapsKey, mapId, focus }: BookingDashboardProps) {
   const t = useTranslations("dashboard");
   const tStatus = useTranslations("status");
   const tCsv = useTranslations("csv");
@@ -82,7 +84,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
   const errorText = useErrorText();
   const customers = useCustomers();
   const spaceTypes = useSpaceTypes();
-  const funding = useFundingContext(isIntegrator);
+  const funding = useFundingContext(isIntegrator, isProvider);
   // The organization's name for the export; shared with the sidebar's query, so no second request.
   const organization = useOrganization(isClinicAdmin);
   const { view } = useTripsView();
@@ -160,9 +162,11 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
     const query = new URLSearchParams({ startDate: from, endDate: to });
     const trips = await api<TripRead[]>(`BookingPortal/my-trips?${query}`);
     // Without funding sources the backend would apply no filter at all, so the report is not asked for.
+    // An external Provider's user has none, and needs none: the backend keeps the report to the
+    // trips given to its Provider (the Trip filter by provider), whichever clinic they come from.
     const report = fundingIds.length
       ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}&fundingSourceIds=${fundingIds.join(",")}`)
-      : [];
+      : isProvider ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}`) : [];
     return { trips: trips ?? [], report: report ?? [], start: from, end: to };
   }
 
@@ -306,6 +310,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
 
   const actions: TripActions = {
     selected,
+    readOnly: isProvider,
     live: livePositions,
     highlightId,
     toggle: (l) => setSelected((s) => {
@@ -372,7 +377,7 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
       action={<DsButton kind="primary" onClick={() => void loadTrips()}>{t("retry")}</DsButton>} />;
   } else if (loaded && allLines.length === 0) {
     state = <ListState kind="empty" view={view} title={t("emptyDay", { date: rangeLabel })} text={t("emptyText")}
-      action={<DsButton kind="tonal" onClick={newBooking}>{t("newBooking")}</DsButton>} />;
+      action={isProvider ? undefined : <DsButton kind="tonal" onClick={newBooking}>{t("newBooking")}</DsButton>} />;
   } else if (loaded && filter && lines.length === 0) {
     state = <ListState kind="empty" view={view} title={t("noMatches", { term: filter })} text={t("noMatchesText", { total: providerLines.length })}
       action={<DsButton kind="tonal" onClick={() => setFilter("")}>{t("clearSearch")}</DsButton>} />;
@@ -417,9 +422,11 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
                 onSelect: () => downloadProductionCsv(providerReport, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] })),
               },
             ]} />
-          <DsButton kind="tonal" icon={<PhPlus size={16} weight="bold" aria-hidden />} className="flex-1 sm:flex-none" onClick={newBooking}>
-            {t("newBooking")}
-          </DsButton>
+          {!isProvider && (
+            <DsButton kind="tonal" icon={<PhPlus size={16} weight="bold" aria-hidden />} className="flex-1 sm:flex-none" onClick={newBooking}>
+              {t("newBooking")}
+            </DsButton>
+          )}
         </div>
       </div>
 
@@ -497,14 +504,14 @@ export function BookingDashboard({ isIntegrator, isClinicAdmin, mapsKey, mapId, 
             <Stat label={t("bandCanceled")} value={summary.canceledTrips} tone="text-[var(--ds-error)]" />
             <Stat label={t("bandBilledValue")} value={summary.totalBilledValue} tone="text-[var(--ds-money)]" />
           </div>
-          <div className="ml-auto flex items-center gap-2.5">
+          {!isProvider && <div className="ml-auto flex items-center gap-2.5">
             <span className={`${MONO} text-[12.5px] uppercase`}>{t("selectedShort", { count: selected.size })}</span>
             <button type="button" disabled={selected.size === 0}
               onClick={() => setAsking(allLines.filter((l) => selected.has(l.trip.tripId ?? "")))}
               className="h-11 rounded-lg border border-[var(--ds-error)] px-[15px] text-[13.5px] font-semibold text-[var(--ds-error)] disabled:opacity-40">
               {t("cancelSelectedShort")}
             </button>
-          </div>
+          </div>}
         </div>
       )}
 

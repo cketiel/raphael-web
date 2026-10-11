@@ -77,3 +77,35 @@ export function useProviderActions(id: number) {
   });
   return { contract, edit };
 }
+
+export type ProviderUser = Schemas["PortalProviderUserDto"];
+export type ProviderUserCreate = Schemas["PortalProviderUserCreateDto"];
+
+/** The users of a contracted external Provider. Only a clinic's admin asks. */
+export function useProviderUsers(id: number, enabled: boolean) {
+  return useQuery({
+    queryKey: ["catalog", "provider-users", id],
+    queryFn: () => api<ProviderUser[]>(`${BASE}/providers/${id}/users`),
+    enabled,
+  });
+}
+
+/**
+ * Create a user, or switch one on or off. Each refreshes the catalog: a first active user makes the
+ * Provider assignable (form of the trip, Provider filter of the list), the last one switched off undoes it.
+ */
+export function useProviderUserActions(id: number) {
+  const client = useQueryClient();
+  const refresh = () => client.invalidateQueries({ queryKey: ["catalog"] });
+
+  const create = useMutation({
+    mutationFn: (body: ProviderUserCreate) => api<ProviderUser>(`${BASE}/providers/${id}/users`, { method: "POST", body: JSON.stringify(body) }),
+    onSuccess: refresh,
+  });
+  const setActive = useMutation({
+    mutationFn: ({ userId, isActive }: { userId: number; isActive: boolean }) =>
+      api<ProviderUser>(`${BASE}/providers/${id}/users/${userId}/active`, { method: "PUT", body: JSON.stringify({ isActive }) }),
+    onSuccess: refresh,
+  });
+  return { create, setActive };
+}

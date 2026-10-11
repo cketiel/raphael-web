@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getValidAccessToken, SessionExpiredError } from "@/server/backend";
 import { serverConfig } from "@/server/config";
 import { rejectCrossSite, sessionExpired } from "@/server/guard";
-import { getSession } from "@/server/session";
+import { getSession, portalKind } from "@/server/session";
 
 /**
  * SignalR is the one connection that cannot go through the BFF: route handlers do not proxy
@@ -18,6 +18,11 @@ export async function GET(request: NextRequest) {
   if (blocked) return blocked;
 
   const session = await getSession();
+  // An external Provider's user, or an account that must change its password, opens no live
+  // channel: its token never reaches the browser.
+  if (session.user && (session.user.mustChangePassword || portalKind(session.user) === "provider")) {
+    return NextResponse.json({ code: "no_realtime", message: "Live updates are not available for this account." }, { status: 403 });
+  }
   try {
     const accessToken = await getValidAccessToken(session);
     return NextResponse.json(

@@ -36,6 +36,8 @@ export interface TripActions {
   track: (line: TripLine) => void;
   edit: (line: TripLine) => void;
   cancel: (line: TripLine) => void;
+  /** An external Provider's user: it follows the trips, it never edits, cancels or selects them. */
+  readOnly?: boolean;
   rowRef: (layout: string, id: number) => (el: HTMLElement | null) => void;
 }
 
@@ -123,8 +125,10 @@ function Actions({ line, a, vertical, small }: { line: TripLine; a: TripActions;
   return (
     <div className={`flex ${small ? "gap-1.5" : "gap-2"} ${vertical ? "flex-col" : "justify-end"}`}>
       <IconButton small={small} label={t("trackTrip")} disabled={off} onClick={() => a.track(line)}><PhCrosshair size={18} className="text-[var(--ds-primary)]" aria-hidden /></IconButton>
-      <IconButton small={small} label={t("editTrip")} disabled={off} onClick={() => a.edit(line)}><PhPencilSimple size={18} className="text-[var(--ds-on-surface-variant)]" aria-hidden /></IconButton>
-      <IconButton small={small} label={t("cancelTrip")} disabled={off} onClick={() => a.cancel(line)}><PhX size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
+      {!a.readOnly && <>
+        <IconButton small={small} label={t("editTrip")} disabled={off} onClick={() => a.edit(line)}><PhPencilSimple size={18} className="text-[var(--ds-on-surface-variant)]" aria-hidden /></IconButton>
+        <IconButton small={small} label={t("cancelTrip")} disabled={off} onClick={() => a.cancel(line)}><PhX size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
+      </>}
     </div>
   );
 }
@@ -138,7 +142,7 @@ function PhoneActions({ line, a }: { line: TripLine; a: TripActions }) {
         className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-[var(--ds-outline)] text-[13.5px] font-semibold text-[var(--ds-primary)] disabled:opacity-45">
         <PhCrosshair size={18} aria-hidden />{t("track")}
       </button>
-      {!line.canceled && (
+      {!line.canceled && !a.readOnly && (
         <Menu look="ds" width={200} label={t("more")}
           buttonClassName="flex size-11 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] text-[var(--ds-on-surface-variant)]"
           trigger={<PhDotsThree size={18} aria-hidden />}
@@ -185,7 +189,7 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-[var(--ds-surface)]">
       <div className={`sticky top-0 z-10 hidden h-[38px] shrink-0 items-center border-b-[1.5px] border-[var(--ds-rule)] bg-[var(--ds-surface)] px-[26px] lg:grid ${multiDay ? GRID_DAYS : GRID} ${head}`}>
-        <div><Checkbox checked={allChecked} label={t("selectAll")} onChange={onToggleAll} disabled={lines.length === 0} /></div>
+        <div><Checkbox checked={allChecked} label={t("selectAll")} onChange={onToggleAll} disabled={lines.length === 0 || a.readOnly} /></div>
         {multiDay && <div>{t("colDate")}</div>}
         <div>{t("colTime")}</div><div>{t("colPatient")}</div><div>{t("colRoute")}</div><div>{t("colStatus")}</div><div>{t("colProvider")}</div>
         <div className="text-right">{t("colActions")}</div>
@@ -201,7 +205,7 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
                 className={`relative hidden items-center border-b border-[var(--ds-outline-variant)] px-[26px] py-1.5 lg:grid ${multiDay ? GRID_DAYS : GRID} ${sel || hl ? "bg-[var(--ds-selected)]" : ""} ${hl ? "shadow-[inset_0_0_0_2px_var(--ds-primary)]" : ""}`}>
                 <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5" style={{ background: statusEdge(line.key) }} />
                 <div className="flex items-center">
-                  <Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled} />
+                  <Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled || a.readOnly} />
                 </div>
                 {multiDay && <DayCell day={line.day} />}
                 <TimeCell line={line} showDay={false} />
@@ -235,7 +239,7 @@ function PhoneCard({ line, a, sel, hl, multiDay }: { line: TripLine; a: TripActi
       className={`relative mx-4 my-2.5 rounded-[9px] border bg-[var(--ds-surface)] py-3 pl-4 pr-3 lg:hidden ${hl ? "border-[var(--ds-primary)]" : "border-[var(--ds-outline-variant)]"} ${sel ? "bg-[var(--ds-selected)]" : ""}`}
       style={{ boxShadow: `inset 4px 0 0 ${statusEdge(line.key)}` }}>
       <div className="flex items-start gap-3">
-        <div className="pt-0.5"><Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled} /></div>
+        <div className="pt-0.5"><Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled || a.readOnly} /></div>
         <TimeCell line={line} showDay={multiDay} big />
         <div className="ml-auto"><StatusChip status={line.trip.status} isCancelled={line.canceled} /></div>
       </div>
@@ -298,7 +302,7 @@ export function TimelineView({ lines, a, multiDay, nowIndex, nowTime, aside, pee
                   className={`flex min-w-0 flex-1 items-start gap-3.5 rounded-[9px] border px-4 py-3 ${hl || sel ? "border-[var(--ds-primary)]" : "border-[var(--ds-outline-variant)]"} ${sel ? "bg-[var(--ds-selected)]" : line.past ? "bg-[var(--ds-subtle)]" : "bg-[var(--ds-surface)]"}`}
                   style={{ boxShadow: `inset 4px 0 0 ${statusEdge(line.key)}` }}>
                   <div className="flex h-11 shrink-0 items-center">
-                    <Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled} />
+                    <Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled || a.readOnly} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="sm:hidden"><TimeCell line={line} showDay={false} big /></div>

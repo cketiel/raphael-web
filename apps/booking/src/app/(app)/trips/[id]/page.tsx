@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { TripTrackingPage } from "@/features/tracking/TripTrackingPage";
+import { getSession, portalKind } from "@/server/session";
 
 /**
  * One trip's tracking, as a page of its own: /trips/40233. The id is the trip's database id; the
@@ -10,9 +11,10 @@ export default async function TripTrackingRoute({ params }: { params: Promise<{ 
   const { id } = await params;
   if (!/^\d{1,10}$/.test(id)) notFound();
   const t = await getTranslations();
+  const session = await getSession();
   // Read at request time, as on Trips: changing the key in App Settings needs a restart, never a rebuild.
   const mapsKey = process.env.GOOGLE_MAPS_BROWSER_KEY ?? "";
   return mapsKey
-    ? <TripTrackingPage tripId={Number(id)} mapsKey={mapsKey} />
+    ? <TripTrackingPage tripId={Number(id)} mapsKey={mapsKey} readOnly={!!session.user && portalKind(session.user) === "provider"} />
     : <p className="p-6 text-sm text-red-600">{t("nav.mapsKeyMissing")}</p>;
 }

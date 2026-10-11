@@ -460,7 +460,10 @@
     "save": "Change password",
     "saving": "Saving...",
     "changed": "Your password has been changed.",
-    "failed": "The password could not be changed right now."
+    "failed": "The password could not be changed right now.",
+    "forcedIntro": "Your password was set by somebody else. Choose your own to continue.",
+    "forcedDone": "Password changed. Sign in again with your new password.",
+    "forcedSignIn": "Sign in"
   },
   "catalog": {
     "title": "Catalog",
@@ -500,7 +503,6 @@
     "emsLicense": "EMS license",
     "licenseExpires": "License expires",
     "planSegment": "Plan segment",
-    "notOperatingYet": "This provider does not operate in Raphael yet: it is in your list, but trips cannot be given to it until it has an account.",
     "contract": "Contract",
     "remove": "Remove from contracted",
     "edit": "Edit contact details",
@@ -517,7 +519,26 @@
     "colActions": "Actions",
     "subtitle": "Find providers and keep the ones your facility works with.",
     "emptyTitle": "No providers match these filters",
-    "emptyText": "Try another name, city or group."
+    "emptyText": "Try another name, city or group.",
+    "assignableYes": "This Provider can be given trips.",
+    "assignableNoUsers": "Pending setup: create at least one user for this Provider. Until then it cannot be given trips and it does not appear in the Provider filter.",
+    "assignableNoOffice": "This Provider works in Raphael but has no active users. Contact the office.",
+    "users": "Provider users",
+    "usersNone": "No users yet.",
+    "userNew": "New user",
+    "userNewNotice": "The user sees the trips every clinic gives this Provider. On its first sign-in it must change the password you set here.",
+    "userFullName": "Full name",
+    "userUsername": "Username",
+    "userPassword": "Temporary password",
+    "userPasswordHint": "At least {min} characters, with letters and digits.",
+    "userCreate": "Create user",
+    "userCreated": "User {username} created. Give the Provider its username and temporary password: it will choose its own when it signs in.",
+    "userActive": "Active",
+    "userInactive": "Inactive",
+    "userPending": "Password pending",
+    "userTurnOff": "Switch off",
+    "userTurnOn": "Switch on",
+    "userConfirmOff": "Switch off {name}? Their open sessions end now."
   },
   "admin": {
     "title": "Administration",

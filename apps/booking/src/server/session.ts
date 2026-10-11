@@ -19,7 +19,17 @@ export interface SessionUser {
   username: string;
   role: string;
   integratorId: number | null;
+  /**
+   * Whose portal this is. "provider": a user of a Provider that works outside Raphael, who only
+   * sees and exports the trips the clinics give it. Missing on sessions opened before 2026-10-11.
+   */
+  kind?: "clinic" | "provider" | "office";
+  /** The password was set by somebody else (a clinic): nothing else is reachable until it changes. */
+  mustChangePassword?: boolean;
 }
+
+/** The portal a session user gets. Sessions older than the field are read from the integrator. */
+export const portalKind = (user: SessionUser) => user.kind ?? (user.integratorId != null ? "clinic" : "office");
 
 // "__Host-" pins the cookie to this exact host, over HTTPS, with Path=/.
 // Browsers treat http://localhost as a secure context, so it also works in local development.

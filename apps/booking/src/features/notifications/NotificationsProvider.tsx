@@ -52,7 +52,8 @@ function expiresAt(n: ClinicNotification) {
  * The clinic's notices for the whole signed-in area: the seven days the backend keeps, plus the ones
  * that arrive live, with this user's read marks. The header, the tab and the page all read from here.
  */
-export function NotificationsProvider({ userId, children }: { userId: string; children: ReactNode }) {
+/** `enabled` false asks for nothing (an external Provider's user has no notices yet). */
+export function NotificationsProvider({ userId, children, enabled = true }: { userId: string; children: ReactNode; enabled?: boolean }) {
   const { notifications: live, status } = useRealtime();
   const stored = useQuery({
     queryKey: ["notifications"],
@@ -60,6 +61,7 @@ export function NotificationsProvider({ userId, children }: { userId: string; ch
     // Read once. Live notices arrive over the hub, so the list is only asked again when the hub
     // comes back from a cut, the one moment a notice can have been missed. No polling.
     staleTime: Infinity,
+    enabled,
   });
   const refetchStored = stored.refetch;
   const [wasCut, setWasCut] = useState(false);

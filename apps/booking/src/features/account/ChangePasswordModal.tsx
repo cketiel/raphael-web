@@ -11,8 +11,11 @@ import { useErrorText } from "@/i18n/useErrorText";
 import { bff } from "@/lib/bff";
 import { PASSWORD_MIN_LENGTH, passwordProblem } from "./passwordRules";
 
-/** Changes the signed-in user's own password. The session stays open afterwards. */
-export function ChangePasswordModal({ onClose, onChanged }: { onClose: () => void; onChanged: () => void }) {
+/**
+ * Changes the signed-in user's own password. The session stays open afterwards, except when the
+ * password had been set by somebody else (ForcePasswordChange): then every session ends.
+ */
+export function ChangePasswordModal({ onClose, onChanged, intro }: { onClose: () => void; onChanged: () => void; intro?: string }) {
   const t = useTranslations("account");
   const tErrors = useTranslations("errors");
   const tc = useTranslations("common");
@@ -54,6 +57,7 @@ export function ChangePasswordModal({ onClose, onChanged }: { onClose: () => voi
         <Button type="submit" loading={busy}>{t("save")}</Button>
       </>}>
       <div className="space-y-4">
+        {intro && <Notice tone="info">{intro}</Notice>}
         <Field label={t("currentPassword")} htmlFor="pw-current">
           <Input id="pw-current" type={type} autoComplete="current-password" required value={current} onChange={(e) => setCurrent(e.target.value)} />
         </Field>

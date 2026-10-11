@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { BookingDashboard } from "@/features/booking/BookingDashboard";
-import { getSession } from "@/server/session";
+import { getSession, portalKind } from "@/server/session";
 
 /** "?trip=40108&date=2026-10-08", from a notification's "View trip". Anything else is ignored. */
 function readFocus(params: Record<string, string | string[] | undefined>) {
@@ -26,6 +26,7 @@ export default async function TripsPage({ searchParams }: { searchParams: Promis
       key={focus ? `${focus.tripId}-${focus.date}` : "today"}
       focus={focus}
       isIntegrator={session.user?.integratorId != null}
+      isProvider={!!session.user && portalKind(session.user) === "provider"}
       isClinicAdmin={session.user?.role === "1" && session.user?.integratorId != null} mapsKey={mapsKey} mapId={mapId} />
   ) : (
     <p className="p-6 text-sm text-red-600">{t("nav.mapsKeyMissing")}</p>

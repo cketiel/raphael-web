@@ -10064,13 +10064,6 @@
         ],
         "parameters": [
           {
-            "name": "providerIds",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "startDate",
             "in": "query",
             "schema": {
@@ -10095,6 +10088,27 @@
           },
           {
             "name": "vehicleRouteIds",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "driverIds",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "vehicleIds",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "providerIds",
             "in": "query",
             "schema": {
               "type": "string"
@@ -12741,6 +12755,124 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/{id}/users": {
+      "get": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PortalProviderUserDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserCreateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/BookingPortal/catalog/providers/{id}/users/{userId}/active": {
+      "put": {
+        "tags": [
+          "BookingPortalCatalog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalProviderUserActiveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PortalProviderUserDto"
                 }
               }
             }
@@ -17319,6 +17451,12 @@
             "format": "int32",
             "nullable": true
           },
+          "isExternalProvider": {
+            "type": "boolean"
+          },
+          "mustChangePassword": {
+            "type": "boolean"
+          },
           "isSuccess": {
             "type": "boolean"
           },
@@ -17980,6 +18118,25 @@
           "canContract": {
             "type": "boolean",
             "description": "The caller may contract it or remove it: a clinic admin."
+          },
+          "accountId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "workMode": {
+            "type": "string",
+            "nullable": true
+          },
+          "activeUserCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "assignable": {
+            "type": "boolean"
+          },
+          "canManageUsers": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false,
@@ -18242,11 +18399,13 @@
           },
           "providerId": {
             "type": "integer",
+            "description": "The Provider carrying out the trip; null when Raphael does (no subcontract).",
             "format": "int32",
             "nullable": true
           },
           "provider": {
             "type": "string",
+            "description": "The Provider's name; null when Raphael carries out the trip.",
             "nullable": true
           },
           "distance": {
@@ -21912,6 +22071,68 @@
         },
         "additionalProperties": false,
         "description": "Only the time travels, because it is the only thing the dispatcher gets to decide:\r\nthe flag itself, the status and the history row are the server's business.\r\n            \r\n<br>\r\n⚠️ Wall-clock time where the trip is operated, not the hour of the machine that sent\r\nit. Null means \"let the server use the operation's own clock\" — for an activation,\r\nnow where the trip runs; for the reverse, the 23:59 the office reads as waiting on\r\nthe patient. See `_meta/TIME_POLICY.md` §2B.\r\n"
+      },
+      "PortalProviderUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fullName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "mustChangePassword": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortalProviderUserCreateDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PortalProviderUserActiveDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

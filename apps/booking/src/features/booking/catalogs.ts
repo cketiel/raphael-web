@@ -21,7 +21,9 @@ export interface FundingSourceRef {
 export type FundingContext =
   | { kind: "integrator"; linked: FundingSourceRef }
   | { kind: "integrator-unlinked" }
-  | { kind: "broker"; all: FundingSourceRef[] };
+  | { kind: "broker"; all: FundingSourceRef[] }
+  /** An external Provider's user: no funding source of its own, and it never books. */
+  | { kind: "provider" };
 
 export function useCustomers() {
   return useQuery({ queryKey: ["customers"], queryFn: () => api<Customer[]>("Customers"),
@@ -33,11 +35,12 @@ export function useSpaceTypes() {
   return useQuery({ queryKey: ["space-types"], queryFn: () => api<SpaceType[]>("SpaceTypes"), staleTime: 30 * 60_000 });
 }
 
-export function useFundingContext(isIntegrator: boolean) {
+export function useFundingContext(isIntegrator: boolean, isProvider = false) {
   return useQuery<FundingContext>({
-    queryKey: ["funding-context", isIntegrator],
+    queryKey: ["funding-context", isIntegrator, isProvider],
     staleTime: 30 * 60_000,
     queryFn: async () => {
+      if (isProvider) return { kind: "provider" };
       if (!isIntegrator) {
         const all = await api<Schemas["FundingSource"][]>("FundingSources");
         return { kind: "broker", all: all.map((f) => ({ id: f.id ?? 0, name: f.name })) };
