@@ -98,6 +98,7 @@ export {
   Rows as PhRows,
   ShieldCheck as PhShieldCheck,
   SignIn as PhSignIn,
+  SidebarSimple as PhSidebarSimple,
   SignOut as PhSignOut,
   Sun as PhSun,
   TextAa as PhTextAa,

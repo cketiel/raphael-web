@@ -10,7 +10,8 @@ import { PhCircleNotch, PhVan, PhWarningCircle } from "@/components/ui/Icon";
  * in the Trips "In progress now" panel (and `compact` in the phone's closed sheet), `inline` on a
  * trip row. The three values are live: each one flashes briefly when it changes.
  */
-export type LiveEtaState = "live" | "stale" | "nodata" | "arriving" | "late";
+/** "done": the trip is over. Same card, dimmed: ARRIVED, 0 mi, and the drop-off time on the dial. */
+export type LiveEtaState = "live" | "stale" | "nodata" | "arriving" | "late" | "done";
 
 export interface LiveEtaValues {
   state: LiveEtaState;
@@ -75,8 +76,10 @@ function Flash({ value, children, className, tint, radius }: { value: unknown; c
   );
 }
 
-export function LiveEta({ v, size, compact = false, ground = "dark" }: {
+export function LiveEta({ v, size, compact = false, ground = "dark", dense = false }: {
   v: LiveEtaValues; size: "lg" | "md" | "inline"; compact?: boolean; ground?: "dark" | "surface";
+  /** Inline only: 18 px tall, for a table row. */
+  dense?: boolean;
 }) {
   const t = useTranslations("liveEta");
   const g = GROUND[size === "inline" ? "surface" : ground];
@@ -84,6 +87,7 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
   const stale = v.state === "stale";
   const arriving = v.state === "arriving";
   const late = v.state === "late";
+  const done = v.state === "done";
   const live = !stale && !noData;
   const accent = late ? g.late : g.disc;
   const thread = live ? accent : g.rail;
@@ -91,16 +95,16 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
   const minutesText = noData || v.minutes === null ? "—" : String(Math.max(0, v.minutes));
   const milesText = noData || v.miles === null ? "—" : `${v.miles} ${t("mi")}`;
   const etaText = noData || !v.eta ? "—" : v.eta;
-  const unitShown = !noData && !arriving && v.minutes !== null;
-  const bigText = arriving ? t("arrivingNow") : minutesText;
+  const unitShown = !noData && !arriving && !done && v.minutes !== null;
+  const bigText = done ? t("arrived") : arriving ? t("arrivingNow") : minutesText;
 
   if (size === "inline") {
     return (
-      <span className="inline-flex h-6 items-center gap-1.5 rounded-md px-2" style={{ background: g.inlineBg, boxShadow: `inset 0 0 0 1px ${g.inlineRing}` }}
+      <span className={`inline-flex items-center gap-1.5 rounded-md ${dense ? "h-[18px] px-1.5" : "h-6 px-2"}`} style={{ background: g.inlineBg, boxShadow: `inset 0 0 0 1px ${g.inlineRing}` }}
         aria-label={t("aria", { minutes: minutesText, miles: milesText, eta: etaText })}>
         <span className={`size-[7px] shrink-0 rounded-full ${live ? "ds-pulse" : ""}`}
           style={live ? { background: late ? g.late : g.dot } : { border: `1.5px solid ${g.mute}` }} />
-        <span className={`${MONO} whitespace-nowrap text-[11px] font-semibold tracking-[0.03em]`} style={{ color: g.ink }}>
+        <span className={`${MONO} whitespace-nowrap font-semibold tracking-[0.03em] ${dense ? "text-[10px]" : "text-[11px]"}`} style={{ color: g.ink }}>
           {noData ? "— · — · —" : `${arriving ? t("arrivingNow") : `${minutesText} ${t("min")}`} · ${milesText} · ${etaText}`}
         </span>
         {late && <span className={`${MONO} whitespace-nowrap text-[10px] font-semibold tracking-[0.06em]`} style={{ color: g.lateInk }}>· {t("lateShort")}</span>}
@@ -138,7 +142,7 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
       <div className={`${MONO} flex items-center gap-2 font-semibold uppercase tracking-[0.12em]`} style={{ fontSize: s.phase, color: live ? g.phase : g.mute }}>
         <span className={`size-2 shrink-0 rounded-full ${live ? "ds-pulse" : ""}`}
           style={live ? { background: late ? g.late : g.dot, boxShadow: `0 0 10px ${late ? g.late : g.dot}` } : { border: `1.5px solid ${g.mute}` }} />
-        {noData ? t("waitingTitle") : v.phase === "Pickup" ? t("toPickup") : t("toDropoff")}
+        {noData ? t("waitingTitle") : done ? t("completed") : v.phase === "Pickup" ? t("toPickup") : t("toDropoff")}
       </div>
 
       <div className="flex w-full items-center">
@@ -151,7 +155,7 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
           <Flash value={v.minutes} tint={g.flash} radius={9} className="px-[7px] py-[3px]">
             <span className="flex items-baseline justify-center gap-1.5">
               <span className={`${MONO} whitespace-nowrap font-semibold leading-none tracking-[-0.01em]`}
-                style={{ fontSize: arriving ? s.arriving : s.num, color: stale ? g.mute : g.ink }}>{bigText}</span>
+                style={{ fontSize: arriving || done ? s.arriving : s.num, color: stale ? g.mute : g.ink }}>{bigText}</span>
               {unitShown && <span className={`${MONO} font-semibold tracking-[0.12em]`} style={{ fontSize: s.unit, color: stale ? g.mute : accent }}>{t("min")}</span>}
             </span>
           </Flash>
@@ -162,7 +166,7 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
         <span className="flex-1 rounded-sm" style={{ minWidth: s.railMin, height: s.rail, background: ahead, backgroundSize: `16px ${s.rail}px` }} />
         <span className="mr-0.5 size-0 shrink-0 border-y-[5px] border-l-[7px] border-y-transparent" style={{ borderLeftColor: thread }} />
         <div className="flex shrink-0 flex-col items-center gap-1.5">
-          <Dial size={s.dial} ring={s.dialRing} arc={s.arc} text={s.dialText} cap={noData || size !== "lg" ? "" : t("arrival")} capSize={s.cap}
+          <Dial size={s.dial} ring={s.dialRing} arc={s.arc} text={s.dialText} cap={noData || size !== "lg" ? "" : done ? t("droppedOff") : t("arrival")} capSize={s.cap}
             v={v} g={g} arcDash={arcDash} accent={accent} live={live} etaText={etaText} ticks />
           {late && (
             <span className={`${MONO} inline-flex h-5 items-center gap-[5px] rounded-[5px] px-2 text-[10px] font-semibold tracking-[0.06em]`} style={{ background: g.lateBg, color: g.lateInk }}>
@@ -176,7 +180,7 @@ export function LiveEta({ v, size, compact = false, ground = "dark" }: {
       <div className={`${MONO} flex items-center gap-[7px] uppercase tracking-[0.08em]`} style={{ fontSize: s.foot, color: stale ? g.lateInk : g.mute }}>
         {stale && <PhWarningCircle size={s.footIcon} aria-hidden />}
         {noData && <PhCircleNotch size={s.footIcon} className="animate-spin" aria-hidden />}
-        {noData ? t("waitingFirst") : stale ? t("lastPosition", { age: ageText(v.ageSeconds, t) }) : t("updated", { age: ageText(v.ageSeconds, t) })}
+        {noData ? t("waitingFirst") : done ? t("completedFoot") : stale ? t("lastPosition", { age: ageText(v.ageSeconds, t) }) : t("updated", { age: ageText(v.ageSeconds, t) })}
       </div>
     </div>
   );

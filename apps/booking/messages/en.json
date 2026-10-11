@@ -44,7 +44,9 @@
       "catalog": "Catalog",
       "notifications": "Alerts",
       "admin": "Admin"
-    }
+    },
+    "collapse": "Collapse menu",
+    "expand": "Expand menu"
   },
   "login": {
     "subtitle": "Sign in with your facility account.",
@@ -184,7 +186,8 @@
     "liveSheetClose": "Hide the trip under way",
     "export": "Export",
     "exportTrips": "Trips (CSV)",
-    "exportTripsNothing": "No trips in these dates to export."
+    "exportTripsNothing": "No trips in these dates to export.",
+    "colDate": "Date"
   },
   "status": {
     "Assigned": "Assigned",
@@ -636,6 +639,10 @@
     "updated": "Updated {age} ago",
     "seconds": "{n} s",
     "minutes": "{n} min",
-    "arrival": "Arrival"
+    "arrival": "Arrival",
+    "arrived": "ARRIVED",
+    "completed": "Trip completed",
+    "completedFoot": "The patient was dropped off",
+    "droppedOff": "Dropped off"
   }
 }

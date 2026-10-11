@@ -44,7 +44,9 @@
       "catalog": "Catálogo",
       "notifications": "Avisos",
       "admin": "Admin"
-    }
+    },
+    "collapse": "Plegar el menú",
+    "expand": "Desplegar el menú"
   },
   "login": {
     "subtitle": "Inicia sesión con la cuenta de tu centro.",
@@ -184,7 +186,8 @@
     "liveSheetClose": "Ocultar el viaje en curso",
     "export": "Exportar",
     "exportTrips": "Viajes (CSV)",
-    "exportTripsNothing": "No hay viajes en estas fechas para exportar."
+    "exportTripsNothing": "No hay viajes en estas fechas para exportar.",
+    "colDate": "Fecha"
   },
   "status": {
     "Assigned": "Asignado",
@@ -636,6 +639,10 @@
     "updated": "Actualizado hace {age}",
     "seconds": "{n} s",
     "minutes": "{n} min",
-    "arrival": "Llegada"
+    "arrival": "Llegada",
+    "arrived": "LLEGÓ",
+    "completed": "Viaje completado",
+    "completedFoot": "El paciente fue entregado",
+    "droppedOff": "Entregado"
   }
 }

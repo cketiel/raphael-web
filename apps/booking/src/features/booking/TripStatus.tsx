@@ -36,13 +36,19 @@ export const statusEdge = (key: StatusKey) => `var(--st-${key})`;
 export const statusRing = (key: StatusKey) => `color-mix(in srgb, var(--st-${key}) var(--st-ring-alpha), transparent)`;
 
 /** Never colour alone: a square of colour, the name in mono small caps, and a ring. */
-export function StatusChip({ status, isCancelled }: { status: string | null | undefined; isCancelled?: boolean | null }) {
+export function StatusChip({ status, isCancelled, dense = false }: {
+  status: string | null | undefined;
+  isCancelled?: boolean | null;
+  /** The table's size: 20 px, so a row keeps its two lines. */
+  dense?: boolean;
+}) {
   const t = useTranslations("status");
   const key = statusKey(status, isCancelled);
   const shown = isCancelled ? "Canceled" : status;
   const label = shown && t.has(shown) ? t(shown) : (shown ?? "");
   return (
-    <span className="inline-flex h-[26px] items-center gap-[7px] whitespace-nowrap rounded-[5px] px-2.5 font-[family-name:var(--font-plex-mono)] text-[11.5px] font-semibold uppercase tracking-[0.05em]"
+    <span className={`inline-flex items-center whitespace-nowrap rounded-[5px] font-[family-name:var(--font-plex-mono)] font-semibold uppercase tracking-[0.05em] ${dense
+      ? "h-5 gap-1.5 px-2 text-[10.5px]" : "h-[26px] gap-[7px] px-2.5 text-[11.5px]"}`}
       style={{ background: `var(--st-${key}-bg)`, color: `var(--st-${key}-ink)`, boxShadow: `inset 0 0 0 1px ${statusRing(key)}` }}>
       <span className="size-2 rounded-[2px]" style={{ background: statusEdge(key) }} aria-hidden="true" />
       {label}

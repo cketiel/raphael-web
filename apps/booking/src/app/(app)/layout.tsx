@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -6,7 +7,7 @@ import { NotificationsProvider } from "@/features/notifications/NotificationsPro
 import { RealtimeProvider } from "@/features/realtime/RealtimeProvider";
 import { selectEnvironment } from "@/server/environments";
 import { getSession } from "@/server/session";
-import { AppShell } from "./AppShell";
+import { AppShell, NAV_COOKIE } from "./AppShell";
 
 /** Every signed-in page: the frame (sections, top bar) and the live channels, opened once. */
 export default async function SignedInLayout({ children }: { children: ReactNode }) {
@@ -23,6 +24,8 @@ export default async function SignedInLayout({ children }: { children: ReactNode
       <RealtimeProvider>
         <NotificationsProvider userId={session.user.userId}>
           <AppShell username={session.user.username} isClinicAdmin={isClinicAdmin}
+            // Read on the server, as the theme is: the page never flashes the wide menu before folding it.
+            navCollapsed={(await cookies()).get(NAV_COOKIE)?.value === "rail"}
             environmentBanner={environment.name !== "PROD" && (
               <div className="bg-amber-400 px-4 py-1 text-center text-xs font-bold text-amber-950">
                 {t("nav.environment", { name: environment.name })}

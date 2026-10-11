@@ -10,12 +10,14 @@ import { liveEtaValues } from "./etaModel";
  * Live ETA for one trip of the list, with its own one-second clock. Only the trips under way carry
  * one, so a list of hundreds re-draws nothing but these few every second.
  */
-export const LiveEtaTicker = memo(function LiveEtaTicker({ trip, position, size, compact = false }: {
+export const LiveEtaTicker = memo(function LiveEtaTicker({ trip, position, size, compact = false, dense = false }: {
   trip: TripRead;
   /** The last position, with its phase, miles and the route's current ETAs; null before the first. */
   position: TripVehiclePosition | null;
   size: "md" | "inline";
   compact?: boolean;
+  /** The table's row: 18 px tall. */
+  dense?: boolean;
 }) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
@@ -33,5 +35,5 @@ export const LiveEtaTicker = memo(function LiveEtaTicker({ trip, position, size,
     legMiles: trip.distance ?? null,
     now,
   });
-  return <LiveEta v={v} size={size} compact={compact} />;
+  return <LiveEta v={v} size={size} compact={compact} dense={dense} />;
 });

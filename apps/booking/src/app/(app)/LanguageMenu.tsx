@@ -19,14 +19,12 @@ export function useChangeLanguage() {
     setBusy(true);
     try {
       await bff("/api/preferences/language", { method: "POST", body: JSON.stringify({ locale: next }) });
-      // Google Maps fixes its language when its script loads, so once it is in this tab only a full
-      // reload changes it. Until then a refresh is enough: the server sends the texts in the new
-      // language and the page keeps what it holds (the trips loaded, the filters, the selection).
-      if ((window as { google?: { maps?: unknown } }).google?.maps) window.location.reload();
-      else {
-        router.refresh();
-        setBusy(false);
-      }
+      // Never a full reload: the server sends the texts in the new language and the page keeps what
+      // it holds (the trips loaded, the filters, the selection), with no request for any of it.
+      // Google Maps keeps the language it loaded with until the next full load; with Google's labels
+      // hidden by default, that is only its attribution line.
+      router.refresh();
+      setBusy(false);
     } catch {
       setBusy(false);
     }

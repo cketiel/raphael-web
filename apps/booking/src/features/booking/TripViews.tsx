@@ -14,8 +14,13 @@ import type { TripLine } from "./tripLines";
 import { StatusChip, statusEdge, statusRing } from "./TripStatus";
 
 const MONO = "font-[family-name:var(--font-plex-mono)]";
-/** The table's columns (Design System §3): check, time, patient, route, status, provider, actions. */
-const GRID = "grid-cols-[44px_104px_minmax(0,1.15fr)_minmax(0,2.53fr)_124px_128px_152px]";
+/**
+ * The table's columns (Design System §3): check, time, patient, route, status, provider, actions.
+ * Every row is two lines tall, the height the route needs (pickup, drop-off): no column may add a
+ * third. A range of several days adds a Date column instead of a third line under the time.
+ */
+const GRID = "grid-cols-[36px_76px_minmax(0,1.15fr)_minmax(0,2.53fr)_160px_minmax(0,128px)_124px]";
+const GRID_DAYS = "grid-cols-[36px_64px_76px_minmax(0,1.15fr)_minmax(0,2.53fr)_160px_minmax(0,128px)_124px]";
 
 /** Something the design draws and nothing feeds yet: red, so it is seen and settled one by one. */
 export function NoData({ children }: { children: ReactNode }) {
@@ -79,10 +84,10 @@ function Route({ line, joined }: { line: TripLine; joined?: boolean }) {
 }
 
 /** "#40235 · AMB · 3.9 mi", and the provider after it when asked. */
-function Meta({ line, withProvider }: { line: TripLine; withProvider?: boolean }) {
+function Meta({ line, withProvider, oneLine }: { line: TripLine; withProvider?: boolean; oneLine?: boolean }) {
   const t = useTranslations("dashboard");
   return (
-    <div className={`${MONO} mt-0.5 text-xs text-[var(--ds-on-surface-variant)]`}>
+    <div className={`${MONO} mt-0.5 text-xs text-[var(--ds-on-surface-variant)] ${oneLine ? "truncate" : ""}`}>
       #{line.number} · {line.space ?? <NoData>{t("noSpace")}</NoData>} · {line.miles ?? <NoData>{t("noMiles")}</NoData>}
       {withProvider && <> · {line.provider ?? t("providerDefault")}</>}
     </div>
@@ -99,10 +104,10 @@ function Checkbox({ checked, label, onChange, disabled }: { checked: boolean; la
   );
 }
 
-function IconButton({ label, onClick, disabled, children }: { label: string; onClick: () => void; disabled?: boolean; children: ReactNode }) {
+function IconButton({ label, onClick, disabled, children, small }: { label: string; onClick: () => void; disabled?: boolean; children: ReactNode; small?: boolean }) {
   return (
     <button type="button" aria-label={label} title={label} onClick={onClick} disabled={disabled}
-      className="flex size-11 shrink-0 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] hover:bg-[var(--ds-selected)] disabled:pointer-events-none disabled:border-[var(--ds-outline-variant)] disabled:bg-[var(--ds-subtle)] disabled:opacity-45">
+      className={`flex ${small ? "size-9" : "size-11"} shrink-0 items-center justify-center rounded-[9px] border border-[var(--ds-outline)] hover:bg-[var(--ds-selected)] disabled:pointer-events-none disabled:border-[var(--ds-outline-variant)] disabled:bg-[var(--ds-subtle)] disabled:opacity-45`}>
       {children}
     </button>
   );
@@ -112,14 +117,14 @@ function IconButton({ label, onClick, disabled, children }: { label: string; onC
  * Track, edit, cancel. A canceled trip keeps its place in the list with the three off: Booking never
  * reactivates a trip (INTEGRATION_API_SPEC: integrators do not, and are not let to).
  */
-function Actions({ line, a, vertical }: { line: TripLine; a: TripActions; vertical?: boolean }) {
+function Actions({ line, a, vertical, small }: { line: TripLine; a: TripActions; vertical?: boolean; small?: boolean }) {
   const t = useTranslations("dashboard");
   const off = line.canceled;
   return (
-    <div className={`flex gap-2 ${vertical ? "flex-col" : "justify-end"}`}>
-      <IconButton label={t("trackTrip")} disabled={off} onClick={() => a.track(line)}><PhCrosshair size={18} className="text-[var(--ds-primary)]" aria-hidden /></IconButton>
-      <IconButton label={t("editTrip")} disabled={off} onClick={() => a.edit(line)}><PhPencilSimple size={18} className="text-[var(--ds-on-surface-variant)]" aria-hidden /></IconButton>
-      <IconButton label={t("cancelTrip")} disabled={off} onClick={() => a.cancel(line)}><PhX size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
+    <div className={`flex ${small ? "gap-1.5" : "gap-2"} ${vertical ? "flex-col" : "justify-end"}`}>
+      <IconButton small={small} label={t("trackTrip")} disabled={off} onClick={() => a.track(line)}><PhCrosshair size={18} className="text-[var(--ds-primary)]" aria-hidden /></IconButton>
+      <IconButton small={small} label={t("editTrip")} disabled={off} onClick={() => a.edit(line)}><PhPencilSimple size={18} className="text-[var(--ds-on-surface-variant)]" aria-hidden /></IconButton>
+      <IconButton small={small} label={t("cancelTrip")} disabled={off} onClick={() => a.cancel(line)}><PhX size={18} className="text-[var(--ds-error)]" aria-hidden /></IconButton>
     </div>
   );
 }
@@ -147,6 +152,18 @@ function PhoneActions({ line, a }: { line: TripLine; a: TripActions }) {
 }
 
 /** The time column: pickup big, appointment under it, and the day when the range spans several. */
+/** The trip's day, in two short lines that match the row's two lines: "FRI" over "09 OCT". */
+function DayCell({ day }: { day: string }) {
+  const format = useFormatter();
+  const d = new Date(`${day}T12:00:00`);
+  return (
+    <div className={`${MONO} text-xs uppercase leading-[1.35] text-[var(--ds-on-surface-variant)]`}>
+      <div className="font-semibold text-[var(--ds-on-surface)]">{format.dateTime(d, { weekday: "short" }).replace(/\./g, "")}</div>
+      <div>{format.dateTime(d, { day: "2-digit", month: "short" }).replace(/\./g, "")}</div>
+    </div>
+  );
+}
+
 function TimeCell({ line, showDay, big }: { line: TripLine; showDay: boolean; big?: boolean }) {
   const t = useTranslations("dashboard");
   const format = useFormatter();
@@ -167,8 +184,9 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
   const head = `${MONO} text-[11px] font-medium uppercase tracking-[0.12em] text-[var(--ds-on-surface-variant)]`;
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-[var(--ds-surface)]">
-      <div className={`sticky top-0 z-10 hidden h-[38px] shrink-0 items-center border-b-[1.5px] border-[var(--ds-rule)] bg-[var(--ds-surface)] px-[26px] lg:grid ${GRID} ${head}`}>
+      <div className={`sticky top-0 z-10 hidden h-[38px] shrink-0 items-center border-b-[1.5px] border-[var(--ds-rule)] bg-[var(--ds-surface)] px-[26px] lg:grid ${multiDay ? GRID_DAYS : GRID} ${head}`}>
         <div><Checkbox checked={allChecked} label={t("selectAll")} onChange={onToggleAll} disabled={lines.length === 0} /></div>
+        {multiDay && <div>{t("colDate")}</div>}
         <div>{t("colTime")}</div><div>{t("colPatient")}</div><div>{t("colRoute")}</div><div>{t("colStatus")}</div><div>{t("colProvider")}</div>
         <div className="text-right">{t("colActions")}</div>
       </div>
@@ -180,23 +198,24 @@ export function TableView({ lines, a, multiDay, allChecked, onToggleAll, footer 
             <div key={line.trip.id}>
               {/* Wide screens: the row */}
               <div ref={a.rowRef("row", line.trip.id)}
-                className={`relative hidden items-center border-b border-[var(--ds-outline-variant)] px-[26px] py-2.5 lg:grid ${GRID} ${sel || hl ? "bg-[var(--ds-selected)]" : ""} ${hl ? "shadow-[inset_0_0_0_2px_var(--ds-primary)]" : ""}`}>
+                className={`relative hidden items-center border-b border-[var(--ds-outline-variant)] px-[26px] py-1.5 lg:grid ${multiDay ? GRID_DAYS : GRID} ${sel || hl ? "bg-[var(--ds-selected)]" : ""} ${hl ? "shadow-[inset_0_0_0_2px_var(--ds-primary)]" : ""}`}>
                 <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5" style={{ background: statusEdge(line.key) }} />
-                <div className="flex h-11 items-center">
+                <div className="flex items-center">
                   <Checkbox checked={sel} label={t("selectTrip", { id: line.number })} onChange={() => a.toggle(line)} disabled={line.canceled} />
                 </div>
-                <TimeCell line={line} showDay={multiDay} />
+                {multiDay && <DayCell day={line.day} />}
+                <TimeCell line={line} showDay={false} />
                 <div className="min-w-0 pr-3">
-                  <div className="truncate text-sm font-semibold">{line.patient}</div>
-                  <Meta line={line} />
+                  <div className="truncate text-sm font-semibold leading-[1.3]">{line.patient}</div>
+                  <Meta line={line} oneLine />
                 </div>
                 <div className="min-w-0 pr-4"><Route line={line} /></div>
-                <div className="flex flex-col items-start gap-1.5">
-                  <StatusChip status={line.trip.status} isCancelled={line.canceled} />
-                  {a.live.has(line.trip.id) && <LiveEtaTicker trip={line.trip} position={a.live.get(line.trip.id) ?? null} size="inline" />}
+                <div className="flex min-w-0 flex-col items-start gap-0.5">
+                  <StatusChip status={line.trip.status} isCancelled={line.canceled} dense />
+                  {a.live.has(line.trip.id) && <LiveEtaTicker trip={line.trip} position={a.live.get(line.trip.id) ?? null} size="inline" dense />}
                 </div>
-                <div className="pr-3 text-[13px] leading-[1.35] text-[var(--ds-on-surface-variant)]">{line.provider ?? t("providerDefault")}</div>
-                <Actions line={line} a={a} />
+                <div className="line-clamp-2 pr-3 text-[13px] leading-[1.35] text-[var(--ds-on-surface-variant)]">{line.provider ?? t("providerDefault")}</div>
+                <Actions line={line} a={a} small />
               </div>
               {/* Phones and tablets: the card */}
               <PhoneCard line={line} a={a} sel={sel} hl={hl} multiDay={multiDay} />

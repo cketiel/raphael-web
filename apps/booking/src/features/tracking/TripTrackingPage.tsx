@@ -196,22 +196,39 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
   ) : null;
 
   // ── cards ──
+  // On a finished trip the buffer is the real one: appointment minus the time the patient was left.
+  const doneBuffer = bufferMinutes(tracking?.droppedOffAt ?? null, tracking?.appointmentTime ?? null);
   const buffer = bufferMinutes(position?.dropoffEta ?? tracking?.dropoffEta ?? null, tracking?.appointmentTime ?? null);
   const liveCard = (open = true) => etaInputs && (
     <LiveCard inputs={etaInputs} compact={phone && !open} size={phone ? "md" : "lg"} showFooter={!phone || open}
       appointment={hhmm(tracking?.appointmentTime)} buffer={buffer} />
   );
 
-  const quiet = tracking && !isLive ? quietCard() : null;
+  // A finished trip keeps the live card's shape, dimmed: ARRIVED, 0 mi, drop-off time on the dial.
+  const doneCard = tracking && done && !canceled && (
+    <div className="relative shrink-0 rounded-xl p-[18px] text-[#f2f8fb] opacity-80 saturate-[.35] [background:radial-gradient(circle_at_88%_6%,rgb(129_99_230/0.42),transparent_58%),linear-gradient(170deg,#073d55,#04202d)]">
+      <LiveEta size={phone ? "md" : "lg"} v={{ state: "done", phase: "Dropoff", minutes: 0, miles: "0", eta: hhmm(tracking.droppedOffAt), ageSeconds: null, progress: 1 }} />
+      <div className="relative mt-4 flex flex-wrap items-end gap-[18px] border-t border-[rgb(207_228_239/0.22)] pt-3.5">
+        <div>
+          <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("appointment")}</div>
+          <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none`}>{hhmm(tracking.appointmentTime) ?? "—"}</div>
+        </div>
+        <div className="ml-auto text-right">
+          <div className={`${MONO} text-[11px] uppercase tracking-[0.1em] text-[#cfe4ef]`}>{t("buffer")}</div>
+          <div className={`${MONO} mt-[5px] text-[20px] font-semibold leading-none ${doneBuffer !== null && doneBuffer < 0 ? "text-[#f7bd81]" : "text-[#8fe0b5]"}`}>
+            {doneBuffer === null ? "—" : t("bufferMin", { sign: doneBuffer >= 0 ? "+" : "\u2212", n: Math.abs(doneBuffer) })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  const quiet = tracking && !isLive && !doneCard ? quietCard() : null;
   function quietCard() {
     const tr = tracking!;
     let title: string, aL: string, aV: string | null, bL: string, bV: string | null, foot: string;
     if (canceled) {
       title = t("quietCanceled"); aL = t("requested"); aV = hhmm(tr.requestedPickupTime); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
       foot = t("quietCanceledFoot");
-    } else if (done) {
-      title = t("quietFinished"); aL = t("droppedOff"); aV = hhmm(tr.droppedOffAt); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
-      foot = t("onlyWhileInProgress");
     } else if (!routed) {
       title = t("quietNotRouted"); aL = t("requestedPickup"); aV = hhmm(tr.requestedPickupTime); bL = t("appointment"); bV = hhmm(tr.appointmentTime);
       foot = t("quietNotRoutedFoot", { provider });
@@ -324,6 +341,7 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
             {(open) => (
               <>
                 {liveCard(open)}
+                {doneCard}
                 {quiet}
                 {open && route}
               </>
@@ -334,6 +352,7 @@ export function TripTrackingPage({ tripId, mapsKey }: { tripId: number; mapsKey:
         <div className="flex min-h-0 flex-1 gap-[18px] bg-[var(--ds-background)] px-4 pb-[22px] pt-[18px] sm:px-[26px]">
           <div className="flex w-[378px] shrink-0 flex-col gap-3.5 overflow-y-auto overflow-x-hidden pr-3 xl:w-[412px]">
             {liveCard()}
+            {doneCard}
             {quiet}
             {route}
           </div>

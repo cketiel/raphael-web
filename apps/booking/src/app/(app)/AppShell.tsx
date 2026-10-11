@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState, useSyncExternalStore, type ComponentType, type ReactNode } from "react";
-import { PhBell, PhBuildings, PhCalendarBlank, PhShieldCheck } from "@/components/ui/Icon";
+import { PhBell, PhBuildings, PhCalendarBlank, PhShieldCheck, PhSidebarSimple } from "@/components/ui/Icon";
 import { UserMenu, initials } from "@/features/account/UserMenu";
 import { useOrganization } from "@/features/admin/adminApi";
 import { TripsViewProvider, ViewSwitch } from "@/features/booking/TripsView";
@@ -46,13 +46,25 @@ const SECTIONS: Section[] = [
  * The four sections are one tap away at every size. `isClinicAdmin` only decides whether Admin is
  * drawn: the page and the backend check it again.
  */
-export function AppShell({ username, isClinicAdmin, environmentBanner, children }: {
+/** The user's choice of a folded sidebar, kept for a year in this browser. */
+export const NAV_COOKIE = "rb_nav";
+
+export function AppShell({ username, isClinicAdmin, navCollapsed, environmentBanner, children }: {
   username: string;
   isClinicAdmin: boolean;
+  /** The sidebar folded to the rail on wide screens too, by the user's choice. */
+  navCollapsed: boolean;
   environmentBanner: ReactNode;
   children: ReactNode;
 }) {
   const t = useTranslations("nav");
+  // Fold and unfold the sidebar: the same rail the window gets below 1280 px, chosen by the user to
+  // give the table more room. Remembered in a cookie the server reads.
+  const [collapsed, setCollapsed] = useState(navCollapsed);
+  const setNav = (rail: boolean) => {
+    setCollapsed(rail);
+    document.cookie = `${NAV_COOKIE}=${rail ? "rail" : "full"}; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Strict${location.protocol === "https:" ? "; Secure" : ""}`;
+  };
   const pathname = usePathname();
   const { unread } = useNotifications();
   const { status, onTripStatus } = useRealtime();
@@ -100,7 +112,7 @@ export function AppShell({ username, isClinicAdmin, environmentBanner, children 
     <TripsViewProvider>
       <div className={`flex ${fullHeight ? "h-dvh" : "min-h-dvh"} bg-[var(--ds-background)] font-[family-name:var(--font-plex-sans)] text-[var(--ds-on-surface)] [color-scheme:var(--ds-color-scheme)]`}>
         {/* Sidebar, 1280 px and up */}
-        <aside className="sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col overflow-y-auto bg-[linear-gradient(180deg,#0a4a66_0%,#073a52_55%,#05293a_100%)] xl:flex">
+        <aside className={`sticky top-0 hidden h-dvh w-[260px] shrink-0 flex-col overflow-y-auto bg-[linear-gradient(180deg,#0a4a66_0%,#073a52_55%,#05293a_100%)] ${collapsed ? "" : "xl:flex"}`}>
           <div className="pointer-events-none absolute left-[130px] top-[-40px] h-[200px] w-[260px] -translate-x-1/2 bg-[radial-gradient(circle,rgb(110_195_224/0.3),transparent_68%)]" />
           <Link href="/" className="relative flex flex-col items-center gap-2.5 px-[22px] pb-5 pt-[26px]">
             <Image src="/brand/raphael-pin.png" alt="" width={43} height={54} priority unoptimized className="h-[54px] w-[43px]" />
@@ -126,6 +138,10 @@ export function AppShell({ username, isClinicAdmin, environmentBanner, children 
             })}
           </nav>
           <div className="relative mt-auto flex flex-col gap-3 px-4 pb-5 pt-[18px]">
+            <button type="button" onClick={() => setNav(true)}
+              className="flex h-9 items-center gap-2 rounded-lg px-3 text-xs font-medium text-[var(--ds-on-brand-variant)] hover:bg-white/[0.08] hover:text-white">
+              <PhSidebarSimple size={17} aria-hidden />{t("collapse")}
+            </button>
             <div className="flex h-9 items-center gap-2 rounded-lg bg-white/[0.08] px-3 text-xs font-medium text-[var(--ds-on-brand-variant)]">
               <span aria-hidden="true" className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
               {t(`live.${status}`)}
@@ -135,7 +151,7 @@ export function AppShell({ username, isClinicAdmin, environmentBanner, children 
         </aside>
 
         {/* Rail, 1024 to 1279 px */}
-        <aside className="sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col items-center gap-2 bg-[linear-gradient(180deg,#0a4a66,#073a52_55%,#05293a)] pb-3.5 pt-4 lg:flex xl:hidden">
+        <aside className={`sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col items-center gap-2 bg-[linear-gradient(180deg,#0a4a66,#073a52_55%,#05293a)] pb-3.5 pt-4 lg:flex ${collapsed ? "" : "xl:hidden"}`}>
           <Link href="/" aria-label="Raphael"><Image src="/brand/raphael-pin.png" alt="" width={34} height={43} unoptimized className="h-[43px] w-[34px]" /></Link>
           <div className="mb-1.5 mt-2.5 h-px w-9 bg-[rgb(154_213_236/0.34)]" />
           <nav aria-label={t("sections")} className="flex flex-col items-center gap-2">
@@ -155,6 +171,11 @@ export function AppShell({ username, isClinicAdmin, environmentBanner, children 
             })}
           </nav>
           <div className="mt-auto flex flex-col items-center gap-2.5">
+            {/* Only where the full sidebar fits: below 1280 px the rail is the only form. */}
+            <button type="button" onClick={() => setNav(false)} aria-label={t("expand")} title={t("expand")}
+              className="hidden size-11 items-center justify-center rounded-[11px] text-[var(--ds-on-brand-variant)] hover:bg-white/[0.08] hover:text-white xl:flex">
+              <PhSidebarSimple size={20} weight="fill" aria-hidden />
+            </button>
             <span aria-hidden="true" title={t(`live.${status}`)} className={`ds-pulse size-2 rounded-full ${STATUS_DOT[status]}`} />
             <span className="flex size-11 items-center justify-center rounded-full bg-[linear-gradient(140deg,#5ab6dd,#0a5c7e)] text-[13px] font-bold text-white" aria-hidden="true">{initials(username)}</span>
           </div>
