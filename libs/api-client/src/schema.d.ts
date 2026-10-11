@@ -559,7 +559,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * One of the clinic's trips, for its tracking view: places, route ETAs and what already happened.
+         * One of the clinic's trips, for its tracking page: who and where, route ETAs and what already
+         *     happened. Everything the page shows in one small request, never the day's whole list.
          * @description The Trip query filter keeps it to the caller's integrator: another clinic's trip is a 404.
          */
         get: {
@@ -14617,6 +14618,25 @@ export interface components {
              * @description When the patient was left at the destination.
              */
             droppedOffAt?: string | null;
+            /** @description The trip's own number (the integrator's id), shown as "Trip #40233". Null when it has none. */
+            externalTripId?: string | null;
+            /** @description The patient, for the page's title. The same name the clinic's trip list shows. */
+            customerName?: string | null;
+            spaceTypeName?: string | null;
+            /**
+             * Format: double
+             * @description Road miles of the trip, as routed.
+             */
+            distance?: number | null;
+            /** @description The places' names ("Home", "Sunrise Dialysis Center"), when the trip has them. */
+            pickupPlace?: string | null;
+            dropoffPlace?: string | null;
+            /** @description The phone to call about the pickup: the patient's, as booked. */
+            pickupPhone?: string | null;
+            /** @description The provider carrying the trip. Null means Raphael's own fleet. */
+            providerName?: string | null;
+            /** @description The kind of vehicle on the route ("Wheelchair", "Stretcher"), or null before routing. */
+            vehicleType?: string | null;
         };
         TripTypeUpdateDto: {
             /** Format: int32 */

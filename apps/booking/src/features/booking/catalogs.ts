@@ -24,7 +24,9 @@ export type FundingContext =
   | { kind: "broker"; all: FundingSourceRef[] };
 
 export function useCustomers() {
-  return useQuery({ queryKey: ["customers"], queryFn: () => api<Customer[]>("Customers"), staleTime: 5 * 60_000 });
+  return useQuery({ queryKey: ["customers"], queryFn: () => api<Customer[]>("Customers"),
+    // Hundreds of patients: read once per session; a booking that creates one refreshes it.
+    staleTime: Infinity });
 }
 
 export function useSpaceTypes() {

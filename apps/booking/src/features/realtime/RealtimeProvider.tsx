@@ -36,6 +36,13 @@ export interface TripVehiclePosition {
   speed: number;
   direction: string | null;
   atUtc: string;
+  /** Where the vehicle is heading for this trip: "Pickup" until the patient is on board, then "Dropoff". */
+  phase?: "Pickup" | "Dropoff";
+  /** Miles to the stop of `phase`, measured by the backend on each fix without Google. Null when unknown. */
+  remainingMiles?: number | null;
+  /** The route's current ETAs ("HH:mm:ss"), as the driver's app last left them: they arrive with every fix. */
+  pickupEta?: string | null;
+  dropoffEta?: string | null;
 }
 
 /** Raphael.Shared WatchTripResult; null when the trip is not the clinic's. */
@@ -57,6 +64,12 @@ interface Realtime {
   notifications: LiveNotification[];
   /** Calls back on every status change of this clinic's trips. Returns the unsubscribe. */
   onTripStatus(listener: (change: TripStatusChange) => void): () => void;
+  /**
+   * Calls back when a followed trip's ETAs or routing change (Raphael.Shared TripTrackingChangedMessage):
+   * the driver wrote an ETA, or the trip was routed, unrouted or re-timed. Only for trips joined with
+   * watchTrip. Returns the unsubscribe.
+   */
+  onTripTracking(listener: (tripId: number) => void): () => void;
   /** Follows one trip's vehicle while it is under way. Returns null when the trip is not this clinic's. */
   watchTrip(tripId: number, onPosition: (p: TripVehiclePosition) => void): Promise<{ result: WatchTripResult | null; stop: () => void }>;
 }
@@ -83,6 +96,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<LiveNotification[]>([]);
   const dispatchRef = useRef<HubConnection | null>(null);
   const statusListeners = useRef(new Set<(c: TripStatusChange) => void>());
+  const trackingListeners = useRef(new Set<(tripId: number) => void>());
   const positionListeners = useRef(new Map<number, (p: TripVehiclePosition) => void>());
 
   useEffect(() => {
@@ -116,6 +130,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
       const dispatchHub = build(base, "/hubs/dispatch");
       dispatchHub.on("TripStatusChanged", (c: TripStatusChange) => statusListeners.current.forEach((l) => l(c)));
+      dispatchHub.on("TripTrackingChanged", (m: { tripId: number }) => trackingListeners.current.forEach((l) => l(m.tripId)));
       dispatchHub.on("TripVehiclePosition", (p: TripVehiclePosition) => positionListeners.current.get(p.tripId)?.(p));
       // Groups do not survive a reconnect: the server sees a new connection and must be asked again.
       dispatchHub.onreconnected(async () => {
@@ -150,6 +165,11 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const onTripTracking = useCallback((listener: (tripId: number) => void) => {
+    trackingListeners.current.add(listener);
+    return () => void trackingListeners.current.delete(listener);
+  }, []);
+
   const onTripStatus = useCallback((listener: (c: TripStatusChange) => void) => {
     statusListeners.current.add(listener);
     return () => void statusListeners.current.delete(listener);
@@ -171,6 +191,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
     status,
     notifications,
     onTripStatus,
+    onTripTracking,
     watchTrip,
   };
 

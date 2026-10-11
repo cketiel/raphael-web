@@ -12,6 +12,11 @@ export interface MenuItem {
   /** Marked as the current choice (a language, a filter). */
   selected?: boolean;
   danger?: boolean;
+  /** A rule above it: the last, separate action (Sign out). */
+  separated?: boolean;
+  /** Shown but not choosable, with `hint` saying why ("No billable trips…"). */
+  disabled?: boolean;
+  hint?: string;
   onSelect: () => void;
 }
 
@@ -20,12 +25,16 @@ export interface MenuItem {
  * on Escape, and the arrow keys move through it.
  * `look="ds"` draws it with the final design's tokens (design/DESIGN.md), for screens already rebuilt.
  */
-export function Menu({ trigger, label, items, header, align = "right", buttonClassName = "", look = "kit" }: {
+export function Menu({ trigger, label, items, header, align = "right", side = "below", width = 200, buttonClassName = "", look = "kit" }: {
   trigger: ReactNode;
   label: string;
   items: MenuItem[];
   header?: ReactNode;
   align?: "left" | "right";
+  /** "above" for a trigger at the foot of the screen, as the user card at the bottom of the sidebar. */
+  side?: "below" | "above";
+  /** The panel's width with `look="ds"`, in px. */
+  width?: number;
   buttonClassName?: string;
   look?: "kit" | "ds";
 }) {
@@ -65,21 +74,25 @@ export function Menu({ trigger, label, items, header, align = "right", buttonCla
         {trigger}
       </button>
       {open && (
-        <div className={`absolute top-full z-[1200] overflow-hidden ${align === "right" ? "right-0" : "left-0"} ${ds
-          ? "mt-1.5 w-[200px] rounded-[10px] border border-[var(--ds-outline-variant)] bg-[var(--ds-surface)] text-[var(--ds-on-surface)] shadow-[var(--ds-pop-shadow)]"
+        <div style={ds ? { width } : undefined}
+          className={`absolute z-[1200] overflow-hidden ${side === "above" ? "bottom-full mb-1.5" : "top-full"} ${align === "right" ? "right-0" : "left-0"} ${ds
+          ? `ds-pop rounded-[10px] border border-[var(--ds-outline-variant)] bg-[var(--ds-surface)] text-[var(--ds-on-surface)] shadow-[var(--ds-pop-shadow)] ${side === "above" ? "" : "mt-1.5"}`
           : "mt-2 min-w-52 rounded-xl border border-border bg-surface py-1 text-foreground shadow-pop"}`}>
           {header && <div className={ds ? "border-b border-[var(--ds-outline-variant)] px-[13px] py-[9px]" : "border-b border-border px-4 py-2.5"}>{header}</div>}
           <ul ref={list} role="menu" aria-label={label}>
             {items.map((item) => (
-              <li key={item.key} role="none">
+              <li key={item.key} role="none" className={item.separated ? (ds ? "border-t border-[var(--ds-outline-variant)]" : "border-t border-border") : undefined}>
                 <button type="button" role={item.selected === undefined ? "menuitem" : "menuitemradio"} aria-checked={item.selected}
+                  disabled={item.disabled} title={item.hint}
                   onClick={() => { setOpen(false); item.onSelect(); }}
                   className={ds
-                    ? `flex h-11 w-full items-center gap-2.5 px-[13px] text-left text-sm focus:outline-none ${
+                    ? `flex h-11 w-full items-center gap-2.5 px-[13px] text-left text-sm focus:outline-none disabled:opacity-45 ${
                       item.selected ? "bg-[var(--ds-selected)] font-semibold text-[var(--ds-primary)]" : "hover:bg-[var(--ds-selected)] focus:bg-[var(--ds-selected)]"}`
                     : `flex w-full items-center gap-3 px-4 py-2.5 text-left text-[0.95rem] hover:bg-surface-2 focus:bg-surface-2 focus:outline-none ${
                       item.danger ? "text-danger" : ""}`}>
-                  {item.icon && <item.icon size={16} aria-hidden className={item.danger ? "" : "text-muted"} />}
+                  {item.icon && (ds
+                    ? <item.icon size={18} aria-hidden className={item.danger ? "text-[var(--ds-error)]" : "text-[var(--ds-on-surface-variant)]"} />
+                    : <item.icon size={16} aria-hidden className={item.danger ? "" : "text-muted"} />)}
                   <span className="flex-1">{item.label}</span>
                   {item.selected && (ds
                     ? <PhCheck size={15} weight="bold" aria-hidden />

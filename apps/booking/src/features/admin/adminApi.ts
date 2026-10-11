@@ -49,8 +49,8 @@ export function useUserActions() {
   };
 }
 
-export function useOrganization() {
-  return useQuery({ queryKey: ["admin", "organization"], queryFn: () => api<Organization>(`${BASE}/organization`) });
+export function useOrganization(enabled = true) {
+  return useQuery({ queryKey: ["admin", "organization"], queryFn: () => api<Organization>(`${BASE}/organization`), enabled });
 }
 
 export function useOrganizationActions() {

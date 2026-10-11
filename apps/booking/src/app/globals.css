@@ -106,6 +106,41 @@
   --ds-on-brand-variant: #cfe4ef;
   --ds-on-brand-faint: #9fc3d4;
   --ds-brand-icon: #9bdcf2;
+  --ds-subtle: #f6f8f9;
+  --ds-switch-on: #ffffff;
+  --ds-track: #e4ebef;
+  --ds-rule: #10303f;
+  --ds-summary: #f1e9db;
+  --ds-summary-rule: rgb(16 48 63 / 0.16);
+  --ds-money: #06516f;
+  --ds-badge: #c0392b;
+  --ds-success: #1c8a57;
+  --ds-pickup: #c0392b;
+  --ds-dropoff: #0a5c7e;
+  --ds-pin-inner: #ffffff;
+  --ds-now-ink: #b3271b;
+  --ds-now-line: #d4786e;
+  --ds-warn-bg: #fcefe3;
+  --ds-cool-bg: #e7edf8;
+  --ds-late-mark: #a85115;
+  --ds-arrived-mark: #1b4f9c;
+  --ds-scrim: rgb(5 25 35 / 0.55);
+  --ds-toast-bg: #10303f;
+  --ds-toast-ink: #ffffff;
+  --ds-toast-ring: rgb(255 255 255 / 0.14);
+  --ds-toast-icon: #5ddba0;
+  --ds-live-panel: linear-gradient(170deg, #073d55, #04202d);
+  /* Trip statuses: edge colour, label background, label ink (Design System §2). */
+  --st-scheduled: #2f6fd0; --st-scheduled-bg: #eaf1fc; --st-scheduled-ink: #24579f;
+  --st-assigned: #1f8a52; --st-assigned-bg: #e9f5ee; --st-assigned-ink: #176b40;
+  --st-accepted: #0d8aa6; --st-accepted-bg: #e4f4f7; --st-accepted-ink: #0a6b81;
+  --st-waiting: #b07a00; --st-waiting-bg: #fdf3df; --st-waiting-ink: #8a6000;
+  --st-late: #d4691a; --st-late-bg: #fcefe3; --st-late-ink: #a85115;
+  --st-arrived: #1b4f9c; --st-arrived-bg: #e7edf8; --st-arrived-ink: #1b4f9c;
+  --st-inprogress: #6d4ad6; --st-inprogress-bg: #efebfc; --st-inprogress-ink: #5839b8;
+  --st-finished: #6b7280; --st-finished-bg: #f1f2f4; --st-finished-ink: #5a606b;
+  --st-canceled: #c0392b; --st-canceled-bg: #fbeceb; --st-canceled-ink: #a8322a;
+  --st-ring-alpha: 20%;
   --ds-color-scheme: light;
 }
 
@@ -128,6 +163,40 @@
     --ds-brand-halo: radial-gradient(circle, rgb(110 195 224 / 0.3) 0%, rgb(110 195 224 / 0.1) 42%, transparent 68%);
     --ds-brand-tile: rgb(255 255 255 / 0.08);
     --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
+    --ds-subtle: #0e2029;
+  --ds-switch-on: #1d4154;
+    --ds-switch-on: #1d4154;
+    --ds-track: #0c2330;
+    --ds-rule: #5ab6dd;
+    --ds-summary: #1b3340;
+    --ds-summary-rule: rgb(233 241 245 / 0.16);
+    --ds-money: #e2c9a3;
+    --ds-badge: #e0564a;
+    --ds-success: #58c98d;
+    --ds-pickup: #ff6b5e;
+    --ds-dropoff: #5ab6dd;
+    --ds-pin-inner: #0b1b24;
+    --ds-now-ink: #ff9a8d;
+    --ds-now-line: #8c4a43;
+    --ds-warn-bg: #2e2318;
+    --ds-cool-bg: #152636;
+    --ds-late-mark: #f0923f;
+    --ds-arrived-mark: #6e9df0;
+    --ds-toast-bg: #16303e;
+    --ds-toast-ink: #e9f1f5;
+    --ds-toast-ring: rgb(110 195 224 / 0.3);
+    --ds-toast-icon: #58c98d;
+    --ds-live-panel: linear-gradient(170deg, #0d3346, #061b25);
+    --st-scheduled: #7aa9f0; --st-scheduled-bg: #15283f; --st-scheduled-ink: #a8c8f8;
+    --st-assigned: #58c98d; --st-assigned-bg: #0f2e20; --st-assigned-ink: #8fe0b5;
+    --st-accepted: #45c2dd; --st-accepted-bg: #0c2e36; --st-accepted-ink: #8adcef;
+    --st-waiting: #d9a93c; --st-waiting-bg: #2e2410; --st-waiting-ink: #edc878;
+    --st-late: #f0923f; --st-late-bg: #33220f; --st-late-ink: #f7bd81;
+    --st-arrived: #6e9df0; --st-arrived-bg: #141f36; --st-arrived-ink: #a3c0f7;
+    --st-inprogress: #a98cf7; --st-inprogress-bg: #211a3b; --st-inprogress-ink: #c6b4fa;
+    --st-finished: #93a3ad; --st-finished-bg: #1b242a; --st-finished-ink: #b8c5cd;
+    --st-canceled: #f27a6c; --st-canceled-bg: #331a18; --st-canceled-ink: #f7a89f;
+    --st-ring-alpha: 34%;
     --ds-color-scheme: dark;
   }
 }
@@ -150,6 +219,38 @@
   --ds-brand-halo: radial-gradient(circle, rgb(110 195 224 / 0.3) 0%, rgb(110 195 224 / 0.1) 42%, transparent 68%);
   --ds-brand-tile: rgb(255 255 255 / 0.08);
   --ds-brand-tile-ring: rgb(154 213 236 / 0.26);
+  --ds-subtle: #0e2029;
+  --ds-track: #0c2330;
+  --ds-rule: #5ab6dd;
+  --ds-summary: #1b3340;
+  --ds-summary-rule: rgb(233 241 245 / 0.16);
+  --ds-money: #e2c9a3;
+  --ds-badge: #e0564a;
+  --ds-success: #58c98d;
+  --ds-pickup: #ff6b5e;
+  --ds-dropoff: #5ab6dd;
+  --ds-pin-inner: #0b1b24;
+  --ds-now-ink: #ff9a8d;
+  --ds-now-line: #8c4a43;
+  --ds-warn-bg: #2e2318;
+  --ds-cool-bg: #152636;
+  --ds-late-mark: #f0923f;
+  --ds-arrived-mark: #6e9df0;
+  --ds-toast-bg: #16303e;
+  --ds-toast-ink: #e9f1f5;
+  --ds-toast-ring: rgb(110 195 224 / 0.3);
+  --ds-toast-icon: #58c98d;
+  --ds-live-panel: linear-gradient(170deg, #0d3346, #061b25);
+  --st-scheduled: #7aa9f0; --st-scheduled-bg: #15283f; --st-scheduled-ink: #a8c8f8;
+  --st-assigned: #58c98d; --st-assigned-bg: #0f2e20; --st-assigned-ink: #8fe0b5;
+  --st-accepted: #45c2dd; --st-accepted-bg: #0c2e36; --st-accepted-ink: #8adcef;
+  --st-waiting: #d9a93c; --st-waiting-bg: #2e2410; --st-waiting-ink: #edc878;
+  --st-late: #f0923f; --st-late-bg: #33220f; --st-late-ink: #f7bd81;
+  --st-arrived: #6e9df0; --st-arrived-bg: #141f36; --st-arrived-ink: #a3c0f7;
+  --st-inprogress: #a98cf7; --st-inprogress-bg: #211a3b; --st-inprogress-ink: #c6b4fa;
+  --st-finished: #93a3ad; --st-finished-bg: #1b242a; --st-finished-ink: #b8c5cd;
+  --st-canceled: #f27a6c; --st-canceled-bg: #331a18; --st-canceled-ink: #f7a89f;
+  --st-ring-alpha: 34%;
   --ds-color-scheme: dark;
 }
 
@@ -174,4 +275,47 @@ body {
 input[type="date"],
 input[type="time"] {
   accent-color: var(--brand);
+}
+
+/* The final design's motion: the live dot, the spinner and the loading shimmer (Design System). */
+@keyframes ds-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.82); } }
+@keyframes ds-shimmer { 0% { background-position: -420px 0; } 100% { background-position: 420px 0; } }
+@keyframes ds-pop { from { opacity: 0; transform: translateY(6px) scale(0.985); } to { opacity: 1; transform: none; } }
+.ds-pulse { animation: ds-pulse 2.4s ease-in-out infinite; }
+/* A live value that just changed: a brief halo in --fl, the colour the component passes (Live ETA). */
+@keyframes ds-live-flash { 0% { background: var(--fl); box-shadow: 0 0 0 7px var(--fl); } 100% { background: transparent; box-shadow: 0 0 0 7px transparent; } }
+.ds-live-flash { animation: ds-live-flash 0.8s ease-out; }
+.ds-pop { animation: ds-pop 0.14s ease-out; }
+.ds-shimmer {
+  background: linear-gradient(90deg, var(--ds-background) 0%, var(--ds-subtle) 40%, var(--ds-background) 80%);
+  background-size: 420px 100%;
+  animation: ds-shimmer 1.4s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-pulse, .ds-shimmer, .ds-pop, .ds-live-flash { animation: none; }
+}
+
+/*
+ * The pointer says what a thing does. Tailwind's reset leaves buttons with the arrow, which made
+ * every control look inert. One rule for the whole portal, so no screen has to remember it:
+ * - a hand on anything that acts when clicked (buttons, links, tabs, menu items, checkboxes, pickers);
+ * - "not-allowed" on the same things when disabled, so a dead button explains itself;
+ * - the text caret on fields where one types, and "wait" on a busy region (aria-busy).
+ */
+@layer base {
+  button, [role="button"], [role="tab"], [role="menuitem"], [role="menuitemradio"], [role="checkbox"], [role="radio"],
+  a[href], summary, select, label[for], input[type="checkbox"], input[type="radio"], input[type="file"],
+  input[type="date"], input[type="time"], input[type="color"], input[type="range"] {
+    cursor: pointer;
+  }
+  button:disabled, [aria-disabled="true"], select:disabled, input:disabled, textarea:disabled {
+    cursor: not-allowed;
+  }
+  input[type="text"], input[type="search"], input[type="email"], input[type="tel"], input[type="password"],
+  input[type="number"], input:not([type]), textarea {
+    cursor: text;
+  }
+  [aria-busy="true"] {
+    cursor: progress;
+  }
 }

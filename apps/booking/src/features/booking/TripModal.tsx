@@ -75,7 +75,8 @@ interface TripModalProps {
   funding: FundingContext | undefined;
   mapId: string;
   onClose: () => void;
-  onSaved: () => Promise<void>;
+  /** After a save. `patientChanged`: the booking created the patient or changed its record. */
+  onSaved: (patientChanged: boolean) => Promise<void>;
 }
 
 /**
@@ -320,11 +321,23 @@ export function TripModal({ trip, customers, spaceTypes, funding, mapId, onClose
       if (providerId) data.append("ProviderId", providerId);
     }
 
+    // The backend creates or updates the patient from these fields. Only then is the patient list
+    // stale: hundreds of rows are not asked for again after every booking.
+    const known = customers.find((c) => (c.riderId ?? "") === form.riderId);
+    const patientChanged = !known
+      || (known.fullName ?? "") !== form.custName
+      || (known.phone ?? "").replace(/\D/g, "").slice(-10) !== phone
+      || (known.dob ?? "").slice(0, 10) !== form.custDOB
+      || (known.gender ?? "") !== form.custGender
+      || (known.address ?? "") !== form.custAddress
+      || (known.city ?? "") !== form.custCity
+      || (known.zip ?? "") !== form.custZip;
+
     try {
       await feedback.busy(async () => {
         await api("BookingPortal/sync-single", { method: "POST", body: data });
         onClose();
-        await onSaved();
+        await onSaved(patientChanged);
       });
       await feedback.alert(t("saved"));
     } catch (e) {

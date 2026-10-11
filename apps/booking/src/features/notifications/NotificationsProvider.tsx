@@ -53,14 +53,22 @@ function expiresAt(n: ClinicNotification) {
  * that arrive live, with this user's read marks. The header, the tab and the page all read from here.
  */
 export function NotificationsProvider({ userId, children }: { userId: string; children: ReactNode }) {
-  const { notifications: live } = useRealtime();
+  const { notifications: live, status } = useRealtime();
   const stored = useQuery({
     queryKey: ["notifications"],
     queryFn: () => api<ClinicNotification[]>("BookingPortal/notifications"),
-    // Live notices arrive over the hub; this only catches up after a reconnect or a long absence.
-    staleTime: 5 * 60_000,
-    refetchInterval: 5 * 60_000,
+    // Read once. Live notices arrive over the hub, so the list is only asked again when the hub
+    // comes back from a cut, the one moment a notice can have been missed. No polling.
+    staleTime: Infinity,
   });
+  const refetchStored = stored.refetch;
+  const [wasCut, setWasCut] = useState(false);
+  if (status === "reconnecting" || status === "disconnected") {
+    if (!wasCut) setWasCut(true);
+  } else if (status === "connected" && wasCut) {
+    setWasCut(false);
+    void refetchStored();
+  }
 
   // Read marks live in localStorage, which the server render cannot see: it renders everything unread.
   const storedMarks = useSyncExternalStore(subscribeReadState, () => readStoredState(userId), () => null);

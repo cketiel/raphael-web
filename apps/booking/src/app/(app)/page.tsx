@@ -25,7 +25,8 @@ export default async function TripsPage({ searchParams }: { searchParams: Promis
       // A new "View trip" is a new list: remounting loads its day instead of keeping the previous one.
       key={focus ? `${focus.tripId}-${focus.date}` : "today"}
       focus={focus}
-      isIntegrator={session.user?.integratorId != null} mapsKey={mapsKey} mapId={mapId} />
+      isIntegrator={session.user?.integratorId != null}
+      isClinicAdmin={session.user?.role === "1" && session.user?.integratorId != null} mapsKey={mapsKey} mapId={mapId} />
   ) : (
     <p className="p-6 text-sm text-red-600">{t("nav.mapsKeyMissing")}</p>
   );

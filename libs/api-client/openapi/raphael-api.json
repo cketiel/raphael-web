@@ -1034,7 +1034,7 @@
         "tags": [
           "BookingPortal"
         ],
-        "summary": "One of the clinic's trips, for its tracking view: places, route ETAs and what already happened.",
+        "summary": "One of the clinic's trips, for its tracking page: who and where, route ETAs and what already\r\nhappened. Everything the page shows in one small request, never the day's whole list.",
         "description": "The Trip query filter keeps it to the caller's integrator: another clinic's trip is a 404.",
         "parameters": [
           {
@@ -20790,6 +20790,50 @@
             "type": "string",
             "description": "When the patient was left at the destination.",
             "format": "date-span",
+            "nullable": true
+          },
+          "externalTripId": {
+            "type": "string",
+            "description": "The trip's own number (the integrator's id), shown as \"Trip #40233\". Null when it has none.",
+            "nullable": true
+          },
+          "customerName": {
+            "type": "string",
+            "description": "The patient, for the page's title. The same name the clinic's trip list shows.",
+            "nullable": true
+          },
+          "spaceTypeName": {
+            "type": "string",
+            "nullable": true
+          },
+          "distance": {
+            "type": "number",
+            "description": "Road miles of the trip, as routed.",
+            "format": "double",
+            "nullable": true
+          },
+          "pickupPlace": {
+            "type": "string",
+            "description": "The places' names (\"Home\", \"Sunrise Dialysis Center\"), when the trip has them.",
+            "nullable": true
+          },
+          "dropoffPlace": {
+            "type": "string",
+            "nullable": true
+          },
+          "pickupPhone": {
+            "type": "string",
+            "description": "The phone to call about the pickup: the patient's, as booked.",
+            "nullable": true
+          },
+          "providerName": {
+            "type": "string",
+            "description": "The provider carrying the trip. Null means Raphael's own fleet.",
+            "nullable": true
+          },
+          "vehicleType": {
+            "type": "string",
+            "description": "The kind of vehicle on the route (\"Wheelchair\", \"Stretcher\"), or null before routing.",
             "nullable": true
           }
         },
