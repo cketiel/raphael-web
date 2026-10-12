@@ -52,14 +52,14 @@ export function IntegratorCatalog() {
         <div className="flex flex-wrap items-center gap-2">
           {[false, true].map((mine) => (
             <button key={String(mine)} type="button" aria-pressed={filters.mine === mine} onClick={() => set({ mine })}
-              className={`inline-flex h-9 items-center rounded-full border px-3.5 text-sm font-semibold ${filters.mine === mine ? "border-brand bg-brand text-white" : "border-border-strong bg-surface hover:text-brand"}`}>
+              className={`inline-flex h-9 items-center rounded-full border px-3.5 text-sm font-semibold ${filters.mine === mine ? "border-brand bg-brand text-on-fill" : "border-border-strong bg-surface hover:text-brand"}`}>
               {mine ? t("myClinics") : t("allIntegrators")}
             </button>
           ))}
           {(page?.groups?.length ?? 0) > 1 && <span className="mx-1 h-6 w-px bg-border" aria-hidden="true" />}
           {(page?.groups?.length ?? 0) > 1 && page!.groups!.map((g) => (
             <button key={g.id} type="button" aria-pressed={filters.groupId === g.id} onClick={() => set({ groupId: filters.groupId === g.id ? null : g.id ?? null })}
-              className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold ${filters.groupId === g.id ? "border-brand bg-brand text-white" : "border-border-strong bg-surface hover:text-brand"}`}>
+              className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold ${filters.groupId === g.id ? "border-brand bg-brand text-on-fill" : "border-border-strong bg-surface hover:text-brand"}`}>
               {g.label} <span className="opacity-70">{g.count}</span>
             </button>
           ))}

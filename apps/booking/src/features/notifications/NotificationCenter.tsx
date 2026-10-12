@@ -146,7 +146,7 @@ function Row({ n, read, onRead, describe, when }: {
         {!read && <Button variant="ghost" size="sm" icon={IconCheck} onClick={onRead}>{t("markRead")}</Button>}
         {link && (
           <Link href={`/?trip=${link.tripId}&date=${link.date}`} onClick={onRead}
-            className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius)] bg-brand px-3 text-sm font-semibold text-white hover:bg-brand-700">
+            className="inline-flex h-8 items-center gap-1.5 rounded-[var(--radius)] bg-brand px-3 text-sm font-semibold text-on-fill hover:bg-brand-700">
             {t("viewTrip")}<IconChevronRight size={14} aria-hidden />
           </Link>
         )}

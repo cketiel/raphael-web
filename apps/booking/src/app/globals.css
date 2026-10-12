@@ -42,6 +42,66 @@
   --radius: 10px;
   --shadow-card: 0 1px 2px rgb(15 31 46 / 0.06), 0 1px 3px rgb(15 31 46 / 0.08);
   --shadow-pop: 0 10px 30px rgb(15 31 46 / 0.18);
+
+  /* Ink on a solid fill (bg-brand, bg-danger, bg-success) and on the soft alert backgrounds. */
+  --on-fill: #ffffff;
+  --danger-ink: #8a1c1c;
+  --success-ink: #14532d;
+  --info-ink: #124a7a;
+  --warning-ink: #7a3d06;
+}
+
+/*
+ * Night values for the tokens above, so the screens not yet rebuilt read in the dark theme too.
+ * Interim: borrowed from Harbor night (--ds-*) until each screen moves to the final design. It also
+ * maps Tailwind's soft tints (-50/-100/-200) and dark inks (-700/-800/-900) that those screens use
+ * literally: a pale pill with dark text would otherwise sit on a dark card. Two copies, as below:
+ * the system's choice, and the person's.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: #0a1a23; --foreground: #e9f1f5; --surface: #112632; --surface-2: #0e2029;
+    --border: #22404f; --border-strong: #3a6277; --muted: #a8c0cc;
+    --brand-50: #133543; --brand-100: #17394a; --brand-200: #2a5a70; --brand-500: #5ab6dd;
+    --brand: #6ec3e0; --brand-700: #8fd3ea; --brand-800: #b5e3f3;
+    --success: #58c98d; --success-soft: #0f2e20; --danger: #ff9a8d; --danger-soft: #331a18;
+    --warning: #edc878; --warning-soft: #2e2318; --info: #7aa9f0; --info-soft: #15283f;
+    --on-fill: #06222e; --danger-ink: #f7a89f; --success-ink: #8fe0b5; --info-ink: #a8c8f8; --warning-ink: #edc878;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.35);
+    --shadow-pop: 0 10px 30px rgb(0 0 0 / 0.5);
+    --color-slate-50: #0e2029; --color-slate-100: #1b2a33; --color-slate-200: #2a3c47;
+    --color-slate-600: #a8b6bf; --color-slate-700: #c3ced5;
+    --color-sky-50: #0f2a38; --color-sky-100: #133543; --color-sky-200: #24506a; --color-sky-800: #a8d8ee; --color-sky-900: #c6e6f5;
+    --color-amber-50: #2e2410; --color-amber-100: #3a2c10; --color-amber-800: #edc878;
+    --color-emerald-50: #0f2e20; --color-emerald-100: #123826; --color-emerald-800: #8fe0b5;
+    --color-violet-50: #211a3b; --color-violet-100: #2a2148; --color-violet-700: #c6b4fa; --color-violet-800: #c6b4fa;
+    --color-blue-50: #15283f; --color-blue-800: #a8c8f8; --color-cyan-50: #0c2e36; --color-cyan-800: #8adcef;
+    --color-green-50: #0f2e20; --color-green-800: #8fe0b5; --color-orange-50: #33220f; --color-orange-800: #f7bd81;
+    --color-red-50: #331a18; --color-red-600: #f27a6c; --color-red-800: #f7a89f;
+    --color-teal-50: #0c2e2b; --color-teal-800: #7fdccb;
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: #0a1a23; --foreground: #e9f1f5; --surface: #112632; --surface-2: #0e2029;
+  --border: #22404f; --border-strong: #3a6277; --muted: #a8c0cc;
+  --brand-50: #133543; --brand-100: #17394a; --brand-200: #2a5a70; --brand-500: #5ab6dd;
+  --brand: #6ec3e0; --brand-700: #8fd3ea; --brand-800: #b5e3f3;
+  --success: #58c98d; --success-soft: #0f2e20; --danger: #ff9a8d; --danger-soft: #331a18;
+  --warning: #edc878; --warning-soft: #2e2318; --info: #7aa9f0; --info-soft: #15283f;
+  --on-fill: #06222e; --danger-ink: #f7a89f; --success-ink: #8fe0b5; --info-ink: #a8c8f8; --warning-ink: #edc878;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px rgb(0 0 0 / 0.35);
+  --shadow-pop: 0 10px 30px rgb(0 0 0 / 0.5);
+  --color-slate-50: #0e2029; --color-slate-100: #1b2a33; --color-slate-200: #2a3c47;
+  --color-slate-600: #a8b6bf; --color-slate-700: #c3ced5;
+  --color-sky-50: #0f2a38; --color-sky-100: #133543; --color-sky-200: #24506a; --color-sky-800: #a8d8ee; --color-sky-900: #c6e6f5;
+  --color-amber-50: #2e2410; --color-amber-100: #3a2c10; --color-amber-800: #edc878;
+  --color-emerald-50: #0f2e20; --color-emerald-100: #123826; --color-emerald-800: #8fe0b5;
+  --color-violet-50: #211a3b; --color-violet-100: #2a2148; --color-violet-700: #c6b4fa; --color-violet-800: #c6b4fa;
+  --color-blue-50: #15283f; --color-blue-800: #a8c8f8; --color-cyan-50: #0c2e36; --color-cyan-800: #8adcef;
+  --color-green-50: #0f2e20; --color-green-800: #8fe0b5; --color-orange-50: #33220f; --color-orange-800: #f7bd81;
+  --color-red-50: #331a18; --color-red-600: #f27a6c; --color-red-800: #f7a89f;
+  --color-teal-50: #0c2e2b; --color-teal-800: #7fdccb;
 }
 
 @theme inline {
@@ -70,6 +130,7 @@
   --color-warning-soft: var(--warning-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
+  --color-on-fill: var(--on-fill);
   --radius-ui: var(--radius);
   --shadow-card: var(--shadow-card);
   --shadow-pop: var(--shadow-pop);
@@ -260,6 +321,8 @@
 html {
   /* 16 px base, as Bootstrap: form controls read at the size of body text, never smaller. */
   font-size: 100%;
+  /* Native controls (selects, date pickers, scrollbars) follow the theme, modals included. */
+  color-scheme: var(--ds-color-scheme);
 }
 
 body {

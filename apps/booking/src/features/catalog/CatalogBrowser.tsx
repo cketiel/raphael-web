@@ -57,7 +57,7 @@ export function CatalogBrowser({ isClinicAdmin }: { isClinicAdmin: boolean }) {
           <div className="inline-flex overflow-hidden rounded-[var(--radius)] border border-border-strong bg-surface">
             {categories.data!.map((c) => (
               <button key={c.key} type="button" onClick={() => { setCategoryKey(c.key ?? ""); setFilters(EMPTY); }}
-                className={`px-4 py-2 text-sm font-semibold ${c.key === category?.key ? "bg-brand text-white" : "hover:bg-surface-2"}`}>
+                className={`px-4 py-2 text-sm font-semibold ${c.key === category?.key ? "bg-brand text-on-fill" : "hover:bg-surface-2"}`}>
                 {locale === "es" ? c.nameEs : c.nameEn}
               </button>
             ))}
@@ -94,7 +94,7 @@ export function CatalogBrowser({ isClinicAdmin }: { isClinicAdmin: boolean }) {
           <div className="inline-flex h-10 overflow-hidden rounded-[var(--radius)] border border-border-strong" role="group" aria-label={t("contractedFilter")}>
             {([null, true, false] as const).map((v) => (
               <button key={String(v)} type="button" onClick={() => set({ contracted: v })} aria-pressed={filters.contracted === v}
-                className={`flex-1 border-r border-border-strong px-3 text-sm font-semibold last:border-r-0 ${filters.contracted === v ? "bg-brand text-white" : "bg-surface hover:bg-surface-2"}`}>
+                className={`flex-1 border-r border-border-strong px-3 text-sm font-semibold last:border-r-0 ${filters.contracted === v ? "bg-brand text-on-fill" : "bg-surface hover:bg-surface-2"}`}>
                 {v === null ? t("all") : v ? t("contracted") : t("notContracted")}
               </button>
             ))}
@@ -186,7 +186,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   return (
     <button type="button" onClick={onClick} aria-pressed={active}
       className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-sm font-semibold transition-colors ${
-        active ? "border-brand bg-brand text-white" : "border-border-strong bg-surface hover:border-brand-500 hover:text-brand"
+        active ? "border-brand bg-brand text-on-fill" : "border-border-strong bg-surface hover:border-brand-500 hover:text-brand"
       }`}>
       {children}
     </button>

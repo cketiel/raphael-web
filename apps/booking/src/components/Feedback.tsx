@@ -67,7 +67,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {children}
 
       {pending > 0 && (
-        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-white/70 backdrop-blur-[1px]" aria-busy="true" aria-live="polite">
+        <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-(--surface)/70 backdrop-blur-[1px]" aria-busy="true" aria-live="polite">
           <div className="size-11 animate-spin rounded-full border-4 border-brand-200 border-t-brand" role="status">
             <span className="sr-only">{t("loading")}</span>
           </div>

@@ -76,10 +76,10 @@ export function Badge({ tone = "neutral", icon: Icon, children, className = "" }
 /** A notice inside a card or a form. */
 export function Notice({ tone = "info", children, className = "" }: { tone?: "info" | "warning" | "danger" | "success"; children: ReactNode; className?: string }) {
   const style = {
-    info: "border-info/25 bg-info-soft text-[#124a7a]",
-    warning: "border-warning/30 bg-warning-soft text-[#7a3d06]",
-    danger: "border-danger/30 bg-danger-soft text-[#8a1c1c]",
-    success: "border-success/30 bg-success-soft text-[#14532d]",
+    info: "border-info/25 bg-info-soft text-[var(--info-ink)]",
+    warning: "border-warning/30 bg-warning-soft text-[var(--warning-ink)]",
+    danger: "border-danger/30 bg-danger-soft text-[var(--danger-ink)]",
+    success: "border-success/30 bg-success-soft text-[var(--success-ink)]",
   }[tone];
   return <div className={`rounded-xl border px-3.5 py-2.5 text-sm ${style} ${className}`}>{children}</div>;
 }
