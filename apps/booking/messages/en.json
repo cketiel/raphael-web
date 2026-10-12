@@ -208,7 +208,7 @@
       "noShow": "Trip #{id} marked as a no-show.",
       "complete": "Trip #{id} completed."
     },
-    "attentionRejected": "Rejected by {provider}: {reason}. Give it to another Provider or to Raphael.",
+    "attentionRejected": "Rejected by {provider}: {reason}. {provider, select, Raphael {Give it to a provider.} other {Give it to another provider or to Raphael.}}",
     "acceptTrip": "Accept trip",
     "acceptSelected": "Accept selected",
     "acceptedToast": "{count, plural, one {# trip accepted} other {# trips accepted}}.",
@@ -335,7 +335,7 @@
       },
       "TRIP_REJECTED": {
         "title": "Trip rejected",
-        "body": "Trip #{tripId} on {date} at {time} was rejected by {provider}: {reason}. Give it to another provider or to Raphael."
+        "body": "Trip #{tripId} on {date} at {time} was rejected by {provider}: {reason}. {provider, select, Raphael {Give it to a provider.} other {Give it to another provider or to Raphael.}}"
       }
     },
     "bellLabel": "Notifications, {count} unread",

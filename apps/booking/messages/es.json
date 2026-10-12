@@ -208,7 +208,7 @@
       "noShow": "Viaje #{id} marcado como no-show.",
       "complete": "Viaje #{id} completado."
     },
-    "attentionRejected": "Rechazado por {provider}: {reason}. Dáselo a otro Provider o a Raphael.",
+    "attentionRejected": "Rechazado por {provider}: {reason}. {provider, select, Raphael {Dáselo a un Provider.} other {Dáselo a otro Provider o a Raphael.}}",
     "acceptTrip": "Aceptar viaje",
     "acceptSelected": "Aceptar seleccionados",
     "acceptedToast": "{count, plural, one {# viaje aceptado} other {# viajes aceptados}}.",
@@ -335,7 +335,7 @@
       },
       "TRIP_REJECTED": {
         "title": "Viaje rechazado",
-        "body": "El viaje #{tripId} del {date} a las {time} lo rechazó {provider}: {reason}. Dáselo a otro Provider o a Raphael."
+        "body": "El viaje #{tripId} del {date} a las {time} lo rechazó {provider}: {reason}. {provider, select, Raphael {Dáselo a un Provider.} other {Dáselo a otro Provider o a Raphael.}}"
       }
     },
     "bellLabel": "Notificaciones, {count} sin leer",

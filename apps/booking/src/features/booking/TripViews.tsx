@@ -465,7 +465,7 @@ export function NeedsAttention({ lines, onPick }: { lines: TripLine[]; onPick: (
               <span className="block text-[13.5px] font-semibold">#{l.number} · {l.patient}</span>
               <span className="mt-[3px] block text-xs text-[var(--ds-on-surface-variant)]">
                 {rejected(l)
-                  ? t("attentionRejected", { provider: l.provider ?? "—", reason: l.trip.providerOutcomeReason ?? "—" })
+                  ? t("attentionRejected", { provider: l.provider ?? "Raphael", reason: l.trip.providerOutcomeReason ?? "—" })
                   : late
                     ? t("attentionLate", { time: l.time ?? "—", place: l.from.place ?? l.from.address })
                     : t("attentionArrived", { space: l.space ?? "—", place: l.to.place ?? l.to.address })}
