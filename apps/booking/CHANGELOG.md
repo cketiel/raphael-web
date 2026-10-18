@@ -4,6 +4,9 @@ All notable changes to `apps/booking`. Format: [Keep a Changelog](https://keepac
 
 ## [Unreleased]
 
+### Changed (RE-058)
+- **Sign-in page**: "© Raphael · NEMT" is now Raphael's slogan, "Raphael Driving Health — The Rider’s Angel".
+
 ### Added (RE-055)
 - **Sign-in refused for a deactivated company**: a user of a Provider the office switched off sees
   "Your company's access is disabled" (`provider_disabled`), not "account disabled".
