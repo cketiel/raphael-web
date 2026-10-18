@@ -2,6 +2,12 @@
 
 All notable changes to `apps/booking`. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), versions: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added (RE-055)
+- **Sign-in refused for a deactivated company**: a user of a Provider the office switched off sees
+  "Your company's access is disabled" (`provider_disabled`), not "account disabled".
+
 ## [0.1.1] - 2026-10-09
 
 ### Fixed

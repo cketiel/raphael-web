@@ -84,7 +84,8 @@
     "password_mismatch": "La contraseña nueva y su confirmación no coinciden.",
     "wrong_current_password": "La contraseña actual no es correcta.",
     "password_change_failed": "No se ha podido cambiar la contraseña.",
-    "integrator_disabled": "El acceso de tu organización está desactivado. Contacta con la oficina."
+    "integrator_disabled": "El acceso de tu organización está desactivado. Contacta con la oficina.",
+    "provider_disabled": "El acceso de tu empresa está desactivado. Contacta con la oficina."
   },
   "dashboard": {
     "title": "Viajes",

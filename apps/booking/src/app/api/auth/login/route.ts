@@ -31,6 +31,9 @@ export async function POST(request: NextRequest) {
   if (status === 403 && code === "integrator_disabled") {
     return NextResponse.json({ code: "integrator_disabled", message: "Your organization's access is disabled. Contact the office." }, { status: 403 });
   }
+  if (status === 403 && code === "provider_disabled") {
+    return NextResponse.json({ code: "provider_disabled", message: "Your company's access is disabled. Contact the office." }, { status: 403 });
+  }
   if (status === 403) {
     return NextResponse.json({ code: "account_disabled", message: "User account is disabled. Contact administrator." }, { status: 403 });
   }

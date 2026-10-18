@@ -84,7 +84,8 @@
     "password_mismatch": "The new password and its confirmation do not match.",
     "wrong_current_password": "The current password is incorrect.",
     "password_change_failed": "The password could not be changed.",
-    "integrator_disabled": "Your organization's access is disabled. Contact the office."
+    "integrator_disabled": "Your organization's access is disabled. Contact the office.",
+    "provider_disabled": "Your company's access is disabled. Contact the office."
   },
   "dashboard": {
     "title": "Trips",
