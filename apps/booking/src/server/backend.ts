@@ -33,7 +33,7 @@ export async function loginWithBackend(username: string, password: string) {
     cache: "no-store",
   });
   const body = response.ok ? ((await response.json()) as Schemas["LoginResponseDto"]) : null;
-  // A refusal says why in `code` (account_disabled, integrator_disabled); only that travels on.
+  // A refusal says why in `code` (account_disabled, integrator_disabled, provider_disabled); only that travels on.
   const refusal = response.ok ? null : ((await response.json().catch(() => null)) as { code?: unknown } | null);
   return { status: response.status, body, code: typeof refusal?.code === "string" ? refusal.code : null };
 }

@@ -77,7 +77,7 @@ export default function LoginPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-[22px] font-[family-name:var(--font-plex-mono)] text-xs text-[var(--ds-on-brand-faint)]">© Raphael · NEMT</p>
+          <p className="mt-[22px] font-[family-name:var(--font-plex-mono)] text-xs text-[var(--ds-on-brand-faint)]">© Raphael Driving Health<br />The Rider’s Angel</p>
         </div>
       </section>
 
@@ -151,7 +151,7 @@ export default function LoginPage() {
                 <span className="text-[13.5px]">{f.text}</span>
               </div>
             ))}
-            <p className="mt-2 text-center font-[family-name:var(--font-plex-mono)] text-[11.5px] text-[var(--ds-on-surface-variant)]">© Raphael · NEMT</p>
+            <p className="mt-2 text-center font-[family-name:var(--font-plex-mono)] text-[11.5px] text-[var(--ds-on-surface-variant)]">© Raphael Driving Health<br />The Rider’s Angel</p>
           </div>
         </div>
       </section>
