@@ -4,6 +4,11 @@ All notable changes to `apps/booking`. Format: [Keep a Changelog](https://keepac
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-04
+
+### Added
+- Public `/privacy` page with the Raphael Driver privacy policy, which Google Play requires (RE-066).
+
 ## [0.2.0] - 2026-10-18
 
 **Needs:** Raphael.Backend **2.3.0** or later (in production since 2026-10-17): Rejected status,
