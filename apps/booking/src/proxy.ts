@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { selectEnvironment } from "@/server/environments";
 
 const SESSION_COOKIE = "__Host-rb_session";
-const PUBLIC_PATHS = new Set(["/login"]);
+const PUBLIC_PATHS = new Set(["/login", "/privacy"]);
 
 function contentSecurityPolicy(nonce: string, isDev: boolean) {
   const api = new URL(selectEnvironment().apiBaseUrl).host;
