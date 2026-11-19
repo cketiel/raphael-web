@@ -688,6 +688,10 @@
     "greaterThanMinQty": "Greater than (min qty)",
     "lessOrEqualMaxQty": "Less or equal (max qty)",
     "freeQty": "Free quantity",
+    "rateFreeAndMin": "Fill in Free quantity or Greater than min quantity, not both: they are the same lower edge.",
+    "rateDates": "The start date cannot be after the end date.",
+    "rateCharges": "The maximum charge cannot be lower than the minimum charge.",
+    "rateBand": "The maximum quantity must be above the free or minimum quantity.",
     "fromDate": "From",
     "toDate": "To",
     "subtitle": "Your organization's users, details and billing."

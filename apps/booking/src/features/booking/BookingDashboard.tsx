@@ -162,17 +162,40 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
     return () => clearTimeout(id);
   }, [toast]);
 
-  /** my-trips, then the production report for the same range (Booking Web app.js:159-179). */
+  /**
+   * my-trips only (RE-076). Each trip carries its stored charge, so the summary needs nothing else;
+   * the production report, every field of every trip, is read only when it is exported.
+   */
   async function fetchTrips(from: string, to: string): Promise<Loaded> {
     const query = new URLSearchParams({ startDate: from, endDate: to });
     const trips = await api<TripRead[]>(`BookingPortal/my-trips?${query}`);
+    return { trips: trips ?? [], report: [], start: from, end: to };
+  }
+
+  /** The production report of the range on screen, read when the user exports it. */
+  async function fetchReport(from: string, to: string): Promise<ProductionRow[]> {
+    const query = new URLSearchParams({ startDate: from, endDate: to });
     // Without funding sources the backend would apply no filter at all, so the report is not asked for.
     // An external Provider's user has none, and needs none: the backend keeps the report to the
     // trips given to its Provider (the Trip filter by provider), whichever clinic they come from.
     const report = fundingIds.length
       ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}&fundingSourceIds=${fundingIds.join(",")}`)
       : isProvider ? await api<ProductionRow[]>(`Schedules/reports/production-range?${query}`) : [];
-    return { trips: trips ?? [], report: report ?? [], start: from, end: to };
+    return report ?? [];
+  }
+
+  async function exportReport() {
+    if (!loaded) return;
+    try {
+      const rows = byParty(await fetchReport(loaded.start, loaded.end));
+      if (rows.length === 0) {
+        setToast({ tone: "warning", text: t("exportNothing") });
+        return;
+      }
+      downloadProductionCsv(rows, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] }));
+    } catch (e) {
+      setToast({ tone: "error", text: errorText(e, t("loadFailed")) });
+    }
   }
 
   /** Kept for this tab only: the way back from the tracking page. */
@@ -297,7 +320,6 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
     isProvider ? byIntegrator(rows, shownProvider) : byProvider(rows, shownProvider);
   // Everything on the screen follows the filter: list, counters, side panels and both exports.
   const providerTrips = byParty(loaded?.trips ?? []);
-  const providerReport = byParty(loaded?.report ?? []);
   // An external Provider exports only the trips it accepted, or later: never one it has not committed to.
   const exportableTrips = isProvider ? providerTrips.filter(isExportable) : providerTrips;
 
@@ -326,7 +348,7 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
   // A clinic selects to cancel; an external Provider selects to accept, so only what it can accept.
   const selectable = isProvider ? lines.filter((l) => providerCan(l.trip, localToday()).accept) : lines.filter((l) => !l.canceled);
   const allChecked = selectable.length > 0 && selectable.every((l) => selected.has(l.trip.tripId ?? ""));
-  const summary = loaded ? summarize(providerTrips, providerReport) : null;
+  const summary = loaded ? summarize(providerTrips) : null;
 
   const actions: TripActions = {
     selected,
@@ -453,8 +475,8 @@ export function BookingDashboard({ isIntegrator, isProvider = false, isClinicAdm
               },
               {
                 key: "report", label: t("exportReport"), icon: PhFileCsv,
-                disabled: providerReport.length === 0, hint: providerReport.length === 0 ? t("exportNothing") : undefined,
-                onSelect: () => downloadProductionCsv(providerReport, csvLocale, tCsv("fileName", { date: new Date().toISOString().split("T")[0] })),
+                disabled: providerTrips.length === 0, hint: providerTrips.length === 0 ? t("exportNothing") : undefined,
+                onSelect: () => void exportReport(),
               },
             ]} />
           {!isProvider && (

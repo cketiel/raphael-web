@@ -363,7 +363,25 @@ function RateForm({ rate, onClose }: { rate: Rate | null; onClose: () => void })
   );
   const set = (patch: Partial<RateEdit>) => setForm((f) => ({ ...f, ...patch }));
 
+  /**
+   * The same checks the server makes (RE-071), asked here first so an obvious mistake costs no call.
+   * The server still has the last word: overlaps and a rate that already priced trips are its call.
+   */
+  function problem(): string | null {
+    if (form.freeQty != null && form.greaterThanMinQty != null) return t("rateFreeAndMin");
+    if (form.fromDate && form.toDate && toDateInput(form.fromDate) > toDateInput(form.toDate)) return t("rateDates");
+    if (form.minCharge != null && form.maxCharge != null && form.maxCharge < form.minCharge) return t("rateCharges");
+    const lower = form.freeQty ?? form.greaterThanMinQty;
+    if (lower != null && form.lessOrEqualMaxQty != null && form.lessOrEqualMaxQty <= lower) return t("rateBand");
+    return null;
+  }
+
   async function save() {
+    const why = problem();
+    if (why) {
+      await feedback.alert(why);
+      return;
+    }
     try {
       if (rate) await edit.mutateAsync({ id: rate.id ?? 0, body: form });
       else await create.mutateAsync(form);
@@ -400,9 +418,12 @@ function RateForm({ rate, onClose }: { rate: Rate | null; onClose: () => void })
 
       <h3 className="mb-2 mt-5 text-sm font-bold">{t("quantityRules")}</h3>
       <div className="grid gap-3 sm:grid-cols-3">
-        <TextField label={t("greaterThanMinQty")} value={form.greaterThanMinQty} onChange={(v) => set({ greaterThanMinQty: num(v) })} type="number" min="0" />
+        {/* Free Qty and > Min Qty are the same lower edge: one or the other, never both (RE-071). */}
+        <TextField label={t("greaterThanMinQty")} value={form.greaterThanMinQty} onChange={(v) => set({ greaterThanMinQty: num(v) })} type="number" min="0"
+          disabled={form.freeQty != null && form.greaterThanMinQty == null} />
         <TextField label={t("lessOrEqualMaxQty")} value={form.lessOrEqualMaxQty} onChange={(v) => set({ lessOrEqualMaxQty: num(v) })} type="number" min="0" />
-        <TextField label={t("freeQty")} value={form.freeQty} onChange={(v) => set({ freeQty: num(v) })} type="number" min="0" />
+        <TextField label={t("freeQty")} value={form.freeQty} onChange={(v) => set({ freeQty: num(v) })} type="number" min="0"
+          disabled={form.greaterThanMinQty != null && form.freeQty == null} />
       </div>
 
       <h3 className="mb-2 mt-5 text-sm font-bold">{t("validity")}</h3>
