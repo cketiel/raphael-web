@@ -688,6 +688,10 @@
     "greaterThanMinQty": "Mayor que (cant. mín.)",
     "lessOrEqualMaxQty": "Menor o igual (cant. máx.)",
     "freeQty": "Cantidad gratuita",
+    "rateFreeAndMin": "Rellena Cantidad gratuita o Mayor que la cantidad mínima, no las dos: son el mismo límite inferior.",
+    "rateDates": "La fecha de inicio no puede ser posterior a la de fin.",
+    "rateCharges": "El cargo máximo no puede ser menor que el mínimo.",
+    "rateBand": "La cantidad máxima tiene que ser mayor que la gratuita o la mínima.",
     "fromDate": "Desde",
     "toDate": "Hasta",
     "subtitle": "Los usuarios, los datos y la facturación de tu organización."

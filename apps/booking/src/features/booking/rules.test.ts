@@ -49,8 +49,10 @@ describe("production report CSV (parity with Booking Web app.js:222-319)", () =>
 
 describe("summary cards", () => {
   it("counts canceled by status or flag and billed as total minus canceled", () => {
-    const s = summarize([trip("Canceled"), trip("Cancelled"), trip("Assigned", true), trip("Finished")], [{ charge: 10.5 }, { charge: null }, { charge: 4 }]);
-    expect(s).toEqual({ totalTrips: 4, canceledTrips: 3, billedTrips: 1, totalBilledValue: "$14.50" });
+    const priced = (status: string, charge: number | null, cancelled = false) => ({ ...trip(status, cancelled), charge });
+    // Cancelled trips carry a charge here on purpose: it must not reach the billed value.
+    const s = summarize([priced("Canceled", 9), priced("Cancelled", 7), priced("Assigned", 5, true), priced("Finished", 10.5), priced("Scheduled", 4), priced("Scheduled", null)]);
+    expect(s).toEqual({ totalTrips: 6, canceledTrips: 3, billedTrips: 3, totalBilledValue: "$14.50" });
   });
 });
 

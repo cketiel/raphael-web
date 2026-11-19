@@ -1,4 +1,3 @@
-import type { ProductionRow } from "./productionReportCsv";
 import type { TripRead } from "./types";
 
 /**
@@ -31,14 +30,15 @@ export function isCanceled(trip: TripRead) {
 }
 
 /**
- * The four summary cards. Mixes two sources, exactly as the original did:
- * the counts come from my-trips, the money from the production report.
+ * The four summary cards, all from my-trips (RE-076). Each trip already carries its charge, the one
+ * the server stored with the single formula, so the production report is no longer read just to add
+ * up money. Cancelled trips never count towards the billed value, whatever a cancellation fee says.
  * "Billed Trips" is total minus canceled, not trips in Billed status.
  */
-export function summarize(trips: TripRead[], report: ProductionRow[]) {
+export function summarize(trips: TripRead[]) {
   const totalTrips = trips.length;
   const canceledTrips = trips.filter(isCanceled).length;
-  const totalAmount = report.reduce((sum, r) => sum + (r.charge || 0), 0);
+  const totalAmount = trips.filter((t) => !isCanceled(t)).reduce((sum, t) => sum + (t.charge || 0), 0);
   return {
     totalTrips,
     canceledTrips,
