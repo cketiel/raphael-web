@@ -4,6 +4,20 @@ All notable changes to `apps/booking`. Format: [Keep a Changelog](https://keepac
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-18
+
+**Needs:** Raphael.Backend **2.10.7** (stored trip charges, RE-073).
+
+### Changed
+- **Billed Value** adds up each trip's stored charge, the one the server keeps with the single
+  formula, and never counts cancelled trips (RE-076). It no longer reads the whole production
+  report on every search; the report is fetched only for **Export report**.
+
+### Added
+- The rate form checks before saving what the server would refuse (RE-071): Free quantity and
+  Greater than min quantity are one or the other, the start date not after the end, the maximum
+  charge not below the minimum and the maximum quantity above the free or minimum one.
+
 ## [0.3.0] - 2026-11-04
 
 ### Added
